@@ -74,3 +74,322 @@ html[data-seek-calculator="on"] nav.actions[aria-label="Course actions"] > butto
 html[data-seek-header="on"] app-bar.course-bar {
   display: none !important;
 }
+
+/* ----------------------------------------------------------------------- */
+/* G. Premium Contents sidebar ------------------------------------------- */
+/* ----------------------------------------------------------------------- */
+/*
+ * SEEK's course-outline component is a stable, semantic surface: app-course-
+ * outline > aside.outline-pane > app-course-outline-side-nav. These rules add
+ * hierarchy and spacing only. They do not hide or move any navigation target.
+ */
+html[data-seek-sidebar="on"] app-course-outline .outline-pane {
+  background: linear-gradient(
+    180deg,
+    var(--color-background-surface-base) 0%,
+    var(--color-background-surface-subtle) 100%
+  ) !important;
+  border-right-color: var(--color-border-secondary) !important;
+  box-shadow: inset -1px 0 0 var(--color-border-secondary);
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-header {
+  height: 5.6rem !important;
+  padding: 0 1.4rem 0 2rem !important;
+  background: linear-gradient(
+    180deg,
+    var(--color-background-surface-base) 0%,
+    var(--color-background-surface-subtle) 100%
+  ) !important;
+  border-bottom-color: var(--color-border-secondary) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-title {
+  gap: 0.8rem !important;
+  color: var(--color-text-secondary) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-title-icon {
+  color: var(--color-text-accent-strong) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-nav {
+  padding: 1rem 0.8rem 1.6rem !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) transparent;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-container {
+  margin: 0.4rem 0.4rem !important;
+  border-left: 0 !important;
+  border-radius: 1.2rem !important;
+  background: transparent !important;
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open {
+  background: var(--color-background-surface-subtle) !important;
+  box-shadow:
+    inset 3px 0 0 var(--color-background-primary),
+    0 1px 2px rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-header {
+  padding: 1rem 1.2rem !important;
+  border-radius: 1rem !important;
+  color: var(--color-text-secondary) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-header:hover {
+  background: var(--color-background-surface-stronger) !important;
+  color: var(--color-text-default) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open .unit-title {
+  font-size: 1.4rem !important;
+  font-weight: 700 !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-count {
+  padding: 0.2rem 0.7rem !important;
+  border: 1px solid var(--color-border-secondary) !important;
+  border-radius: 999px !important;
+  background: var(--color-background-surface-stronger) !important;
+  color: var(--color-text-secondary) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-chevron {
+  color: var(--color-icon-secondary) !important;
+  transition: transform 180ms ease, color 180ms ease !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-header:hover .unit-chevron,
+html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open .unit-chevron {
+  color: var(--color-icon-primary) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-list {
+  gap: 0.2rem !important;
+  padding: 0 0.8rem 1rem 1.6rem !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row {
+  position: relative !important;
+  gap: 0.8rem !important;
+  padding: 0.8rem 1rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.9rem !important;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row:hover {
+  background: var(--color-background-surface-stronger) !important;
+  border-color: var(--color-border-secondary) !important;
+  transform: translateX(1px);
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row.selected {
+  padding-left: 1.2rem !important;
+  background: var(--color-background-primary-light) !important;
+  background: color-mix(
+    in srgb,
+    var(--color-background-primary) 12%,
+    var(--color-background-surface-subtle)
+  ) !important;
+  border-color: var(--color-border-primary-light) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--color-background-primary) 20%,
+    var(--color-border-secondary)
+  ) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row.selected::before {
+  content: "";
+  position: absolute;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--color-background-primary);
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-icon {
+  margin-top: 0.1rem !important;
+  color: var(--color-icon-secondary) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row.selected .child-icon {
+  color: var(--color-icon-primary) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-title {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row.selected .child-title {
+  font-weight: 700 !important;
+  color: var(--color-text-default) !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-type {
+  color: var(--color-text-secondary) !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  opacity: 0.72;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .status-icon {
+  color: var(--color-icon-success-strong) !important;
+  opacity: 0.65;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .child-row:hover .status-icon,
+html[data-seek-sidebar="on"] app-course-outline .child-row.selected .status-icon {
+  opacity: 1;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .unit-header:focus-visible,
+html[data-seek-sidebar="on"] app-course-outline .child-row:focus-visible {
+  outline: 2px solid var(--color-border-focus) !important;
+  outline-offset: -2px !important;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+html[data-seek-sidebar="on"] app-course-outline .outline-nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--color-border-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-seek-sidebar="on"] app-course-outline .unit-container,
+  html[data-seek-sidebar="on"] app-course-outline .unit-chevron,
+  html[data-seek-sidebar="on"] app-course-outline .child-row {
+    transition: none !important;
+  }
+}
+
+/* ----------------------------------------------------------------------- */
+/* H. Black mode --------------------------------------------------------- */
+/* ----------------------------------------------------------------------- */
+/*
+ * SEEK's own dark theme is a soft indigo. Black mode keeps SEEK's semantic
+ * text and accent tokens, then replaces the surfaces with near-black values.
+ * The selector is deliberately more specific than SEEK's :root[data-theme=dark].
+ */
+html[data-seek-theme="black"]:root {
+  color-scheme: dark;
+
+  --color-text-default: #f6f6f6;
+  --color-text-secondary: #b0b5cb;
+  --color-text-disabled: #5d687e;
+  --color-text-link: #7dd3fc;
+  --color-text-inverse: #05070a;
+  --color-text-primary: #d8dae5;
+  --color-text-on-primary: #05070a;
+  --color-text-on-accent: #05070a;
+  --color-text-accent-strong: #fbbf24;
+  --color-text-accent-light: #fcd34d;
+  --color-text-success-strong: #4ade80;
+  --color-text-success-light: #86efac;
+  --color-text-error-strong: #fb7185;
+  --color-text-error-light: #fda4af;
+  --color-text-warning-strong: #fbbf24;
+  --color-text-warning-light: #fde68a;
+  --color-text-info-strong: #7dd3fc;
+  --color-text-info-light: #bae6fd;
+  --color-text-reserved: #c4b5fd;
+
+  --color-icon-default: #f6f6f6;
+  --color-icon-secondary: #b0b5cb;
+  --color-icon-disabled: #5d687e;
+  --color-icon-inverse: #05070a;
+  --color-icon-primary: #d8dae5;
+  --color-icon-accent-strong: #fbbf24;
+  --color-icon-accent-light: #fcd34d;
+  --color-icon-success-strong: #4ade80;
+  --color-icon-error-strong: #fb7185;
+  --color-icon-warning-strong: #fbbf24;
+  --color-icon-info-strong: #7dd3fc;
+
+  --color-background-surface-base: #000000;
+  --color-background-surface-subtle: #05070b;
+  --color-background-surface-moderate: #030508;
+  --color-background-surface-strong: #080c12;
+  --color-background-surface-stronger: #0f1620;
+  --color-background-surface-adaptive: #05070b;
+  --color-background-surface-inverse: #f6f6f6;
+  --color-background-surface-gradient-start: #05070b;
+  --color-background-surface-gradient-end: #0f1620;
+  --color-background-disabled: #121a24;
+  --color-background-primary: #d8dae5;
+  --color-background-primary-hover: #f6f6f6;
+  --color-background-primary-light: #121a24;
+  --color-background-accent-strong: #f59e0b;
+  --color-background-accent-light: #2a1d07;
+  --color-background-accent-tinted-light: #120d04;
+  --color-background-accent-gradient-start: #b45309;
+  --color-background-accent-gradient-end: #f59e0b;
+  --color-background-success-strong: #22c55e;
+  --color-background-success-light: #041f14;
+  --color-background-success-tinted-light: #06120c;
+  --color-background-error-strong: #ef4444;
+  --color-background-error-light: #2a0b0b;
+  --color-background-error-tinted-light: #140606;
+  --color-background-warning-strong: #f59e0b;
+  --color-background-warning-light: #2a1a05;
+  --color-background-warning-tinted-light: #140d04;
+  --color-background-info-strong: #3b82f6;
+  --color-background-info-light: #04162e;
+  --color-background-info-tinted-light: #060d18;
+  --color-background-reserved-strong: #8b5cf6;
+  --color-background-reserved-light: #16002e;
+  --color-background-reserved-gradient-start: #5700cc;
+  --color-background-reserved-gradient-end: #8b5cf6;
+
+  --color-border-default: #1e2735;
+  --color-border-secondary: #121a24;
+  --color-border-focus: #7dd3fc;
+  --color-border-primary: #d8dae5;
+  --color-border-primary-light: #1e2735;
+  --color-border-accent-strong: #fbbf24;
+  --color-border-accent-light: #6b4a0f;
+  --color-border-success-strong: #22c55e;
+  --color-border-success-light: #054f31;
+  --color-border-error-strong: #ef4444;
+  --color-border-error-light: #7a271a;
+  --color-border-warning-strong: #f59e0b;
+  --color-border-warning-light: #7a2e0e;
+  --color-border-info-strong: #3b82f6;
+  --color-border-info-light: #002a6b;
+  --color-border-reserved: #8b5cf6;
+
+  --scrollbar-thumb-color: #2a3446;
+  --scrollbar-thumb-hover-color: #3b4a63;
+}

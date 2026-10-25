@@ -19,20 +19,42 @@
     announcements: false,
     forum: false,
     calculator: false,
-    header: false
+    header: false,
+    sidebar: true,
+    theme: 'system'
   });
 
-  const SETTING_KEYS = Object.freeze(Object.keys(DEFAULT_SETTINGS));
+  const BOOLEAN_SETTING_KEYS = Object.freeze([
+    'unitNav',
+    'overview',
+    'divider',
+    'transcript',
+    'announcements',
+    'forum',
+    'calculator',
+    'header',
+    'sidebar'
+  ]);
+
+  const THEME_VALUES = Object.freeze(['system', 'light', 'dark', 'black']);
+
+  const SETTING_KEYS = Object.freeze([...BOOLEAN_SETTING_KEYS, 'theme']);
+
+  function normalizeTheme(value) {
+    return THEME_VALUES.includes(value) ? value : DEFAULT_SETTINGS.theme;
+  }
 
   function normalizeSettings(value) {
     const source = value && typeof value === 'object' ? value : {};
     const normalized = {};
 
-    for (const key of SETTING_KEYS) {
+    for (const key of BOOLEAN_SETTING_KEYS) {
       normalized[key] = typeof source[key] === 'boolean'
         ? source[key]
         : DEFAULT_SETTINGS[key];
     }
+
+    normalized.theme = normalizeTheme(source.theme);
 
     return normalized;
   }
@@ -149,7 +171,10 @@
     STORAGE_KEY,
     DEFAULT_SETTINGS,
     SETTING_KEYS,
+    BOOLEAN_SETTING_KEYS,
+    THEME_VALUES,
     normalizeSettings,
+    normalizeTheme,
     extractSettings,
     loadSettings,
     saveSettings,

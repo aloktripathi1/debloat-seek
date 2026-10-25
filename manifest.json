@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Debloat SEEK",
-  "version": "1.0.0",
-  "description": "Locally declutter the IIT Madras SEEK course interface without changing SEEK itself.",
+  "version": "1.1.0",
+  "description": "Locally declutter and theme the IIT Madras SEEK course interface without changing SEEK itself.",
   "minimum_chrome_version": "105",
   "permissions": [
     "storage"

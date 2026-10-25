@@ -16,9 +16,11 @@
   }
 
   const {
+    BOOLEAN_SETTING_KEYS,
     DEFAULT_SETTINGS,
     SETTING_KEYS,
     STORAGE_KEY,
+    THEME_VALUES,
     extractSettings,
     loadSettings,
     normalizeSettings
@@ -32,10 +34,103 @@
     announcements: 'data-seek-announcements',
     forum: 'data-seek-forum',
     calculator: 'data-seek-calculator',
-    header: 'data-seek-header'
+    header: 'data-seek-header',
+    sidebar: 'data-seek-sidebar'
   });
 
+  const SEEK_THEME_ATTRIBUTE = 'data-theme';
+  const SEEK_THEME_SETTING_ATTRIBUTE = 'data-seek-theme-setting';
+  const SEEK_THEME_STATE_ATTRIBUTE = 'data-seek-theme';
+
   let currentSettings = null;
+  let systemThemeMedia = null;
+  let rootThemeObserver = null;
+
+  function resolveTheme(theme) {
+    if (theme === 'system') {
+      return globalThis.matchMedia
+        && globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+
+    return THEME_VALUES.includes(theme) ? theme : 'light';
+  }
+
+  function seekThemeFor(resolvedTheme) {
+    return resolvedTheme === 'light' ? 'light' : 'dark';
+  }
+
+  function applyTheme(theme) {
+    const root = document.documentElement;
+
+    if (!root) {
+      return;
+    }
+
+    const resolvedTheme = resolveTheme(theme);
+    const seekTheme = seekThemeFor(resolvedTheme);
+
+    root.setAttribute(SEEK_THEME_SETTING_ATTRIBUTE, theme);
+    root.setAttribute(SEEK_THEME_STATE_ATTRIBUTE, resolvedTheme);
+
+    // SEEK already ships a dark palette. Black mode builds on it and only
+    // replaces the surface tokens in styles.css.
+    if (root.getAttribute(SEEK_THEME_ATTRIBUTE) !== seekTheme) {
+      root.setAttribute(SEEK_THEME_ATTRIBUTE, seekTheme);
+    }
+  }
+
+  function watchSystemTheme() {
+    if (systemThemeMedia || !globalThis.matchMedia) {
+      return;
+    }
+
+    systemThemeMedia = globalThis.matchMedia('(prefers-color-scheme: dark)');
+
+    const update = () => {
+      if (currentSettings && currentSettings.theme === 'system') {
+        applyTheme('system');
+      }
+    };
+
+    if (typeof systemThemeMedia.addEventListener === 'function') {
+      systemThemeMedia.addEventListener('change', update);
+    } else if (typeof systemThemeMedia.addListener === 'function') {
+      systemThemeMedia.addListener(update);
+    }
+  }
+
+  function watchSeekTheme() {
+    if (rootThemeObserver) {
+      return;
+    }
+
+    const root = document.documentElement;
+
+    if (!root) {
+      return;
+    }
+
+    // SEEK's theme service can write data-theme after the app boots. Keep the
+    // extension's explicit choice authoritative without touching SEEK storage.
+    rootThemeObserver = new MutationObserver(() => {
+      if (!currentSettings) {
+        return;
+      }
+
+      const expected = seekThemeFor(resolveTheme(currentSettings.theme));
+
+      if (root.getAttribute(SEEK_THEME_ATTRIBUTE) !== expected) {
+        root.setAttribute(SEEK_THEME_ATTRIBUTE, expected);
+      }
+    });
+
+    rootThemeObserver.observe(root, {
+      attributes: true,
+      attributeFilter: [SEEK_THEME_ATTRIBUTE]
+    });
+  }
 
   function applySettings(value) {
     const settings = normalizeSettings(value);
@@ -53,9 +148,11 @@
     currentSettings = settings;
     root.setAttribute('data-seek-cleaner', 'active');
 
-    for (const key of SETTING_KEYS) {
+    for (const key of BOOLEAN_SETTING_KEYS) {
       root.setAttribute(FEATURE_ATTRIBUTES[key], settings[key] ? 'on' : 'off');
     }
+
+    applyTheme(settings.theme);
   }
 
   function handleStorageChange(changes, areaName) {
@@ -81,6 +178,8 @@
       applySettings(DEFAULT_SETTINGS);
     }
 
+    watchSystemTheme();
+    watchSeekTheme();
     chrome.storage.onChanged.addListener(handleStorageChange);
   }
 
@@ -89,5 +188,8 @@
     if (!currentSettings) {
       applySettings(DEFAULT_SETTINGS);
     }
+
+    watchSystemTheme();
+    watchSeekTheme();
   });
 })();

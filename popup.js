@@ -14,18 +14,35 @@
   }
 
   const {
+    BOOLEAN_SETTING_KEYS,
     DEFAULT_SETTINGS,
+    THEME_VALUES,
     loadSettings,
     saveSettings
   } = api;
 
   const controls = new Map();
+  const themeButtons = new Map();
   const statusElement = document.getElementById('status');
   const summaryElement = document.getElementById('summary');
   const restoreButton = document.getElementById('restore-defaults');
+  const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
   let settings = { ...DEFAULT_SETTINGS };
   let saveChain = Promise.resolve();
+
+  function resolveTheme(theme) {
+    if (theme === 'system') {
+      return systemThemeMedia.matches ? 'dark' : 'light';
+    }
+
+    return THEME_VALUES.includes(theme) ? theme : 'light';
+  }
+
+  function applyPopupTheme(theme) {
+    document.documentElement.dataset.theme = resolveTheme(theme);
+    document.documentElement.dataset.themeSetting = theme;
+  }
 
   function setStatus(message, tone) {
     if (!statusElement) {
@@ -48,13 +65,18 @@
       }
     }
 
-    if (summaryElement) {
-      const enabledDefaults = ['unitNav', 'overview', 'divider']
-        .filter((key) => settings[key]).length;
-      const enabledOptional = ['transcript', 'announcements', 'forum', 'calculator', 'header']
-        .filter((key) => settings[key]).length;
+    for (const [theme, button] of themeButtons) {
+      const selected = settings.theme === theme;
+      button.setAttribute('aria-checked', selected ? 'true' : 'false');
+      button.tabIndex = selected ? 0 : -1;
+    }
 
-      summaryElement.textContent = `${enabledDefaults}/3 default · ${enabledOptional}/5 optional`;
+    applyPopupTheme(settings.theme);
+
+    if (summaryElement) {
+      const enabled = BOOLEAN_SETTING_KEYS.filter((key) => settings[key]).length;
+      const total = BOOLEAN_SETTING_KEYS.length;
+      summaryElement.textContent = `${enabled} on · ${total - enabled} off`;
     }
   }
 
@@ -80,7 +102,7 @@
   }
 
   function handleToggle(key, input) {
-    if (!Object.prototype.hasOwnProperty.call(DEFAULT_SETTINGS, key)) {
+    if (!BOOLEAN_SETTING_KEYS.includes(key)) {
       return;
     }
 
@@ -93,17 +115,73 @@
     queueSave();
   }
 
+  function handleTheme(theme) {
+    if (!THEME_VALUES.includes(theme) || settings.theme === theme) {
+      return;
+    }
+
+    settings = {
+      ...settings,
+      theme
+    };
+
+    render();
+    queueSave();
+  }
+
+  function handleThemeKeydown(event) {
+    const navigationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+
+    if (!navigationKeys.includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const themes = [...themeButtons.keys()];
+    const current = themes.indexOf(settings.theme);
+    let next = current;
+
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      next = (current - 1 + themes.length) % themes.length;
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      next = (current + 1) % themes.length;
+    } else if (event.key === 'Home') {
+      next = 0;
+    } else if (event.key === 'End') {
+      next = themes.length - 1;
+    }
+
+    const nextTheme = themes[next];
+    handleTheme(nextTheme);
+    themeButtons.get(nextTheme)?.focus();
+  }
+
   function restoreDefaults() {
     settings = { ...DEFAULT_SETTINGS };
     render();
     queueSave();
   }
 
+  function bindThemeControls() {
+    for (const button of document.querySelectorAll('[data-theme-option]')) {
+      const theme = button.dataset.themeOption;
+
+      if (!THEME_VALUES.includes(theme)) {
+        continue;
+      }
+
+      themeButtons.set(theme, button);
+      button.addEventListener('click', () => handleTheme(theme));
+      button.addEventListener('keydown', handleThemeKeydown);
+    }
+  }
+
   async function init() {
     for (const input of document.querySelectorAll('input[data-setting]')) {
       const key = input.dataset.setting;
 
-      if (!Object.prototype.hasOwnProperty.call(DEFAULT_SETTINGS, key)) {
+      if (!BOOLEAN_SETTING_KEYS.includes(key)) {
         continue;
       }
 
@@ -111,8 +189,24 @@
       input.addEventListener('change', () => handleToggle(key, input));
     }
 
+    bindThemeControls();
+
     if (restoreButton) {
       restoreButton.addEventListener('click', restoreDefaults);
+    }
+
+    if (typeof systemThemeMedia.addEventListener === 'function') {
+      systemThemeMedia.addEventListener('change', () => {
+        if (settings.theme === 'system') {
+          applyPopupTheme('system');
+        }
+      });
+    } else if (typeof systemThemeMedia.addListener === 'function') {
+      systemThemeMedia.addListener(() => {
+        if (settings.theme === 'system') {
+          applyPopupTheme('system');
+        }
+      });
     }
 
     try {

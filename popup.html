@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="system">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,15 +15,63 @@
         <span></span>
       </div>
       <div class="hero-copy">
-        <h1 id="popup-title">Debloat SEEK</h1>
+        <div class="hero-title-row">
+          <h1 id="popup-title">Debloat SEEK</h1>
+          <span class="local-badge">Local only</span>
+        </div>
         <p>Customize the IIT Madras SEEK course interface locally.</p>
       </div>
     </header>
 
     <p class="description">
-      Hide interface elements locally. Nothing is sent anywhere; assignments and
-      course content are untouched.
+      Refine the Contents sidebar and hide interface elements locally. Nothing is
+      sent anywhere; assignments and course content are untouched.
     </p>
+
+    <section class="settings-section appearance-section" aria-labelledby="appearance-heading">
+      <div class="section-heading">
+        <h2 id="appearance-heading">Appearance</h2>
+        <span class="section-note">SEEK + panel</span>
+      </div>
+
+      <div class="theme-control" role="radiogroup" aria-labelledby="appearance-heading">
+        <button class="theme-option" type="button" role="radio" data-theme-option="system"
+          aria-checked="true" tabindex="0">
+          <span class="theme-swatch theme-swatch-system" aria-hidden="true"></span>
+          <span>System</span>
+        </button>
+        <button class="theme-option" type="button" role="radio" data-theme-option="light"
+          aria-checked="false" tabindex="-1">
+          <span class="theme-swatch theme-swatch-light" aria-hidden="true"></span>
+          <span>Light</span>
+        </button>
+        <button class="theme-option" type="button" role="radio" data-theme-option="dark"
+          aria-checked="false" tabindex="-1">
+          <span class="theme-swatch theme-swatch-dark" aria-hidden="true"></span>
+          <span>Dark</span>
+        </button>
+        <button class="theme-option" type="button" role="radio" data-theme-option="black"
+          aria-checked="false" tabindex="-1">
+          <span class="theme-swatch theme-swatch-black" aria-hidden="true"></span>
+          <span>Black</span>
+        </button>
+      </div>
+
+      <label class="setting-row setting-row-appearance" for="setting-sidebar">
+        <span class="setting-copy">
+          <span class="setting-title" id="sidebar-title">Premium Contents sidebar</span>
+          <span class="setting-description" id="sidebar-desc">Adds cleaner spacing, hierarchy, and a refined selected state.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="sidebar" aria-hidden="true">On</span>
+          <span class="switch">
+            <input id="setting-sidebar" type="checkbox" role="switch" data-setting="sidebar"
+              aria-labelledby="sidebar-title" aria-describedby="sidebar-desc" checked>
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+    </section>
 
     <section class="settings-section" aria-labelledby="default-heading">
       <div class="section-heading">
@@ -167,7 +215,7 @@
       <p id="status" class="status" data-tone="neutral" role="status" aria-live="polite">
         Loading settings…
       </p>
-      <p class="hint">Chrome sync · open SEEK tabs update automatically.</p>
+      <p class="hint">Chrome sync · local preferences only.</p>
     </footer>
   </main>
 
