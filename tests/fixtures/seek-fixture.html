@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SEEK selector fixture</title>
+</head>
+<body>
+  <!--
+    Minimal, privacy-safe DOM fixture based on the supplied SEEK course page.
+    It contains the target elements plus decoys that must not be hidden.
+  -->
+  <app-root>
+    <app-bar class="course-bar">
+      <div class="lead">
+        <app-button label="Overview">
+          <button type="button" aria-label="Overview" class="btn">Overview</button>
+        </app-button>
+        <span class="divider" aria-hidden="true"></span>
+        <div class="heading">
+          <button type="button" class="title">Sep 2026 - AI: Search Methods</button>
+          <span class="page-label">Contents</span>
+        </div>
+      </div>
+
+      <nav class="actions" aria-label="Course actions">
+        <app-button label="Contents">
+          <button type="button" aria-label="Contents" class="btn">Contents</button>
+        </app-button>
+        <app-button label="Grades">
+          <button type="button" aria-label="Grades" class="btn">Grades</button>
+        </app-button>
+        <app-button label="Forum">
+          <button type="button" aria-label="Forum" class="btn">Forum</button>
+        </app-button>
+        <app-button label="Calculator">
+          <button type="button" aria-label="Calculator" class="btn">Calculator</button>
+        </app-button>
+        <app-button data-announcements-trigger label="Announcements">
+          <button type="button" aria-label="Announcements" class="btn">Announcements</button>
+        </app-button>
+        <span class="divider in-actions" aria-hidden="true"></span>
+        <button type="button" class="profile" aria-label="Account">AK</button>
+      </nav>
+    </app-bar>
+
+    <main>
+      <app-course-outline>
+        <aside class="course-outline-side-nav">Course outline</aside>
+        <section class="unit-pane">
+          <app-course-unit-view>
+            <app-lesson-view>
+              <div class="lesson-view">
+                <div class="content-column">
+                  <div class="video-container">Video</div>
+                </div>
+                <aside class="transcript-panel hidden-mobile">
+                  <div class="panel-header">Video Transcript</div>
+                </aside>
+              </div>
+            </app-lesson-view>
+          </app-course-unit-view>
+
+          <nav class="unit-nav" aria-label="Previous and next unit">
+            <div class="unit-nav-row">
+              <button type="button" class="unit-nav-button is-previous">Previous</button>
+              <button type="button" class="unit-nav-button is-next">Next</button>
+            </div>
+          </nav>
+        </section>
+      </app-course-outline>
+
+      <div class="course-panels">
+        <app-announcements-panel>
+          <aside class="announcements-panel" aria-label="Announcements" tabindex="-1">
+            <app-button label="Close announcements">
+              <button type="button" aria-label="Close announcements">Close</button>
+            </app-button>
+          </aside>
+        </app-announcements-panel>
+      </div>
+
+      <section class="decoy-panel" aria-label="Decoy elements">
+        <button id="decoy-overview" type="button" aria-label="Overview">Unrelated Overview</button>
+        <span id="decoy-divider" class="divider" aria-hidden="true"></span>
+        <nav id="decoy-unit-nav" class="unit-nav" aria-label="Other navigation">Other nav</nav>
+        <app-button label="Announcements">
+          <button id="decoy-announcements" type="button" aria-label="Announcements, 1">Unrelated announcements</button>
+        </app-button>
+        <app-button label="Forum">
+          <button id="decoy-forum" type="button" aria-label="Forum">Unrelated forum</button>
+        </app-button>
+        <app-button label="Calculator">
+          <button id="decoy-calculator" type="button" aria-label="Calculator">Unrelated calculator</button>
+        </app-button>
+        <app-bar id="decoy-app-bar">
+          <header class="app-bar">Unrelated header</header>
+        </app-bar>
+        <aside id="decoy-transcript" class="transcript-panel hidden-mobile">Unrelated transcript</aside>
+      </section>
+    </main>
+  </app-root>
+</body>
+</html>
