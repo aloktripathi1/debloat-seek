@@ -1,0 +1,7 @@
+# Private SEEK DOM snapshot used only for local selector verification
+/seek.html
+
+# Python and OS artifacts
+__pycache__/
+*.pyc
+.DS_Store
