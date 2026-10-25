@@ -107,7 +107,9 @@ def check_popup():
         check(checked is expected, f"{key} HTML fallback default is {'on' if expected else 'off'}")
 
     check(soup.html.get("data-theme") == "system",
-          "Popup starts in system theme before saved settings load")
+          "Popup uses its own system theme, independent of the SEEK theme")
+    check("applyPopupTheme" not in read("popup.js"),
+          "Popup does not apply the SEEK theme to itself")
 
     theme_options = soup.select("[data-theme-option]")
     theme_values = [element.get("data-theme-option") for element in theme_options]

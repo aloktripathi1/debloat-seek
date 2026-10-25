@@ -1,6 +1,6 @@
 # Debloat SEEK
 
-A small Manifest V3 Chrome extension that locally declutters and refines the IIT Madras SEEK course interface. It hides selected UI controls, gives the Contents sidebar a cleaner visual hierarchy, and adds System, Light, Dark, and Black themes to SEEK and the extension panel. Everything happens in the browser only. It does not change SEEK, call SEEK APIs, send data anywhere, or touch assignments, submissions, assessments, or course content.
+A small Manifest V3 Chrome extension that locally declutters and refines the IIT Madras SEEK course interface. It hides selected UI controls, gives the Contents sidebar a cleaner visual hierarchy, and adds System, Light, Dark, and Black themes to SEEK pages. Everything happens in the browser only. It does not change SEEK, call SEEK APIs, send data anywhere, or touch assignments, submissions, assessments, or course content.
 
 ## Supported site
 
@@ -52,10 +52,10 @@ Click the Debloat SEEK icon in the Chrome toolbar to open the popup.
 
 | Option | What it does |
 | --- | --- |
-| Theme | **System** follows your operating system, **Light** uses SEEK's light palette, **Dark** uses SEEK's soft dark palette, and **Black** replaces SEEK's dark surfaces with true black and near-black surfaces for low-glare reading. The same theme is applied to the extension panel. |
+| Theme | **System** follows your operating system, **Light** uses SEEK's light palette, **Dark** uses SEEK's soft dark palette, and **Black** replaces SEEK's dark surfaces with true black and near-black surfaces for low-glare reading. This setting changes SEEK pages only. |
 | Premium Contents sidebar | Refines `app-course-outline` with calmer spacing, clearer unit and lesson hierarchy, a subtle selected-lesson state, better focus rings, and a thin scrollbar. It does not hide or reorder any lesson. |
 
-The theme setting is stored with the other preferences and is applied to open SEEK tabs immediately. The extension sets SEEK's root `data-theme` attribute so SEEK's own components switch palettes, then layers Black-mode surface overrides on top. If you later change SEEK's own Appearance menu, the extension's saved theme remains authoritative. Set the extension theme to **System** if you want the extension to follow the operating-system preference.
+The theme setting is stored with the other preferences and is applied to open SEEK tabs immediately. The extension sets SEEK's root `data-theme` attribute so SEEK's own components switch palettes, then layers Black-mode surface overrides on top. If you later change SEEK's own Appearance menu, the extension's saved theme remains authoritative. The extension popup itself keeps its own light/dark appearance based on your operating-system preference; the theme choice does not recolor the popup.
 
 ### Default cleanup (on by default)
 
@@ -218,9 +218,9 @@ After loading the extension in Chrome:
 2. Confirm the Previous/Next bar, Overview button, and the divider beside Overview are hidden.
 3. Confirm the transcript panel, Announcements button, Forum button, Calculator button, and course header bar are still visible.
 4. Confirm the Contents sidebar has the refined spacing, unit/lesson hierarchy, selected-lesson treatment, and focus rings, with no lesson hidden or reordered.
-5. Open the popup. Choose **Dark**. Both the popup and SEEK should switch to the soft dark palette without a reload.
-6. Choose **Black**. SEEK surfaces should become true black or near black, and the popup should use its black palette.
-7. Choose **Light**. Both should switch to the light palette. Choose **System** and confirm both follow the operating-system preference.
+5. Open the popup. Choose **Dark**. SEEK should switch to the soft dark palette without a reload. The popup should keep its own system light/dark appearance.
+6. Choose **Black**. SEEK surfaces should become true black or near black. The popup should not turn black.
+7. Choose **Light**. SEEK should switch to the light palette. Choose **System** and confirm SEEK follows the operating-system preference. The popup should continue to follow the operating system independently.
 8. Enable **Video Transcript panel**. The transcript panel should disappear without a reload.
 9. Enable **Announcements**. The announcements trigger, including a badge variant, should disappear. The announcements panel's close button should remain unaffected.
 10. Enable **Forum**. Only the Forum button in the course actions should disappear.
@@ -242,7 +242,7 @@ After loading the extension in Chrome:
 - The extension targets the desktop course UI. Mobile layouts or future SEEK surfaces may use different components.
 - The sidebar refinement depends on the current `app-course-outline` class names. If SEEK renames those classes, the sidebar keeps SEEK's original look rather than breaking.
 - Theme overrides cover SEEK's own surfaces and components. Embedded third-party content such as a YouTube player, PDF viewer, or external editor may keep its own light or dark appearance.
-- The extension's theme takes precedence over SEEK's own Appearance menu. SEEK's menu may therefore show a different selected option until you choose a new one there. Set the extension theme to System if you want it to follow the OS.
+- The extension's theme takes precedence over SEEK's own Appearance menu. SEEK's menu may therefore show a different selected option until you choose a new one there. Set the SEEK theme to System if you want SEEK to follow the OS. The extension popup is not affected by this setting.
 - It runs only in the top frame of the two exact SEEK origins. It does not modify embedded assignment iframes.
 - Chrome sync availability depends on the browser profile. If sync is unavailable, settings still save to local storage.
 - The automated browser test uses a fixture and the supplied snapshot, not a live authenticated SEEK session.

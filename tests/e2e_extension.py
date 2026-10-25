@@ -158,12 +158,10 @@ def expected_theme_surface(resolved_theme):
     }[resolved_theme]
 
 
-def expected_popup_surface(resolved_theme):
-    return {
-        "light": "#f4f7fb",
-        "dark": "#080d15",
-        "black": "#000000"
-    }[resolved_theme]
+def expected_popup_surface(popup):
+    return popup.evaluate(
+        "() => matchMedia('(prefers-color-scheme: dark)').matches ? '#080d15' : '#f4f7fb'"
+    )
 
 
 def wait_for_root(page, settings):
@@ -450,20 +448,25 @@ def main():
                 check(get_stored_settings(popup) == DEFAULT_SETTINGS, "defaults are persisted in chrome.storage.sync")
 
                 print("\nTheme modes")
+                popup_system_surface = expected_popup_surface(popup)
+
                 set_theme(popup, page, "dark")
                 check(theme_surface(page) == expected_theme_surface("dark"),
                       "SEEK uses the soft dark surface")
-                check(popup_surface(popup) == expected_popup_surface("dark"),
-                      "panel uses the dark surface")
+                check(popup_surface(popup) == popup_system_surface,
+                      "extension panel keeps its own system theme")
+                check(popup.evaluate("() => document.documentElement.getAttribute('data-theme')") == "system",
+                      "extension panel is not recolored by the SEEK theme")
 
                 set_theme(popup, page, "black")
                 check(theme_surface(page) == "#000000", "SEEK uses a true black surface")
-                check(popup_surface(popup) == "#000000", "panel uses a true black surface")
+                check(popup_surface(popup) == popup_system_surface,
+                      "extension panel stays unchanged in Black mode")
 
                 set_theme(popup, page, "light")
                 check(theme_surface(page) == "#ffffff", "SEEK uses the light surface")
-                check(popup_surface(popup) == expected_popup_surface("light"),
-                      "panel uses the light surface")
+                check(popup_surface(popup) == popup_system_surface,
+                      "extension panel stays unchanged in Light mode")
 
                 set_theme(popup, page, "system")
                 resolved_system = page.evaluate(
@@ -471,8 +474,8 @@ def main():
                 )
                 check(theme_surface(page) == expected_theme_surface(resolved_system),
                       f"SEEK follows system theme ({resolved_system})")
-                check(popup_surface(popup) == expected_popup_surface(resolved_system),
-                      f"panel follows system theme ({resolved_system})")
+                check(popup_surface(popup) == popup_system_surface,
+                      "extension panel still follows the operating system")
 
                 print("\nPremium Contents sidebar")
                 check_sidebar(page, True)

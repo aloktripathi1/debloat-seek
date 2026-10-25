@@ -3,6 +3,8 @@
  *
  * Writes complete, normalized settings snapshots to shared storage. Saves are
  * chained so rapid toggling cannot write an older snapshot after a newer one.
+ * The popup follows the operating-system light/dark preference; the saved theme
+ * controls SEEK pages only.
  */
 (function () {
   'use strict';
@@ -26,23 +28,9 @@
   const statusElement = document.getElementById('status');
   const summaryElement = document.getElementById('summary');
   const restoreButton = document.getElementById('restore-defaults');
-  const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
 
   let settings = { ...DEFAULT_SETTINGS };
   let saveChain = Promise.resolve();
-
-  function resolveTheme(theme) {
-    if (theme === 'system') {
-      return systemThemeMedia.matches ? 'dark' : 'light';
-    }
-
-    return THEME_VALUES.includes(theme) ? theme : 'light';
-  }
-
-  function applyPopupTheme(theme) {
-    document.documentElement.dataset.theme = resolveTheme(theme);
-    document.documentElement.dataset.themeSetting = theme;
-  }
 
   function setStatus(message, tone) {
     if (!statusElement) {
@@ -70,8 +58,6 @@
       button.setAttribute('aria-checked', selected ? 'true' : 'false');
       button.tabIndex = selected ? 0 : -1;
     }
-
-    applyPopupTheme(settings.theme);
 
     if (summaryElement) {
       const enabled = BOOLEAN_SETTING_KEYS.filter((key) => settings[key]).length;
@@ -193,20 +179,6 @@
 
     if (restoreButton) {
       restoreButton.addEventListener('click', restoreDefaults);
-    }
-
-    if (typeof systemThemeMedia.addEventListener === 'function') {
-      systemThemeMedia.addEventListener('change', () => {
-        if (settings.theme === 'system') {
-          applyPopupTheme('system');
-        }
-      });
-    } else if (typeof systemThemeMedia.addListener === 'function') {
-      systemThemeMedia.addListener(() => {
-        if (settings.theme === 'system') {
-          applyPopupTheme('system');
-        }
-      });
     }
 
     try {
