@@ -1,0 +1,76 @@
+/*
+ * Debloat SEEK
+ *
+ * All rules are gated by a state attribute on <html>. The content script flips
+ * those attributes, so disabling a feature simply removes its CSS rule. No
+ * element is deleted and no inline styles are written.
+ *
+ * Angular build-specific content attributes are intentionally not used.
+ */
+
+/* A. Previous / Next unit navigation ------------------------------------- */
+html[data-seek-unit-nav="on"] nav.unit-nav[aria-label="Previous and next unit"] {
+  display: none !important;
+}
+
+/* B. Overview button ----------------------------------------------------- */
+/*
+ * The button itself carries the stable accessible label. The wrapping
+ * app-button and the :has() fallback remove the host element as well, avoiding
+ * an empty inline gap. Scoped to .lead so no other Overview-like control is hit.
+ */
+html[data-seek-overview="on"] app-bar.course-bar .lead app-button[label="Overview"],
+html[data-seek-overview="on"] app-bar.course-bar .lead button[aria-label="Overview"],
+html[data-seek-overview="on"] app-bar.course-bar .lead app-button:has(> button[aria-label="Overview"]) {
+  display: none !important;
+}
+
+/* C. Target divider ------------------------------------------------------ */
+/*
+ * Only the divider that is a direct child of the course-bar .lead container.
+ * This is the divider immediately after the Overview button. It deliberately
+ * does not match the separate span.divider inside nav.actions[Course actions].
+ */
+html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider {
+  display: none !important;
+}
+
+/* Optional A. Video transcript panel ------------------------------------- */
+html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile,
+html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel {
+  display: none !important;
+}
+
+/* Optional B/C. Announcements trigger, with or without a badge ------------ */
+/*
+ * data-announcements-trigger is the stable component marker. The label-based
+ * fallbacks cover builds where that attribute is missing. The aria-label
+ * prefix matches "Announcements" and "Announcements, 1" without hardcoding a
+ * notification count. Scoped to the course-actions nav so the announcements
+ * panel's own "Close announcements" control is never matched.
+ */
+html[data-seek-announcements="on"] app-button[data-announcements-trigger],
+html[data-seek-announcements="on"] nav.actions[aria-label="Course actions"] app-button[label="Announcements"],
+html[data-seek-announcements="on"] nav.actions[aria-label="Course actions"] app-button:has(button[aria-label^="Announcements"]),
+html[data-seek-announcements="on"] nav.actions[aria-label="Course actions"] > button[aria-label^="Announcements"] {
+  display: none !important;
+}
+
+/* Optional D. Forum trigger ---------------------------------------------- */
+html[data-seek-forum="on"] nav.actions[aria-label="Course actions"] app-button[label="Forum"],
+html[data-seek-forum="on"] nav.actions[aria-label="Course actions"] app-button:has(> button[aria-label="Forum"]),
+html[data-seek-forum="on"] nav.actions[aria-label="Course actions"] > button[aria-label="Forum"] {
+  display: none !important;
+}
+
+/* Optional E. Calculator trigger ----------------------------------------- */
+html[data-seek-calculator="on"] nav.actions[aria-label="Course actions"] app-button[label="Calculator"],
+html[data-seek-calculator="on"] nav.actions[aria-label="Course actions"] app-button:has(> button[aria-label="Calculator"]),
+html[data-seek-calculator="on"] nav.actions[aria-label="Course actions"] > button[aria-label="Calculator"] {
+  display: none !important;
+}
+
+/* Optional F. Entire course header bar ----------------------------------- */
+html[data-seek-header="on"] app-bar.course-bar {
+  display: none !important;
+}
