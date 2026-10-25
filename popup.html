@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Debloat SEEK</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup" aria-labelledby="popup-title">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="hero-copy">
+        <h1 id="popup-title">Debloat SEEK</h1>
+        <p>Customize the IIT Madras SEEK course interface locally.</p>
+      </div>
+    </header>
+
+    <p class="description">
+      Hide interface elements locally. Nothing is sent anywhere; assignments and
+      course content are untouched.
+    </p>
+
+    <section class="settings-section" aria-labelledby="default-heading">
+      <div class="section-heading">
+        <h2 id="default-heading">Default cleanup</h2>
+        <span class="section-note">On by default</span>
+      </div>
+
+      <label class="setting-row" for="setting-unit-nav">
+        <span class="setting-copy">
+          <span class="setting-title" id="unit-nav-title">Previous/Next navigation</span>
+          <span class="setting-description" id="unit-nav-desc">Hides the Previous and Next unit bar on lesson pages.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="unitNav" aria-hidden="true">On</span>
+          <span class="switch">
+            <input id="setting-unit-nav" type="checkbox" role="switch" data-setting="unitNav"
+              aria-labelledby="unit-nav-title" aria-describedby="unit-nav-desc" checked>
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-overview">
+        <span class="setting-copy">
+          <span class="setting-title" id="overview-title">Overview button</span>
+          <span class="setting-description" id="overview-desc">Hides only the Overview button in the course bar.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="overview" aria-hidden="true">On</span>
+          <span class="switch">
+            <input id="setting-overview" type="checkbox" role="switch" data-setting="overview"
+              aria-labelledby="overview-title" aria-describedby="overview-desc" checked>
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-divider">
+        <span class="setting-copy">
+          <span class="setting-title" id="divider-title">Target divider</span>
+          <span class="setting-description" id="divider-desc">Hides only the divider beside the Overview button.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="divider" aria-hidden="true">On</span>
+          <span class="switch">
+            <input id="setting-divider" type="checkbox" role="switch" data-setting="divider"
+              aria-labelledby="divider-title" aria-describedby="divider-desc" checked>
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+    </section>
+
+    <section class="settings-section" aria-labelledby="optional-heading">
+      <div class="section-heading">
+        <h2 id="optional-heading">Optional cleanup</h2>
+        <span class="section-note">Off by default</span>
+      </div>
+
+      <label class="setting-row" for="setting-transcript">
+        <span class="setting-copy">
+          <span class="setting-title" id="transcript-title">Video Transcript panel</span>
+          <span class="setting-description" id="transcript-desc">Hides the transcript sidebar on lesson pages.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="transcript" aria-hidden="true">Off</span>
+          <span class="switch">
+            <input id="setting-transcript" type="checkbox" role="switch" data-setting="transcript"
+              aria-labelledby="transcript-title" aria-describedby="transcript-desc">
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-announcements">
+        <span class="setting-copy">
+          <span class="setting-title" id="announcements-title">Announcements</span>
+          <span class="setting-description" id="announcements-desc">Hides the button and its unread badge.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="announcements" aria-hidden="true">Off</span>
+          <span class="switch">
+            <input id="setting-announcements" type="checkbox" role="switch" data-setting="announcements"
+              aria-labelledby="announcements-title" aria-describedby="announcements-desc">
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-forum">
+        <span class="setting-copy">
+          <span class="setting-title" id="forum-title">Forum</span>
+          <span class="setting-description" id="forum-desc">Hides the Forum button in the course actions.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="forum" aria-hidden="true">Off</span>
+          <span class="switch">
+            <input id="setting-forum" type="checkbox" role="switch" data-setting="forum"
+              aria-labelledby="forum-title" aria-describedby="forum-desc">
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-calculator">
+        <span class="setting-copy">
+          <span class="setting-title" id="calculator-title">Calculator</span>
+          <span class="setting-description" id="calculator-desc">Hides the Calculator button in the course actions.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="calculator" aria-hidden="true">Off</span>
+          <span class="switch">
+            <input id="setting-calculator" type="checkbox" role="switch" data-setting="calculator"
+              aria-labelledby="calculator-title" aria-describedby="calculator-desc">
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+
+      <label class="setting-row" for="setting-header">
+        <span class="setting-copy">
+          <span class="setting-title" id="header-title">Course header bar</span>
+          <span class="setting-description" id="header-desc">Hides the entire course bar, including its title and action buttons.</span>
+        </span>
+        <span class="setting-control">
+          <span class="state-label" data-state-for="header" aria-hidden="true">Off</span>
+          <span class="switch">
+            <input id="setting-header" type="checkbox" role="switch" data-setting="header"
+              aria-labelledby="header-title" aria-describedby="header-desc">
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          </span>
+        </span>
+      </label>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-actions">
+        <button id="restore-defaults" class="restore-button" type="button">Restore defaults</button>
+        <span id="summary" class="summary" aria-hidden="true"></span>
+      </div>
+      <p id="status" class="status" data-tone="neutral" role="status" aria-live="polite">
+        Loading settings…
+      </p>
+      <p class="hint">Chrome sync · open SEEK tabs update automatically.</p>
+    </footer>
+  </main>
+
+  <script src="settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
