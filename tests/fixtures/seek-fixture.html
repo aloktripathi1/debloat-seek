@@ -3,6 +3,193 @@
 <head>
   <meta charset="utf-8">
   <title>SEEK selector fixture</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-text-default: #242424;
+      --color-text-secondary: #5d687e;
+      --color-icon-secondary: #5d687e;
+      --color-icon-primary: #494f69;
+      --color-icon-success-strong: #039855;
+      --color-text-accent-strong: #781f1a;
+      --color-background-surface-base: #ffffff;
+      --color-background-surface-subtle: #f9f9fa;
+      --color-background-surface-strong: #f6f6f6;
+      --color-background-surface-stronger: #eff0f2;
+      --color-background-primary: #494f69;
+      --color-background-primary-light: #e9ebf2;
+      --color-border-default: #dfe4ed;
+      --color-border-secondary: #f2f2f2;
+      --color-border-primary-light: #d8dae5;
+      --color-border-focus: #3384ff;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --color-text-default: #f6f6f6;
+      --color-text-secondary: #b0b5cb;
+      --color-icon-secondary: #b0b5cb;
+      --color-icon-primary: #d8dae5;
+      --color-icon-success-strong: #32d583;
+      --color-text-accent-strong: #bf8d30;
+      --color-background-surface-base: #1b1d29;
+      --color-background-surface-subtle: #222736;
+      --color-background-surface-strong: #222736;
+      --color-background-surface-stronger: #2d3243;
+      --color-background-primary: #d8dae5;
+      --color-background-primary-light: #222736;
+      --color-border-default: #494f69;
+      --color-border-secondary: #2d3243;
+      --color-border-primary-light: #2d3243;
+      --color-border-focus: #3384ff;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font-family: sans-serif;
+    }
+
+    app-course-outline {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .outline-pane {
+      display: flex;
+      flex: 0 0 300px;
+      flex-direction: column;
+      border-right: 1px solid var(--color-border-default);
+      background: var(--color-background-surface-base);
+    }
+
+    .outline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      padding: 0 12px 0 20px;
+      border-bottom: 1px solid var(--color-border-default);
+    }
+
+    .outline-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .outline-nav {
+      padding: 4px 0 12px;
+      overflow-y: auto;
+    }
+
+    .unit-container {
+      display: flex;
+      flex-direction: column;
+      border-left: 3px solid transparent;
+    }
+
+    .unit-container.is-open {
+      border-left-color: var(--color-background-primary);
+      background: var(--color-background-surface-subtle);
+    }
+
+    .unit-container:not(.is-open) > .child-container {
+      display: none;
+    }
+
+    .unit-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px 12px 9px;
+      border: none;
+      background: none;
+      color: var(--color-text-secondary);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .unit-title {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .unit-count {
+      font-size: 11px;
+    }
+
+    .unit-chevron,
+    .child-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .child-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 0 8px 8px 20px;
+    }
+
+    .child-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--color-text-default);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .child-row.selected {
+      background: color-mix(in srgb, var(--color-background-primary) 12%, transparent);
+    }
+
+    .child-icon {
+      color: var(--color-icon-secondary);
+    }
+
+    .child-title {
+      display: block;
+      font-size: 13px;
+    }
+
+    .child-type {
+      display: block;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+
+    .status-icon {
+      color: var(--color-icon-success-strong);
+    }
+
+    .unit-pane {
+      flex: 1;
+    }
+
+    .decoy-panel {
+      padding: 16px;
+    }
+  </style>
 </head>
 <body>
   <!--
@@ -45,7 +232,66 @@
 
     <main>
       <app-course-outline>
-        <aside class="course-outline-side-nav">Course outline</aside>
+        <aside class="outline-pane" aria-label="Course contents">
+          <header class="outline-header">
+            <h2 class="outline-title">
+              <span class="outline-title-icon" aria-hidden="true">≡</span>
+              Contents
+            </h2>
+            <button type="button" class="btn" aria-label="Hide contents">Hide</button>
+          </header>
+
+          <app-course-outline-side-nav>
+            <div class="outline-nav">
+              <div class="unit-container is-open">
+                <button type="button" class="unit-header" aria-expanded="true">
+                  <span class="unit-chevron" aria-hidden="true">›</span>
+                  <span class="unit-title">Course Introduction</span>
+                  <span class="unit-count">2</span>
+                </button>
+                <div class="child-container is-open">
+                  <div class="child-list">
+                    <button type="button" class="child-row selected">
+                      <span class="child-icon" aria-hidden="true">▤</span>
+                      <span class="text">
+                        <span class="child-title">About the Course</span>
+                        <span class="child-type">Lesson</span>
+                      </span>
+                      <span class="status-icon" aria-label="Completed">✓</span>
+                    </button>
+                    <button type="button" class="child-row">
+                      <span class="child-icon" aria-hidden="true">▤</span>
+                      <span class="text">
+                        <span class="child-title">Course Welcome</span>
+                        <span class="child-type">Video</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="unit-container">
+                <button type="button" class="unit-header" aria-expanded="false">
+                  <span class="unit-chevron" aria-hidden="true">›</span>
+                  <span class="unit-title">Search Methods</span>
+                  <span class="unit-count">5</span>
+                </button>
+                <div class="child-container" inert>
+                  <div class="child-list">
+                    <button type="button" class="child-row">
+                      <span class="child-icon" aria-hidden="true">▤</span>
+                      <span class="text">
+                        <span class="child-title">Uninformed Search</span>
+                        <span class="child-type">Lesson</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </app-course-outline-side-nav>
+        </aside>
+
         <section class="unit-pane">
           <app-course-unit-view>
             <app-lesson-view>
@@ -96,6 +342,7 @@
           <header class="app-bar">Unrelated header</header>
         </app-bar>
         <aside id="decoy-transcript" class="transcript-panel hidden-mobile">Unrelated transcript</aside>
+        <aside id="decoy-outline-pane" class="outline-pane">Unrelated outline</aside>
       </section>
     </main>
   </app-root>

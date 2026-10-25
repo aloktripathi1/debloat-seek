@@ -95,25 +95,54 @@ def check_popup():
     keys = [element.get("data-setting") for element in inputs]
 
     check(keys == [
-        "unitNav", "overview", "divider",
+        "sidebar", "unitNav", "overview", "divider",
         "transcript", "announcements", "forum", "calculator", "header"
-    ], "Eight independent settings are present in the expected order")
+    ], "Nine independent settings are present in the expected order")
 
-    default_keys = {"unitNav", "overview", "divider"}
+    default_keys = {"unitNav", "overview", "divider", "sidebar"}
     for element in inputs:
         key = element.get("data-setting")
         checked = element.has_attr("checked")
         expected = key in default_keys
         check(checked is expected, f"{key} HTML fallback default is {'on' if expected else 'off'}")
 
+    check(soup.html.get("data-theme") == "system",
+          "Popup starts in system theme before saved settings load")
+
+    theme_options = soup.select("[data-theme-option]")
+    theme_values = [element.get("data-theme-option") for element in theme_options]
+    check(theme_values == ["system", "light", "dark", "black"],
+          "System, Light, Dark, and Black theme options are present")
+    check(soup.select_one(".theme-control[role='radiogroup']") is not None,
+          "Theme control exposes a radiogroup")
+    checked_themes = [
+        element.get("data-theme-option")
+        for element in theme_options
+        if element.get("aria-checked") == "true"
+    ]
+    check(checked_themes == ["system"], "System theme is the accessible default")
+
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 8, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 9, "Every setting has a clickable label row")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
           "Popup loads its local controller")
+
+
+def check_settings_model():
+    print("\nSettings model")
+    settings_js = read("settings.js")
+
+    check("sidebar: true" in settings_js, "Premium sidebar is enabled by default")
+    check("theme: 'system'" in settings_js, "System theme is the safe default")
+    check("THEME_VALUES" in settings_js, "Theme values are declared once")
+    check("'system', 'light', 'dark', 'black'" in settings_js,
+          "Theme values include system, light, dark, and black")
+    check("BOOLEAN_SETTING_KEYS" in settings_js, "Boolean settings are separated from theme")
+    check("normalizeTheme" in settings_js, "Stored theme values are normalized")
 
 
 def check_no_remote_code():
@@ -168,6 +197,20 @@ def check_css():
     check('aria-label^="Announcements"' in css,
           "Announcements label fallback uses a stable prefix, not a hardcoded count")
     check("display: none !important;" in css, "Targets are hidden through CSS rather than deletion")
+    check(css.count('html[data-seek-sidebar="on"]') >= 20,
+          "Premium sidebar rules are gated by their own state")
+    check("app-course-outline .outline-pane" in css,
+          "Sidebar styling is scoped to the course outline component")
+    check("app-course-outline .child-row.selected" in css,
+          "Selected lesson rows receive the refined state")
+    check('html[data-seek-theme="black"]:root' in css,
+          "Black mode overrides SEEK's theme tokens with higher specificity")
+    check("--color-background-surface-base: #000000;" in css,
+          "Black mode uses a true black page surface")
+    check("--color-background-surface-subtle: #05070b;" in css,
+          "Black mode keeps subtle surfaces near black")
+    check("--color-border-default: #1e2735;" in css,
+          "Black mode keeps borders visible without glare")
 
 
 def check_readme():
@@ -181,7 +224,10 @@ def check_readme():
         "Troubleshooting",
         "Known limitations",
         "Calculator",
-        "Course header bar"
+        "Course header bar",
+        "Black",
+        "Premium Contents sidebar",
+        "System"
     ]
 
     for phrase in required_phrases:
@@ -192,6 +238,7 @@ def main():
     check_manifest()
     check_syntax()
     check_popup()
+    check_settings_model()
     check_no_remote_code()
     check_css()
     check_readme()

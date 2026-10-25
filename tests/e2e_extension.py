@@ -37,7 +37,13 @@ DEFAULT_SETTINGS = {
     "announcements": False,
     "forum": False,
     "calculator": False,
-    "header": False
+    "header": False,
+    "sidebar": True,
+    "theme": "system"
+}
+
+BOOLEAN_SETTINGS = {
+    key: value for key, value in DEFAULT_SETTINGS.items() if key != "theme"
 }
 
 ATTRIBUTES = {
@@ -48,7 +54,8 @@ ATTRIBUTES = {
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
-    "header": "data-seek-header"
+    "header": "data-seek-header",
+    "sidebar": "data-seek-sidebar"
 }
 
 TARGETS = {
@@ -60,7 +67,10 @@ TARGETS = {
     "announcements": 'nav.actions app-button[data-announcements-trigger]',
     "forum": 'nav.actions app-button[label="Forum"]',
     "calculator": 'nav.actions app-button[label="Calculator"]',
-    "header": 'app-bar.course-bar'
+    "header": 'app-bar.course-bar',
+    "sidebarPane": 'app-course-outline .outline-pane',
+    "sidebarUnit": 'app-course-outline .unit-container',
+    "sidebarLesson": 'app-course-outline .child-row'
 }
 
 failures = []
@@ -121,6 +131,41 @@ def check_hidden(page, selector, should_be_hidden, label):
         check(actual != "none", f"{label} is visible (display: {actual})")
 
 
+def computed_style(page, selector, property_name):
+    return page.locator(selector).first.evaluate(
+        "(element, propertyName) => getComputedStyle(element).getPropertyValue(propertyName).trim()",
+        property_name
+    )
+
+
+def theme_surface(page):
+    return page.evaluate(
+        "() => getComputedStyle(document.documentElement).getPropertyValue('--color-background-surface-base').trim()"
+    )
+
+
+def popup_surface(popup):
+    return popup.evaluate(
+        "() => getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()"
+    )
+
+
+def expected_theme_surface(resolved_theme):
+    return {
+        "light": "#ffffff",
+        "dark": "#1b1d29",
+        "black": "#000000"
+    }[resolved_theme]
+
+
+def expected_popup_surface(resolved_theme):
+    return {
+        "light": "#f4f7fb",
+        "dark": "#080d15",
+        "black": "#000000"
+    }[resolved_theme]
+
+
 def wait_for_root(page, settings):
     expected = {
         ATTRIBUTES[key]: "on" if settings[key] else "off"
@@ -138,7 +183,52 @@ def wait_for_root(page, settings):
     )
 
 
-def check_default_page(page):
+def check_theme(page, expected_setting):
+    expected_resolved = page.evaluate(
+        """(theme) => theme === 'system'
+            ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : theme""",
+        expected_setting
+    )
+    actual_setting = page.evaluate("() => document.documentElement.getAttribute('data-seek-theme-setting')")
+    actual_resolved = page.evaluate("() => document.documentElement.getAttribute('data-seek-theme')")
+    actual_seek = page.evaluate("() => document.documentElement.getAttribute('data-theme')")
+
+    check(actual_setting == expected_setting,
+          f"theme setting is {expected_setting} (got {actual_setting})")
+    check(actual_resolved == expected_resolved,
+          f"theme resolves to {expected_resolved} (got {actual_resolved})")
+    check(actual_seek == ("light" if expected_resolved == "light" else "dark"),
+          f"SEEK data-theme matches {expected_resolved}")
+
+    return expected_resolved
+
+
+def check_sidebar(page, enabled):
+    expected_radius = "12px" if enabled else "0px"
+
+    page.wait_for_function(
+        """([selector, expected]) => {
+            const element = document.querySelector(selector);
+            return element && getComputedStyle(element).borderRadius === expected;
+        }""",
+        arg=[TARGETS["sidebarUnit"], expected_radius],
+        timeout=5000
+    )
+
+    radius = computed_style(page, TARGETS["sidebarUnit"], "border-radius")
+    check(radius == expected_radius,
+          f"premium sidebar {'active' if enabled else 'inactive'} (unit radius: {radius})")
+    check_hidden(page, TARGETS["sidebarPane"], False, "sidebar pane remains visible")
+    check_hidden(page, TARGETS["sidebarLesson"], False, "sidebar lessons remain visible")
+
+
+def check_default_page(page, theme="system"):
+    resolved_theme = check_theme(page, theme)
+    check_sidebar(page, True)
+    check(theme_surface(page) == expected_theme_surface(resolved_theme),
+          f"page surface matches {resolved_theme} theme")
+
     check_hidden(page, TARGETS["unitNav"], True, "unit navigation")
     check_hidden(page, TARGETS["overview"], True, "Overview button")
     check_hidden(page, TARGETS["overviewHost"], True, "Overview component host")
@@ -168,6 +258,13 @@ def get_popup_states(popup):
         """elements => Object.fromEntries(
             elements.map(element => [element.dataset.setting, element.checked])
         )"""
+    )
+
+
+def get_popup_theme(popup):
+    return popup.eval_on_selector(
+        '[data-theme-option][aria-checked="true"]',
+        "element => element.dataset.themeOption"
     )
 
 
@@ -201,6 +298,49 @@ def set_toggle(popup, page, key, enabled):
 
     status = popup.locator("#status").inner_text()
     check(status.startswith("Saved"), f"{key} toggle saved (status: {status})")
+
+
+def set_theme(popup, page, theme):
+    button = popup.locator(f'[data-theme-option="{theme}"]')
+    changed = button.get_attribute("aria-checked") != "true"
+
+    if changed:
+        button.click()
+
+    page.wait_for_function(
+        "(theme) => document.documentElement.getAttribute('data-seek-theme-setting') === theme",
+        arg=theme,
+        timeout=5000
+    )
+
+    expected_resolved = page.evaluate(
+        """(theme) => theme === 'system'
+            ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : theme""",
+        theme
+    )
+
+    page.wait_for_function(
+        """([theme, resolved]) => {
+            const root = document.documentElement;
+            return root.getAttribute('data-seek-theme-setting') === theme
+                && root.getAttribute('data-seek-theme') === resolved
+                && root.getAttribute('data-theme') === (resolved === 'light' ? 'light' : 'dark');
+        }""",
+        arg=[theme, expected_resolved],
+        timeout=5000
+    )
+
+    if changed:
+        popup.wait_for_function(
+            "() => document.querySelector('#status')?.textContent.startsWith('Saved')",
+            timeout=5000
+        )
+        status = popup.locator("#status").inner_text()
+        check(status.startswith("Saved"), f"{theme} theme saved (status: {status})")
+
+    check(button.get_attribute("aria-checked") == "true", f"{theme} theme is selected in the popup")
+    check_theme(page, theme)
 
 
 def get_stored_settings(popup):
@@ -263,7 +403,7 @@ def main():
                 page = context.new_page()
                 page.on("pageerror", lambda error: page_errors.append(f"page: {error}"))
                 page.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
-                wait_for_root(page, DEFAULT_SETTINGS)
+                wait_for_root(page, BOOLEAN_SETTINGS)
 
                 print("\nInitial defaults")
                 check_default_page(page)
@@ -305,8 +445,41 @@ def main():
                     timeout=5000
                 )
 
-                check(get_popup_states(popup) == DEFAULT_SETTINGS, "popup starts with safe defaults")
+                check(get_popup_states(popup) == BOOLEAN_SETTINGS, "popup starts with safe boolean defaults")
+                check(get_popup_theme(popup) == "system", "popup starts in System theme")
                 check(get_stored_settings(popup) == DEFAULT_SETTINGS, "defaults are persisted in chrome.storage.sync")
+
+                print("\nTheme modes")
+                set_theme(popup, page, "dark")
+                check(theme_surface(page) == expected_theme_surface("dark"),
+                      "SEEK uses the soft dark surface")
+                check(popup_surface(popup) == expected_popup_surface("dark"),
+                      "panel uses the dark surface")
+
+                set_theme(popup, page, "black")
+                check(theme_surface(page) == "#000000", "SEEK uses a true black surface")
+                check(popup_surface(popup) == "#000000", "panel uses a true black surface")
+
+                set_theme(popup, page, "light")
+                check(theme_surface(page) == "#ffffff", "SEEK uses the light surface")
+                check(popup_surface(popup) == expected_popup_surface("light"),
+                      "panel uses the light surface")
+
+                set_theme(popup, page, "system")
+                resolved_system = page.evaluate(
+                    "() => matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'"
+                )
+                check(theme_surface(page) == expected_theme_surface(resolved_system),
+                      f"SEEK follows system theme ({resolved_system})")
+                check(popup_surface(popup) == expected_popup_surface(resolved_system),
+                      f"panel follows system theme ({resolved_system})")
+
+                print("\nPremium Contents sidebar")
+                check_sidebar(page, True)
+                set_toggle(popup, page, "sidebar", False)
+                check_sidebar(page, False)
+                set_toggle(popup, page, "sidebar", True)
+                check_sidebar(page, True)
 
                 print("\nOptional toggles are independent")
                 set_toggle(popup, page, "transcript", True)
@@ -406,37 +579,42 @@ def main():
                 check_hidden(page, TARGETS["divider"], False, "divider restored")
 
                 print("\nAll-off persistence and Restore defaults")
+                set_toggle(popup, page, "sidebar", False)
                 page.reload(wait_until="domcontentloaded")
-                wait_for_root(page, {key: False for key in DEFAULT_SETTINGS})
+                all_off = {key: False for key in BOOLEAN_SETTINGS}
+                wait_for_root(page, all_off)
                 check_hidden(page, TARGETS["unitNav"], False, "unit navigation visible after all-off reload")
                 check_hidden(page, TARGETS["overview"], False, "Overview visible after all-off reload")
                 check_hidden(page, TARGETS["divider"], False, "divider visible after all-off reload")
                 check_hidden(page, TARGETS["calculator"], False, "calculator visible after all-off reload")
                 check_hidden(page, TARGETS["header"], False, "course header visible after all-off reload")
+                check_sidebar(page, False)
+                check_theme(page, "system")
 
                 popup.close()
                 popup = open_popup(context, extension_id)
-                check(get_popup_states(popup) == {key: False for key in DEFAULT_SETTINGS},
+                check(get_popup_states(popup) == all_off,
                       "popup restores the all-off state")
 
                 popup.locator("#restore-defaults").click()
-                wait_for_root(page, DEFAULT_SETTINGS)
+                wait_for_root(page, BOOLEAN_SETTINGS)
                 popup.wait_for_function(
                     "() => !document.querySelector('#status')?.textContent.startsWith('Saving')",
                     timeout=5000
                 )
 
-                check(get_popup_states(popup) == DEFAULT_SETTINGS, "Restore defaults resets every toggle")
+                check(get_popup_states(popup) == BOOLEAN_SETTINGS, "Restore defaults resets every toggle")
+                check(get_popup_theme(popup) == "system", "Restore defaults resets the theme")
                 check(get_stored_settings(popup) == DEFAULT_SETTINGS, "Restore defaults is persisted")
                 check_default_page(page)
 
                 print("\nMissing elements and origin coverage")
                 page.goto("https://seek.study.iitm.ac.in/courses/empty", wait_until="domcontentloaded")
-                wait_for_root(page, DEFAULT_SETTINGS)
+                wait_for_root(page, BOOLEAN_SETTINGS)
                 check(page.locator(TARGETS["unitNav"]).count() == 0, "minimal SEEK course page has no target elements")
 
                 page.goto("https://seek.onlinedegree.iitm.ac.in/courses/test", wait_until="domcontentloaded")
-                wait_for_root(page, DEFAULT_SETTINGS)
+                wait_for_root(page, BOOLEAN_SETTINGS)
                 check_default_page(page)
 
                 context.route(
