@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SEEK course overview fixture</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-text-default: #242424;
+      --color-text-secondary: #5d687e;
+      --color-text-disabled: #8d94a8;
+      --color-text-on-primary: #ffffff;
+      --color-text-success-strong: #039855;
+      --color-icon-secondary: #5d687e;
+      --color-icon-primary: #494f69;
+      --color-icon-success-strong: #039855;
+      --color-background-surface-base: #ffffff;
+      --color-background-surface-subtle: #f9f9fa;
+      --color-background-surface-strong: #f6f6f6;
+      --color-background-surface-stronger: #eff0f2;
+      --color-background-primary: #494f69;
+      --color-background-primary-light: #e9ebf2;
+      --color-border-default: #dfe4ed;
+      --color-border-secondary: #f2f2f2;
+      --color-border-primary-light: #d8dae5;
+      --color-border-focus: #3384ff;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --color-text-default: #f6f6f6;
+      --color-text-secondary: #b0b5cb;
+      --color-text-disabled: #5d687e;
+      --color-text-on-primary: #0d1119;
+      --color-text-success-strong: #32d583;
+      --color-icon-secondary: #b0b5cb;
+      --color-icon-primary: #d8dae5;
+      --color-icon-success-strong: #32d583;
+      --color-background-surface-base: #1b1d29;
+      --color-background-surface-subtle: #222736;
+      --color-background-surface-strong: #222736;
+      --color-background-surface-stronger: #2d3243;
+      --color-background-primary: #d8dae5;
+      --color-background-primary-light: #222736;
+      --color-border-default: #494f69;
+      --color-border-secondary: #2d3243;
+      --color-border-primary-light: #2d3243;
+      --color-border-focus: #3384ff;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font-family: Roboto, sans-serif;
+    }
+
+    app-course-overview {
+      display: block;
+      min-height: 100vh;
+    }
+
+    .overview-page {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 32rem;
+      align-items: start;
+      max-width: 132rem;
+      margin: 0 auto;
+      padding: 32px 24px;
+      gap: 20px;
+    }
+
+    @media (min-width: 992px) {
+      .overview-page {
+        grid-template-columns: minmax(28rem, 1fr) minmax(0, 96rem) minmax(28rem, 1fr);
+        max-width: none;
+      }
+
+      .banner,
+      .card-group,
+      .modules {
+        grid-column: 2;
+      }
+
+      .overview-side {
+        grid-column: 3;
+        width: 32rem;
+      }
+    }
+
+    .overview-main {
+      display: contents;
+    }
+
+    .banner,
+    .card-group,
+    .modules {
+      grid-column: 1;
+    }
+
+    .overview-side {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+    }
+
+    .banner {
+      padding: 16px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-primary-light);
+      font-size: 13px;
+    }
+
+    .overview-card {
+      overflow: hidden;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+    }
+
+    .course-header {
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      background: var(--color-background-surface-subtle);
+    }
+
+    .course-image {
+      width: 160px;
+      height: 104px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: var(--color-background-surface-stronger);
+    }
+
+    .course-meta {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .course-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .instructor {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border-default);
+    }
+
+    .stat-group {
+      display: flex;
+      gap: 24px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label,
+    .progress-label {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stat-value,
+    .progress-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .progress {
+      display: flex;
+      min-width: 220px;
+      flex: 1;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .progress-label-group {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      background: var(--color-background-surface-stronger);
+    }
+
+    .progress-bar::-webkit-progress-bar {
+      border-radius: 999px;
+      background: var(--color-background-surface-stronger);
+    }
+
+    .progress-bar::-webkit-progress-value {
+      border-radius: 999px;
+      background: var(--color-text-success-strong);
+    }
+
+    .description {
+      padding: 24px;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .modules {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modules-title {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .module-list {
+      display: flex;
+      margin: 0;
+      padding: 0;
+      flex-direction: column;
+      gap: 12px;
+      list-style: none;
+    }
+
+    .module-card {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .module-card h3 {
+      margin: 0 0 4px;
+      font-size: 14px;
+    }
+
+    .module-card p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
+    .module-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .module-text {
+      display: flex;
+      min-width: 0;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .module-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .module-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
+    .module-meta > span {
+      display: flex;
+      gap: 4px;
+    }
+
+    .module-meta > span + span::before {
+      content: "";
+      align-self: center;
+      width: 3px;
+      height: 3px;
+      margin-right: 3px;
+      border-radius: 50%;
+      background: var(--color-text-secondary);
+    }
+
+    .module-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 999px;
+      color: var(--color-text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .module-chevron {
+      color: var(--color-text-secondary);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .module-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .module-progress {
+      width: auto;
+      height: 4px;
+      flex: 1;
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      background: var(--color-background-surface-stronger);
+    }
+
+    .module-progress::-webkit-progress-bar {
+      border-radius: 999px;
+      background: var(--color-background-surface-stronger);
+    }
+
+    .module-progress::-webkit-progress-value {
+      border-radius: 999px;
+      background: var(--color-text-success-strong);
+    }
+
+    .module-progress-caption {
+      flex: 0 0 auto;
+      color: var(--color-text-secondary);
+      font-size: 11px;
+    }
+
+    .continue-learning {
+      margin-left: auto;
+    }
+
+    .continue-learning .btn {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--color-background-primary);
+      color: var(--color-text-on-primary);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .overview-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .widget {
+      overflow: hidden;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-border-default);
+    }
+
+    .widget-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .due-list {
+      display: flex;
+      margin: 0;
+      padding: 8px;
+      flex-direction: column;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .due-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+      border-radius: 8px;
+    }
+
+    .due-date {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--color-background-surface-stronger);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .due-body {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .due-title {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .due-meta {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+    }
+
+    @media (max-width: 991.98px) {
+      .overview-page {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .overview-main {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .overview-side {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .overview-page {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .course-header {
+        flex-direction: column;
+      }
+
+      .course-image {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <app-course-overview>
+    <div class="overview-page">
+      <div class="overview-main">
+        <div class="banner is-warning" role="status">
+          This course ends soon. Check the schedule before the final assessment.
+        </div>
+
+        <div class="card-group">
+          <article class="overview-card">
+            <div class="course-header">
+              <div class="course-image" role="img" aria-label="Course artwork"></div>
+              <div class="course-meta">
+                <h1 class="course-title">AI: Search Methods for Problem Solving</h1>
+                <p class="instructor">Instructor: Prof. Example</p>
+                <div class="pills">
+                  <span class="pill">Sep 2026</span>
+                  <span class="pill">4 credits</span>
+                  <span class="pill">Foundation</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats">
+              <div class="stat-group">
+                <div class="stat">
+                  <span class="stat-label">Modules</span>
+                  <span class="stat-value">12</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Weeks</span>
+                  <span class="stat-value">16</span>
+                </div>
+              </div>
+              <div class="progress">
+                <div class="progress-top">
+                  <div class="progress-label-group">
+                    <span class="progress-label">Course progress</span>
+                    <span class="progress-value">42%</span>
+                  </div>
+                </div>
+                <progress class="progress-bar" value="42" max="100">42%</progress>
+              </div>
+              <app-button class="continue-learning">
+                <button class="btn btn-gradient" type="button" aria-label="Continue learning">
+                  <span>Continue learning</span>
+                </button>
+              </app-button>
+            </div>
+
+            <p class="description">
+              A structured introduction to search, planning, and problem solving for AI.
+            </p>
+          </article>
+        </div>
+
+        <section class="modules" aria-labelledby="modules-title">
+          <h2 class="modules-title" id="modules-title">Modules</h2>
+          <ul class="module-list">
+            <li>
+              <button class="module-card is-complete" type="button">
+                <span class="module-head">
+                  <span class="module-text">
+                    <span class="module-title">Week 1: Foundations</span>
+                    <span class="module-meta">
+                      <span><b class="meta-count">8</b><span class="meta-label">lessons</span></span>
+                      <span><b class="meta-count">1</b><span class="meta-label">assignment</span></span>
+                    </span>
+                  </span>
+                  <span class="module-status" data-status="complete">
+                    <span class="module-status-label">Complete</span>
+                  </span>
+                  <span class="module-chevron" aria-hidden="true">›</span>
+                </span>
+                <span class="module-progress-row">
+                  <progress class="module-progress" value="100" max="100" aria-label="100% of assignments submitted"></progress>
+                  <span class="module-progress-caption">1 of 1 submitted</span>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button class="module-card" type="button">
+                <span class="module-head">
+                  <span class="module-text">
+                    <span class="module-title">Week 2: Uninformed Search</span>
+                    <span class="module-meta">
+                      <span><b class="meta-count">7</b><span class="meta-label">lessons</span></span>
+                      <span><b class="meta-count">1</b><span class="meta-label">assignment</span></span>
+                    </span>
+                  </span>
+                  <span class="module-status" data-status="in-progress">
+                    <span class="module-status-label">In progress</span>
+                  </span>
+                  <span class="module-chevron" aria-hidden="true">›</span>
+                </span>
+                <span class="module-progress-row">
+                  <progress class="module-progress" value="50" max="100" aria-label="50% of assignments submitted"></progress>
+                  <span class="module-progress-caption">0 of 1 submitted</span>
+                </span>
+              </button>
+            </li>
+            <li>
+              <button class="module-card" type="button">
+                <span class="module-head">
+                  <span class="module-text">
+                    <span class="module-title">Week 3: Informed Search</span>
+                    <span class="module-meta">
+                      <span><b class="meta-count">6</b><span class="meta-label">lessons</span></span>
+                    </span>
+                  </span>
+                  <span class="module-status" data-status="lessons-only">
+                    <span class="module-status-label">Lessons only</span>
+                  </span>
+                  <span class="module-chevron" aria-hidden="true">›</span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <aside class="overview-side" aria-label="Course side panel">
+        <section class="widget">
+          <div class="widget-header">
+            <h2 class="widget-title">Upcoming</h2>
+            <span class="pill">3 items</span>
+          </div>
+          <ul class="due-list">
+            <li class="due-item" tabindex="0">
+              <span class="due-date">28<br>OCT</span>
+              <span class="due-body">
+                <span class="due-title">Practice Assignment 1</span>
+                <span class="due-meta">Due in 2 days</span>
+              </span>
+            </li>
+            <li class="due-item" tabindex="0">
+              <span class="due-date">04<br>NOV</span>
+              <span class="due-body">
+                <span class="due-title">Graded Assignment 2</span>
+                <span class="due-meta">Due next week</span>
+              </span>
+            </li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </app-course-overview>
+</body>
+</html>

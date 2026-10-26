@@ -213,6 +213,34 @@ def check_css():
           "Black mode keeps subtle surfaces near black")
     check("--color-border-default: #1e2735;" in css,
           "Black mode keeps borders visible without glare")
+    check(css.count('html[data-seek-cleaner="active"]') >= 100,
+          "Premium interface rules are gated by the active content state")
+    check("--seek-radius-lg: 1.4rem;" in css,
+          "Shared large radius token is declared")
+    check("--seek-duration: 180ms;" in css,
+          "Shared motion duration is declared")
+    check("--seek-reading-max: 92rem;" in css,
+          "Lesson reading width is capped")
+    check(".lesson-view .content-column" in css,
+          "Lesson content column is scoped and readable")
+    check(".lesson-view .transcript-panel" in css,
+          "Transcript panel uses the shared surface")
+    check("app-course-overview .module-card" in css,
+          "Course overview module cards are styled")
+    check("app-course-overview .module-status" in css,
+          "Course overview module status is styled")
+    check("app-course-overview .overview-card .continue-learning .btn" in css,
+          "Course overview primary action is styled")
+    check("grid-template-columns: minmax(0, 1fr) 30rem" in css,
+          "Course overview removes the empty left rail")
+    check("app-assessments-view .submission-overview" in css,
+          "Assessment submission overview is styled")
+    check("@media (prefers-reduced-motion: reduce)" in css,
+          "Reduced-motion preferences are respected")
+    check(":focus-visible" in css,
+          "Visible keyboard focus states are declared")
+    check("linear-gradient" not in css,
+          "Decorative gradients are avoided in the redesign")
 
 
 def check_readme():

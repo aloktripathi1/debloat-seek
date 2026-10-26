@@ -22,6 +22,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = (ROOT / "tests" / "fixtures" / "seek-fixture.html").read_text(encoding="utf-8")
+OVERVIEW_FIXTURE = (ROOT / "tests" / "fixtures" / "course-overview-fixture.html").read_text(encoding="utf-8")
+ASSESSMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assessment-fixture.html").read_text(encoding="utf-8")
 MINIMAL = "<!doctype html><html lang='en'><body><h1>SEEK</h1></body></html>"
 SEEK_PATTERNS = [
     "https://seek.study.iitm.ac.in/**",
@@ -110,7 +112,17 @@ def route_handler(route):
         route.abort()
         return
 
-    body = MINIMAL if request.url.rstrip("/").endswith("/courses/empty") else FIXTURE
+    url = request.url.rstrip("/")
+
+    if url.endswith("/courses/empty"):
+        body = MINIMAL
+    elif url.endswith("/courses/overview"):
+        body = OVERVIEW_FIXTURE
+    elif url.endswith("/courses/assessment"):
+        body = ASSESSMENT_FIXTURE
+    else:
+        body = FIXTURE
+
     route.fulfill(status=200, content_type="text/html; charset=utf-8", body=body)
 
 
@@ -203,7 +215,7 @@ def check_theme(page, expected_setting):
 
 
 def check_sidebar(page, enabled):
-    expected_radius = "12px" if enabled else "0px"
+    expected_radius = "14px" if enabled else "0px"
 
     page.wait_for_function(
         """([selector, expected]) => {
@@ -248,6 +260,124 @@ def check_default_page(page, theme="system"):
     check_hidden(page, "#decoy-app-bar", False, "unrelated app bar")
     check_hidden(page, "#decoy-transcript", False, "unrelated transcript panel")
     check_hidden(page, 'button[aria-label="Close announcements"]', False, "announcements panel close button")
+
+
+def check_lesson_redesign(page):
+    checks = [
+        ('app-bar.course-bar .app-bar', 'height', '56px', 'course bar uses the compact header height'),
+        ('.unit-view .title-bar', 'height', '56px', 'lesson title bar aligns with the header'),
+        ('.unit-view .title-bar .title', 'font-size', '15px', 'lesson title uses the interface type scale'),
+        ('.lesson-view', 'padding', '24px', 'lesson surface has comfortable padding'),
+        ('.lesson-view', 'gap', '16px', 'lesson columns use consistent spacing'),
+        ('.lesson-view .content-column', 'max-width', '920px', 'lesson reading column stays readable'),
+        ('.lesson-view .video-container', 'border-radius', '14px', 'video player uses the shared radius'),
+        ('.lesson-view .tab-bar-wrapper', 'border-radius', '10px', 'lesson tabs use the compact radius'),
+        ('.lesson-view .objectives', 'border-radius', '14px', 'objectives panel uses the shared radius'),
+        ('.lesson-view .transcript-panel', 'width', '340px', 'transcript panel has a stable width'),
+        ('app-course-outline .outline-pane', 'width', '290px', 'Contents sidebar uses the shared width'),
+        ('app-course-outline .unit-container', 'border-radius', '14px', 'Contents units use the shared radius'),
+        ('app-course-outline .child-row', 'border-radius', '8px', 'Contents lessons use the compact radius')
+    ]
+
+    for selector, property_name, expected, label in checks:
+        actual = computed_style(page, selector, property_name)
+        check(actual == expected, f"{label} ({property_name}: {actual})")
+
+    page.locator('app-course-outline .child-row').first.focus()
+    check(computed_style(page, 'app-course-outline .child-row', 'outline-width') == '2px',
+          "Contents lessons have a visible keyboard focus ring")
+    check(computed_style(page, 'app-course-outline .child-row', 'outline-style') == 'solid',
+          "Contents lesson focus ring is solid")
+
+    page.emulate_media(reduced_motion='reduce')
+    page.wait_for_timeout(50)
+    durations = computed_style(page, 'app-course-outline .child-row', 'transition-duration')
+    check(
+        all(float(part.strip().rstrip('s')) <= 0.001 for part in durations.split(',') if part.strip()),
+        f"reduced motion removes long transitions ({durations})"
+    )
+    page.emulate_media(reduced_motion='no-preference', color_scheme='light')
+
+
+def check_overview_redesign(page):
+    checks = [
+        ('.overview-page', 'padding', '24px', 'course overview uses the page rhythm'),
+        ('.overview-page', 'gap', '24px', 'course overview uses consistent spacing'),
+        ('.overview-card', 'border-radius', '14px', 'course overview card uses the shared radius'),
+        ('.course-header', 'padding', '24px', 'course header has generous padding'),
+        ('.course-header', 'background-color', 'rgb(249, 249, 250)', 'course header uses the subtle surface'),
+        ('.course-title', 'font-size', '22px', 'course title has clear hierarchy'),
+        ('.course-title', 'font-weight', '700', 'course title has strong emphasis'),
+        ('.module-card', 'border-radius', '14px', 'module cards use the shared radius'),
+        ('.module-card', 'padding', '16px', 'module cards use consistent padding'),
+        ('.widget', 'border-radius', '14px', 'side widgets use the shared radius'),
+        ('.due-item', 'padding', '12px 8px', 'upcoming items use compact spacing')
+    ]
+
+    for selector, property_name, expected, label in checks:
+        actual = computed_style(page, selector, property_name)
+        check(actual == expected, f"{label} ({property_name}: {actual})")
+
+    columns = computed_style(page, '.overview-page', 'grid-template-columns')
+    check(len(columns.split()) == 2, f"course overview removes the empty left rail ({columns})")
+    check(computed_style(page, '.overview-side', 'width') == '300px',
+          "course overview keeps one supporting rail")
+
+    page.locator('.module-card').first.hover()
+    page.wait_for_timeout(220)
+    check(computed_style(page, '.module-card', 'transform') == 'matrix(1, 0, 0, 1, 0, -1)',
+          "module cards lift subtly on hover")
+
+    page.locator('.module-card').first.focus()
+    check(computed_style(page, '.module-card', 'outline-width') == '2px',
+          "module cards have a visible keyboard focus ring")
+
+    check(computed_style(page, '.continue-learning .btn', 'border-radius') == '8px',
+          "course overview primary action uses the compact radius")
+    check(computed_style(page, '.continue-learning .btn', 'background-color') not in ('rgba(0, 0, 0, 0)', 'transparent'),
+          "course overview primary action has a filled primary surface")
+    check(computed_style(page, '.module-status', 'border-radius') == '999px',
+          "module status uses a quiet pill")
+    check(computed_style(page, '.module-progress', 'height') == '4px',
+          "module progress uses a slim track")
+
+    original_viewport = page.viewport_size
+
+    for width, height, label in [(768, 900, 'tablet'), (390, 844, 'phone')]:
+        page.set_viewport_size({'width': width, 'height': height})
+        page.wait_for_timeout(150)
+        overflow = page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth")
+        check(not overflow, f"course overview has no horizontal overflow at {label} width")
+
+        side_top = page.evaluate("() => document.querySelector('.overview-side').getBoundingClientRect().top")
+        modules_top = page.evaluate("() => document.querySelector('.modules').getBoundingClientRect().top")
+        check(side_top > modules_top, f"supporting rail follows course contents at {label} width")
+
+    page.set_viewport_size(original_viewport)
+    page.wait_for_timeout(100)
+
+
+def check_assessment_redesign(page):
+    checks = [
+        ('.pa-start-page', 'padding', '24px', 'assessment start page uses the page rhythm'),
+        ('.assessment-instructions', 'border-radius', '14px', 'assessment instructions use the shared radius'),
+        ('.submission-overview', 'border-radius', '14px', 'submission overview uses the shared radius'),
+        ('.submission-overview', 'padding', '24px', 'submission overview has generous padding'),
+        ('.submission-overview', 'background-color', 'rgb(249, 249, 250)',
+         'submission overview uses the subtle surface'),
+        ('.card-title', 'font-size', '11px', 'submission label uses the compact type scale'),
+        ('.card-title', 'font-weight', '600', 'submission label has clear emphasis'),
+        ('.earned', 'font-size', '32px', 'submission score has strong hierarchy'),
+        ('.earned', 'font-weight', '700', 'submission score has strong emphasis'),
+        ('.submission-toolbar', 'border-radius', '10px', 'submission toolbar uses the compact radius'),
+        ('.test-case-card', 'border-radius', '10px', 'test cases use the compact radius'),
+        ('.test-case-card', 'background-color', 'rgb(249, 249, 250)',
+         'test cases use the subtle surface')
+    ]
+
+    for selector, property_name, expected, label in checks:
+        actual = computed_style(page, selector, property_name)
+        check(actual == expected, f"{label} ({property_name}: {actual})")
 
 
 def get_popup_states(popup):
@@ -400,11 +530,26 @@ def main():
 
                 page = context.new_page()
                 page.on("pageerror", lambda error: page_errors.append(f"page: {error}"))
+                page.emulate_media(color_scheme="light")
                 page.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)
 
                 print("\nInitial defaults")
                 check_default_page(page)
+
+                print("\nRedesigned course surfaces")
+                check_lesson_redesign(page)
+
+                page.goto("https://seek.study.iitm.ac.in/courses/overview", wait_until="domcontentloaded")
+                wait_for_root(page, BOOLEAN_SETTINGS)
+                check_overview_redesign(page)
+
+                page.goto("https://seek.study.iitm.ac.in/courses/assessment", wait_until="domcontentloaded")
+                wait_for_root(page, BOOLEAN_SETTINGS)
+                check_assessment_redesign(page)
+
+                page.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
+                wait_for_root(page, BOOLEAN_SETTINGS)
 
                 print("\nAngular-style rerender and in-app navigation")
                 page.evaluate(

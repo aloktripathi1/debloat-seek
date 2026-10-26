@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SEEK assessment fixture</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-text-default: #242424;
+      --color-text-secondary: #5d687e;
+      --color-text-disabled: #8d94a8;
+      --color-text-on-primary: #ffffff;
+      --color-text-success-strong: #039855;
+      --color-icon-secondary: #5d687e;
+      --color-icon-primary: #494f69;
+      --color-icon-success-strong: #039855;
+      --color-background-surface-base: #ffffff;
+      --color-background-surface-subtle: #f9f9fa;
+      --color-background-surface-strong: #f6f6f6;
+      --color-background-surface-stronger: #eff0f2;
+      --color-background-primary: #494f69;
+      --color-background-primary-light: #e9ebf2;
+      --color-border-default: #dfe4ed;
+      --color-border-secondary: #f2f2f2;
+      --color-border-primary-light: #d8dae5;
+      --color-border-focus: #3384ff;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --color-text-default: #f6f6f6;
+      --color-text-secondary: #b0b5cb;
+      --color-text-disabled: #5d687e;
+      --color-text-on-primary: #0d1119;
+      --color-text-success-strong: #32d583;
+      --color-icon-secondary: #b0b5cb;
+      --color-icon-primary: #d8dae5;
+      --color-icon-success-strong: #32d583;
+      --color-background-surface-base: #1b1d29;
+      --color-background-surface-subtle: #222736;
+      --color-background-surface-strong: #222736;
+      --color-background-surface-stronger: #2d3243;
+      --color-background-primary: #d8dae5;
+      --color-background-primary-light: #222736;
+      --color-border-default: #494f69;
+      --color-border-secondary: #2d3243;
+      --color-border-primary-light: #2d3243;
+      --color-border-focus: #3384ff;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font-family: Roboto, sans-serif;
+    }
+
+    app-assessments-view {
+      display: block;
+      min-height: 100vh;
+    }
+
+    .pa-start-page {
+      display: flex;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .assessment-instructions {
+      display: flex;
+      padding: 16px;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .assessment-instructions h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .assessment-instructions p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .submission-overview {
+      display: flex;
+      padding: 16px;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-subtle);
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .overview-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .score-display {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .score-display .earned,
+    .score-display .slash,
+    .score-display .max {
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .stats-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .stats-row .divider {
+      width: 1px;
+      height: 32px;
+      background: var(--color-border-default);
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat .label {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stat .count {
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .stats-bar {
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--color-background-surface-stronger);
+      overflow: hidden;
+    }
+
+    .stats-bar span {
+      display: block;
+      width: 80%;
+      height: 100%;
+      background: var(--color-text-success-strong);
+    }
+
+    .programming-assignment-view {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .question-layout {
+      display: flex;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .submission-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+    }
+
+    .test-case-card {
+      padding: 16px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-subtle);
+    }
+
+    .test-case-card h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+
+    .test-case-card p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
+    .test-case-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 4px;
+      background: var(--color-background-surface-base);
+      font: inherit;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <app-assessments-view>
+    <div class="pa-start-page">
+      <section class="assessment-instructions" aria-labelledby="assessment-title">
+        <h1 id="assessment-title">Practice Assignment 1</h1>
+        <p>
+          Submit a single Python file. The assignment is graded automatically against
+          hidden tests. You may submit multiple times before the deadline.
+        </p>
+      </section>
+
+      <section class="submission-overview" aria-labelledby="submission-title">
+        <div class="card-title-row">
+          <h2 class="card-title" id="submission-title">Submission overview</h2>
+        </div>
+
+        <div class="overview-row">
+          <div class="score-display" aria-label="Score 8 out of 10">
+            <span class="earned">8</span>
+            <span class="slash">/</span>
+            <span class="max">10</span>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat">
+              <span class="label">Passed</span>
+              <span class="count">8</span>
+            </div>
+            <span class="divider" aria-hidden="true"></span>
+            <div class="stat">
+              <span class="label">Failed</span>
+              <span class="count">2</span>
+            </div>
+            <span class="divider" aria-hidden="true"></span>
+            <div class="stat">
+              <span class="label">Attempts</span>
+              <span class="count">3</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-bar" aria-hidden="true"><span></span></div>
+      </section>
+    </div>
+
+    <section class="programming-assignment-view" aria-label="Programming assignment">
+      <div class="question-layout">
+        <div class="submission-toolbar" role="toolbar" aria-label="Submission actions">
+          <button type="button" class="btn btn-size-small">Run tests</button>
+          <button type="button" class="btn btn-size-small">Submit</button>
+          <button type="button" class="test-case-pill">Show diff</button>
+        </div>
+
+        <article class="test-case-card">
+          <h3>Test case 1: basic search</h3>
+          <p>Expected the shortest path to be returned for a simple graph.</p>
+        </article>
+
+        <article class="test-case-card">
+          <h3>Test case 2: disconnected graph</h3>
+          <p>Expected a clear no-path result without raising an exception.</p>
+        </article>
+      </div>
+    </section>
+  </app-assessments-view>
+</body>
+</html>

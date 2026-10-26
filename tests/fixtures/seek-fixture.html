@@ -8,6 +8,9 @@
       color-scheme: light;
       --color-text-default: #242424;
       --color-text-secondary: #5d687e;
+      --color-text-disabled: #8d94a8;
+      --color-text-on-primary: #ffffff;
+      --color-text-success-strong: #039855;
       --color-icon-secondary: #5d687e;
       --color-icon-primary: #494f69;
       --color-icon-success-strong: #039855;
@@ -28,6 +31,9 @@
       color-scheme: dark;
       --color-text-default: #f6f6f6;
       --color-text-secondary: #b0b5cb;
+      --color-text-disabled: #5d687e;
+      --color-text-on-primary: #0d1119;
+      --color-text-success-strong: #32d583;
       --color-icon-secondary: #b0b5cb;
       --color-icon-primary: #d8dae5;
       --color-icon-success-strong: #32d583;
@@ -58,6 +64,70 @@
     app-course-outline {
       display: flex;
       min-height: 100vh;
+    }
+
+    app-bar.course-bar {
+      display: block;
+      border-bottom: 1px solid var(--color-border-default);
+      background: var(--color-background-surface-base);
+    }
+
+    .app-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 48px;
+      padding: 0 12px;
+      background: var(--color-background-surface-base);
+    }
+
+    .lead,
+    .heading,
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .lead {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .heading {
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .title {
+      min-width: 0;
+      overflow: hidden;
+      border: 0;
+      background: transparent;
+      color: var(--color-text-default);
+      font: inherit;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .actions {
+      gap: 2px;
+    }
+
+    .profile {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: var(--color-background-primary-light);
+      color: var(--color-text-default);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .outline-pane {
@@ -184,6 +254,103 @@
 
     .unit-pane {
       flex: 1;
+      min-width: 0;
+    }
+
+    .unit-view {
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+    }
+
+    .title-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--color-border-default);
+      background: var(--color-background-surface-base);
+    }
+
+    .title-bar .center-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-bar .title-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+    }
+
+    .title-bar .title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .lesson-view {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      min-height: 0;
+      flex: 1;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .content-column {
+      display: flex;
+      flex: 6;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .video-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+
+    .transcript-panel {
+      display: flex;
+      flex: 4;
+      min-width: 240px;
+      max-width: 400px;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .tab-bar-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-scroller {
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .objectives {
+      display: block;
+    }
+
+    .objectives .empty-state {
+      text-align: center;
     }
 
     .decoy-panel {
@@ -198,36 +365,38 @@
   -->
   <app-root>
     <app-bar class="course-bar">
-      <div class="lead">
-        <app-button label="Overview">
-          <button type="button" aria-label="Overview" class="btn">Overview</button>
-        </app-button>
-        <span class="divider" aria-hidden="true"></span>
-        <div class="heading">
-          <button type="button" class="title">Sep 2026 - AI: Search Methods</button>
-          <span class="page-label">Contents</span>
+      <header class="app-bar">
+        <div class="lead">
+          <app-button label="Overview">
+            <button type="button" aria-label="Overview" class="btn">Overview</button>
+          </app-button>
+          <span class="divider" aria-hidden="true"></span>
+          <div class="heading">
+            <button type="button" class="title">Sep 2026 - AI: Search Methods</button>
+            <span class="page-label">Contents</span>
+          </div>
         </div>
-      </div>
 
-      <nav class="actions" aria-label="Course actions">
-        <app-button label="Contents">
-          <button type="button" aria-label="Contents" class="btn">Contents</button>
-        </app-button>
-        <app-button label="Grades">
-          <button type="button" aria-label="Grades" class="btn">Grades</button>
-        </app-button>
-        <app-button label="Forum">
-          <button type="button" aria-label="Forum" class="btn">Forum</button>
-        </app-button>
-        <app-button label="Calculator">
-          <button type="button" aria-label="Calculator" class="btn">Calculator</button>
-        </app-button>
-        <app-button data-announcements-trigger label="Announcements">
-          <button type="button" aria-label="Announcements" class="btn">Announcements</button>
-        </app-button>
-        <span class="divider in-actions" aria-hidden="true"></span>
-        <button type="button" class="profile" aria-label="Account">AK</button>
-      </nav>
+        <nav class="actions" aria-label="Course actions">
+          <app-button label="Contents">
+            <button type="button" aria-label="Contents" class="btn">Contents</button>
+          </app-button>
+          <app-button label="Grades">
+            <button type="button" aria-label="Grades" class="btn">Grades</button>
+          </app-button>
+          <app-button label="Forum">
+            <button type="button" aria-label="Forum" class="btn">Forum</button>
+          </app-button>
+          <app-button label="Calculator">
+            <button type="button" aria-label="Calculator" class="btn">Calculator</button>
+          </app-button>
+          <app-button data-announcements-trigger label="Announcements">
+            <button type="button" aria-label="Announcements" class="btn">Announcements</button>
+          </app-button>
+          <span class="divider in-actions" aria-hidden="true"></span>
+          <button type="button" class="profile" aria-label="Account">AK</button>
+        </nav>
+      </header>
     </app-bar>
 
     <main>
@@ -294,24 +463,61 @@
 
         <section class="unit-pane">
           <app-course-unit-view>
-            <app-lesson-view>
-              <div class="lesson-view">
-                <div class="content-column">
-                  <div class="video-container">Video</div>
+            <div class="unit-view">
+              <app-title-bar>
+                <div class="title-bar">
+                  <div class="center-content">
+                    <span class="title-icon" aria-hidden="true">▤</span>
+                    <div class="title-content">
+                      <div class="title-row">
+                        <h1 class="title">About the Course</h1>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <aside class="transcript-panel hidden-mobile">
-                  <div class="panel-header">Video Transcript</div>
-                </aside>
-              </div>
-            </app-lesson-view>
-          </app-course-unit-view>
+              </app-title-bar>
 
-          <nav class="unit-nav" aria-label="Previous and next unit">
-            <div class="unit-nav-row">
-              <button type="button" class="unit-nav-button is-previous">Previous</button>
-              <button type="button" class="unit-nav-button is-next">Next</button>
+              <app-lesson-view>
+                <div class="lesson-view">
+                  <div class="content-column">
+                    <div class="video-container">Video</div>
+                    <app-tab-bar class="tab-bar">
+                      <div class="tab-bar-wrapper">
+                        <div class="tab-scroller">
+                          <button type="button" class="tab-item active">Objectives</button>
+                          <button type="button" class="tab-item">Transcript</button>
+                        </div>
+                      </div>
+                    </app-tab-bar>
+                    <div class="objectives">
+                      <div class="empty-state">Objectives not available for this lesson</div>
+                    </div>
+                  </div>
+                  <aside class="transcript-panel hidden-mobile">
+                    <div class="panel-header">
+                      <div class="controls">
+                        <span class="language-label">Video Transcript</span>
+                        <span class="auto-scroll">Auto-scroll</span>
+                      </div>
+                    </div>
+                    <div class="cue-list">
+                      <button type="button" class="cue">
+                        <span class="timestamp">0:00</span>
+                        <span class="text">Welcome to the course.</span>
+                      </button>
+                    </div>
+                  </aside>
+                </div>
+              </app-lesson-view>
+
+              <nav class="unit-nav" aria-label="Previous and next unit">
+                <div class="unit-nav-row">
+                  <button type="button" class="unit-nav-button is-previous">Previous</button>
+                  <button type="button" class="unit-nav-button is-next">Next</button>
+                </div>
+              </nav>
             </div>
-          </nav>
+          </app-course-unit-view>
         </section>
       </app-course-outline>
 

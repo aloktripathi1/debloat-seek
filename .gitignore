@@ -1,5 +1,6 @@
-# Private SEEK DOM snapshot used only for local selector verification
+# Private SEEK DOM snapshots used only for local visual/selector verification
 /seek.html
+/course-page.html
 
 # Python and OS artifacts
 __pycache__/
