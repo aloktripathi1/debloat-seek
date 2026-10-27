@@ -96,8 +96,8 @@ def check_popup():
 
     check(keys == [
         "unitNav", "overview", "divider",
-        "transcript", "objectives", "announcements", "forum", "calculator", "header"
-    ], "Nine independent settings are present in the expected order")
+        "transcript", "objectives", "answers", "announcements", "forum", "calculator", "header"
+    ], "Ten independent settings are present in the expected order")
 
     default_keys = {"unitNav", "overview", "divider"}
     for element in inputs:
@@ -127,7 +127,7 @@ def check_popup():
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 9, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 10, "Every setting has a clickable label row")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
@@ -138,6 +138,7 @@ def check_settings_model():
     print("\nSettings model")
     settings_js = read("settings.js")
 
+    check("answers: false" in settings_js, "Assignment answer hiding is off by default")
     check("theme: 'system'" in settings_js, "System theme is the safe default")
     check("THEME_VALUES" in settings_js, "Theme values are declared once")
     check("'system', 'light', 'dark', 'black'" in settings_js,
@@ -197,6 +198,16 @@ def check_css():
           "Calculator selectors are gated by their own state")
     check(css.count('html[data-seek-header="on"]') == 1,
           "Course header is gated by its own state")
+    check(css.count('html[data-seek-answers="on"]') >= 20,
+          "Assignment answer hiding is gated by its own state")
+    check("app-assessment-question-view .evaluated-answer" in css,
+          "Assignment answer hiding is scoped to the evaluated answer view")
+    check(".reveal-badge" in css and ".expected-answer" in css,
+          "Assignment answer hiding covers revealed and expected answers")
+    check(".choice.is-correct" in css and ".choice.is-wrong" in css,
+          "Assignment answer hiding neutralises correct and wrong choices")
+    check("data-seek-answers" in read("content.js"),
+          "Content script exposes the assignment answer state")
     check("app-bar.course-bar .lead > span.divider" in css,
           "Divider selector is scoped to the course-bar lead container")
     check("app-bar.course-bar" in css,
@@ -250,6 +261,7 @@ def check_readme():
         "Known limitations",
         "Calculator",
         "Objectives",
+        "Assignment",
         "Course header bar",
         "Black",
         "System"

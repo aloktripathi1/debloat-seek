@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = (ROOT / "tests" / "fixtures" / "seek-fixture.html").read_text(encoding="utf-8")
 OVERVIEW_FIXTURE = (ROOT / "tests" / "fixtures" / "course-overview-fixture.html").read_text(encoding="utf-8")
 ASSESSMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assessment-fixture.html").read_text(encoding="utf-8")
+ASSIGNMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assignment-fixture.html").read_text(encoding="utf-8")
 MINIMAL = "<!doctype html><html lang='en'><body><h1>SEEK</h1></body></html>"
 SEEK_PATTERNS = [
     "https://seek.study.iitm.ac.in/**",
@@ -37,6 +38,7 @@ DEFAULT_SETTINGS = {
     "divider": True,
     "transcript": False,
     "objectives": False,
+    "answers": False,
     "announcements": False,
     "forum": False,
     "calculator": False,
@@ -54,6 +56,7 @@ ATTRIBUTES = {
     "divider": "data-seek-divider",
     "transcript": "data-seek-transcript",
     "objectives": "data-seek-objectives",
+    "answers": "data-seek-answers",
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
@@ -120,6 +123,8 @@ def route_handler(route):
         body = OVERVIEW_FIXTURE
     elif url.endswith("/courses/assessment"):
         body = ASSESSMENT_FIXTURE
+    elif url.endswith("/courses/assignment"):
+        body = ASSIGNMENT_FIXTURE
     else:
         body = FIXTURE
 
@@ -261,6 +266,83 @@ def check_stock_lesson(page):
     check_hidden(page, TARGETS["objectivesOnlyBar"], False,
                  "objectives-only tab bar stays visible by default")
     check_hidden(page, "#decoy-objectives", False, "unrelated objectives panel")
+
+
+def check_assignment_review(page, hidden):
+    header = 'app-assessment-question-view .evaluated-answer > .header'
+    badge = 'app-assessment-question-view .evaluated-answer .reveal-badge'
+    feedback = 'app-assessment-question-view .evaluated-answer .choice-feedback'
+    wrong_choice = 'app-assessment-question-view .evaluated-answer .choice.is-wrong'
+    expected_choice = 'app-assessment-question-view .evaluated-answer .choice.is-expected'
+    selected_radio = 'app-assessment-question-view .evaluated-answer .choice .radio.is-checked'
+    radio_dot = 'app-assessment-question-view .evaluated-answer .choice .radio-dot'
+    checkbox_icon = 'app-assessment-question-view .evaluated-answer .choice .checkbox.is-checked svg'
+    answer_label = 'app-assessment-question-view .evaluated-answer .short-answer .answer-label'
+    short_answer = 'app-assessment-question-view .evaluated-answer .short-answer .show-submission'
+    chip_badge = 'app-assessment-question-view .chip.correct .badge'
+    instructions_badge = 'app-assessment-question-view .chip.instructions .badge'
+    instructions_circle = 'app-assessment-question-view .chip.instructions .circle'
+    chip_circle = 'app-assessment-question-view .chip.correct.current .circle'
+    chip_current = 'app-assessment-question-view .chip.correct.current'
+    success_cell = 'app-assessment-question-view .cell.has-success'
+    incorrect_panel = 'app-assessment-question-view .evaluated-answer.incorrect'
+
+    if hidden:
+        check_hidden(page, header, True, "reviewed answer header is hidden")
+        check_hidden(page, badge, True, "correct/expected badges are hidden")
+        check_hidden(page, feedback, True, "per-choice feedback is hidden")
+        check_hidden(page, radio_dot, True, "selected radio marker is hidden")
+        check_hidden(page, checkbox_icon, True, "checked checkbox marker is hidden")
+        check_hidden(page, answer_label, True, "short-answer label is hidden")
+        check_hidden(page, short_answer, True, "submitted and expected short answers are hidden")
+        check_hidden(page, chip_badge, True, "question correctness badges are hidden")
+        check_hidden(page, instructions_badge, False, "instructions chip badge stays visible")
+        check(computed_style(page, instructions_circle, 'background-color') == 'rgb(224, 242, 254)',
+              "instructions chip keeps its own colour")
+
+        check(computed_style(page, wrong_choice, 'background-color') == 'rgb(249, 249, 250)',
+              "wrong choice uses the neutral surface")
+        check(computed_style(page, expected_choice, 'background-color') == 'rgb(249, 249, 250)',
+              "expected choice uses the neutral surface")
+        check(computed_style(page, wrong_choice, 'border-color') == 'rgba(0, 0, 0, 0)',
+              "wrong choice border is neutralised")
+        check(computed_style(page, expected_choice, 'border-style') == 'solid',
+              "expected choice dashed border is neutralised")
+        check(computed_style(page, selected_radio, 'border-color') == 'rgb(223, 228, 237)',
+              "selected radio border is neutralised")
+        check(computed_style(page, success_cell, 'border-color') == 'rgb(223, 228, 237)',
+              "review cell border is neutralised")
+        check(computed_style(page, incorrect_panel, 'border-color') == 'rgb(223, 228, 237)',
+              "review panel border is neutralised")
+        check(computed_style(page, chip_circle, 'background-color') == 'rgb(246, 246, 246)',
+              "question chips lose correctness colour")
+        check(computed_style(page, chip_circle, 'color') == 'rgb(36, 36, 36)',
+              "question chip numbers use the default text colour")
+        check(computed_style(page, chip_current, 'border-color') == 'rgb(36, 36, 36)',
+              "current question keeps a neutral marker")
+    else:
+        check_hidden(page, header, False, "reviewed answer header is visible")
+        check_hidden(page, badge, False, "correct/expected badges are visible")
+        check_hidden(page, feedback, False, "per-choice feedback is visible")
+        check_hidden(page, radio_dot, False, "selected radio marker is visible")
+        check_hidden(page, checkbox_icon, False, "checked checkbox marker is visible")
+        check_hidden(page, answer_label, False, "short-answer label is visible")
+        check_hidden(page, short_answer, False, "submitted and expected short answers are visible")
+        check_hidden(page, chip_badge, False, "question correctness badges are visible")
+        check_hidden(page, instructions_badge, False, "instructions chip badge is visible by default")
+
+        check(computed_style(page, wrong_choice, 'background-color') == 'rgb(254, 243, 242)',
+              "wrong choice keeps SEEK's error tint")
+        check(computed_style(page, expected_choice, 'background-color') == 'rgb(255, 250, 235)',
+              "expected choice keeps SEEK's warning tint")
+        check(computed_style(page, success_cell, 'border-color') == 'rgb(3, 152, 85)',
+              "review cell keeps SEEK's success border")
+        check(computed_style(page, incorrect_panel, 'border-color') == 'rgb(217, 45, 32)',
+              "review panel keeps SEEK's error border")
+        check(computed_style(page, chip_circle, 'background-color') == 'rgb(3, 152, 85)',
+              "current question keeps its correctness colour")
+        check(computed_style(page, chip_current, 'border-color') == 'rgb(3, 152, 85)',
+              "current question keeps its correctness border")
 
 
 def check_overview_redesign(page):
@@ -652,6 +734,42 @@ def main():
 
                 set_toggle(popup, page, "calculator", False)
                 check_hidden(page, TARGETS["calculator"], False, "calculator restored")
+
+                print("\nAssignment answer practice mode")
+                page.goto("https://seek.study.iitm.ac.in/courses/assignment", wait_until="domcontentloaded")
+                page.wait_for_function(
+                    """() => document.documentElement.getAttribute('data-seek-cleaner') === 'active'
+                        && document.documentElement.getAttribute('data-seek-answers') === 'off'""",
+                    timeout=5000
+                )
+                check_assignment_review(page, False)
+                set_toggle(popup, page, "answers", True)
+                check_assignment_review(page, True)
+
+                fresh_assignment = context.new_page()
+                fresh_assignment.on("pageerror", lambda error: page_errors.append(f"fresh assignment: {error}"))
+                fresh_assignment.emulate_media(color_scheme="light")
+                fresh_assignment.goto(
+                    "https://seek.study.iitm.ac.in/courses/assignment",
+                    wait_until="domcontentloaded"
+                )
+                fresh_assignment.wait_for_function(
+                    """() => document.documentElement.getAttribute('data-seek-cleaner') === 'active'
+                        && document.documentElement.getAttribute('data-seek-answers') === 'on'""",
+                    timeout=5000
+                )
+                check_assignment_review(fresh_assignment, True)
+                fresh_assignment.close()
+
+                set_toggle(popup, page, "answers", False)
+                check_assignment_review(page, False)
+
+                page.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
+                wait_for_root(page, {
+                    **BOOLEAN_SETTINGS,
+                    "transcript": True,
+                    "announcements": True
+                })
 
                 print("\nPersistence after reload")
                 set_toggle(popup, page, "calculator", True)

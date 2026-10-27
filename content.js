@@ -32,6 +32,7 @@
     divider: 'data-seek-divider',
     transcript: 'data-seek-transcript',
     objectives: 'data-seek-objectives',
+    answers: 'data-seek-answers',
     announcements: 'data-seek-announcements',
     forum: 'data-seek-forum',
     calculator: 'data-seek-calculator',

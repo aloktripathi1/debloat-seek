@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "seek-fixture.html"
+ASSIGNMENT_FIXTURE = ROOT / "tests" / "fixtures" / "assignment-fixture.html"
 REAL_DOM = ROOT / "seek.html"
 
 SELECTORS = {
@@ -52,10 +53,69 @@ ATTRIBUTES = {
     "divider": "data-seek-divider",
     "transcript": "data-seek-transcript",
     "objectives": "data-seek-objectives",
+    "answers": "data-seek-answers",
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
     "header": "data-seek-header"
+}
+
+ASSIGNMENT_SELECTORS = {
+    "header": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer > .header',
+        2
+    ),
+    "revealBadges": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .reveal-badge',
+        3
+    ),
+    "choices": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-correct, '
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-expected, '
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-wrong, '
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-selected',
+        3
+    ),
+    "radioDots": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice .radio-dot',
+        2
+    ),
+    "checkboxIcons": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer '
+        '.choice .checkbox.is-checked svg',
+        1
+    ),
+    "shortAnswer": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer '
+        '.short-answer .answer-label, '
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer '
+        '.short-answer .show-submission',
+        2
+    ),
+    "feedback": (
+        'html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice-feedback',
+        2
+    ),
+    "chipBadges": (
+        'html[data-seek-answers="on"] app-assessment-question-view .chip.correct .badge, '
+        'html[data-seek-answers="on"] app-assessment-question-view .chip.incorrect .badge, '
+        'html[data-seek-answers="on"] app-assessment-question-view .chip.partial .badge, '
+        'html[data-seek-answers="on"] app-assessment-question-view .chip.eval-unanswered .badge',
+        4
+    ),
+    "cellBorders": (
+        'html[data-seek-answers="on"] app-assessment-question-view .cell.has-success, '
+        'html[data-seek-answers="on"] app-assessment-question-view .cell.has-error, '
+        'html[data-seek-answers="on"] app-assessment-question-view .cell.has-warning',
+        2
+    ),
+    "evaluatedBorders": (
+        'html[data-seek-answers="on"] app-assessment-question-view '
+        '.evaluated-answer.correct, '
+        'html[data-seek-answers="on"] app-assessment-question-view '
+        '.evaluated-answer.incorrect',
+        2
+    )
 }
 
 failures = []
@@ -181,6 +241,32 @@ def test_badge_variant():
           "missing announcements trigger is handled gracefully")
 
 
+def test_assignment_answers():
+    print("\nAssignment answer practice mode")
+    soup = BeautifulSoup(ASSIGNMENT_FIXTURE.read_text(encoding="utf-8"), "html.parser")
+    set_states(soup, answers=True)
+
+    for key, (selector, expected) in ASSIGNMENT_SELECTORS.items():
+        check(len(soup.select(selector)) == expected,
+              f"assignment {key} matches {expected} element(s) when enabled")
+
+    instructions = soup.select_one("app-assessment-question-view .chip.instructions")
+    check(instructions is not None, "instructions chip is present in the review fixture")
+    check(instructions not in soup.select(ASSIGNMENT_SELECTORS["chipBadges"][0]),
+          "correctness badge selector does not match the instructions chip")
+
+    set_states(soup)
+    for key, (selector, _) in ASSIGNMENT_SELECTORS.items():
+        check(len(soup.select(selector)) == 0,
+              f"assignment {key} selector matches nothing when disabled")
+
+    lesson = load_fixture()
+    set_states(lesson, answers=True)
+    for key, (selector, _) in ASSIGNMENT_SELECTORS.items():
+        check(len(lesson.select(selector)) == 0,
+              f"assignment {key} selector does not match lesson markup")
+
+
 def test_missing_elements():
     print("\nMissing elements")
     soup = BeautifulSoup("<html><body><h1>SEEK</h1></body></html>", "html.parser")
@@ -231,6 +317,7 @@ def main():
     test_off_states(soup)
     test_on_states(soup)
     test_badge_variant()
+    test_assignment_answers()
     test_missing_elements()
     test_real_dom()
 

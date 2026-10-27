@@ -1,6 +1,8 @@
 # Private SEEK DOM snapshots used only for local visual/selector verification
 /seek.html
 /course-page.html
+/assingment-page.html
+/assignment-page.html
 
 # Python and OS artifacts
 __pycache__/

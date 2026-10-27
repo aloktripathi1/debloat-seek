@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SEEK assignment review fixture</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-text-default: #242424;
+      --color-text-secondary: #5d687e;
+      --color-icon-default: #242424;
+      --color-icon-success-strong: #039855;
+      --color-background-surface-base: #ffffff;
+      --color-background-surface-subtle: #f9f9fa;
+      --color-background-surface-strong: #f6f6f6;
+      --color-border-default: #dfe4ed;
+      --color-border-success-strong: #039855;
+      --color-border-error-strong: #d92d20;
+      --color-border-warning-strong: #f79009;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --color-text-default: #f6f6f6;
+      --color-text-secondary: #b0b5cb;
+      --color-icon-default: #f6f6f6;
+      --color-icon-success-strong: #32d583;
+      --color-background-surface-base: #1b1d29;
+      --color-background-surface-subtle: #222736;
+      --color-background-surface-strong: #222736;
+      --color-border-default: #494f69;
+      --color-border-success-strong: #32d583;
+      --color-border-error-strong: #f97066;
+      --color-border-warning-strong: #fdb022;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font-family: Roboto, sans-serif;
+    }
+
+    app-assessment-question-view {
+      display: block;
+      padding: 16px;
+    }
+
+    .assessment-question-view {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .assessment-paginator,
+    .chips {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .chip .circle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--color-background-surface-strong);
+      color: var(--color-text-default);
+    }
+
+    .chip .badge {
+      display: flex;
+      align-items: center;
+    }
+
+    .chip.correct .circle {
+      background: #d1fadf;
+      color: #039855;
+    }
+
+    .chip.correct.current {
+      border-color: #039855;
+    }
+
+    .chip.correct.current .circle {
+      background: #039855;
+      color: #ffffff;
+    }
+
+    .chip.incorrect .circle {
+      background: #fee4e2;
+      color: #d92d20;
+    }
+
+    .chip.partial .circle {
+      background: #fef0c7;
+      color: #b54708;
+    }
+
+    .chip.eval-unanswered .circle {
+      background: #f2f4f7;
+      color: #242424;
+    }
+
+    .chip.instructions .circle {
+      background: #e0f2fe;
+      color: #026aa2;
+    }
+
+    .cell {
+      border: 1px solid var(--color-border-default);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .cell.has-success {
+      border-color: #039855;
+    }
+
+    .cell.has-error {
+      border-color: #d92d20;
+    }
+
+    .cell.has-warning {
+      border-color: #f79009;
+    }
+
+    .evaluated-answer {
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .evaluated-answer.correct {
+      border-color: #039855;
+    }
+
+    .evaluated-answer.incorrect {
+      border-color: #d92d20;
+    }
+
+    .evaluated-answer .header {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-radius: 8px 8px 0 0;
+      background: #ecfdf3;
+    }
+
+    .evaluated-answer.incorrect .header {
+      background: #fee4e2;
+    }
+
+    .choices {
+      list-style: none;
+      margin: 16px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .choice {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--color-background-surface-subtle);
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .choice.is-selected {
+      border-color: #494f69;
+    }
+
+    .choice.is-correct {
+      background: #ecfdf3;
+      border-color: #039855;
+    }
+
+    .choice.is-expected {
+      background: #fffaeb;
+      border-color: #f79009;
+      border-style: dashed;
+    }
+
+    .choice.is-wrong {
+      background: #fef3f2;
+      border-color: #d92d20;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .radio,
+    .checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--color-border-default);
+      border-radius: 50%;
+      background: var(--color-background-surface-base);
+    }
+
+    .checkbox {
+      border-radius: 4px;
+    }
+
+    .radio.is-checked {
+      border-color: var(--color-icon-default);
+    }
+
+    .radio-dot {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-icon-default);
+    }
+
+    .checkbox.is-checked {
+      background: var(--color-icon-default);
+      border-color: var(--color-icon-default);
+      color: #ffffff;
+    }
+
+    .checkbox svg {
+      display: none;
+    }
+
+    .checkbox.is-checked svg {
+      display: block;
+    }
+
+    .reveal-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #039855;
+      color: #ffffff;
+      font-size: 12px;
+    }
+
+    .choice.is-expected .reveal-badge {
+      background: #f79009;
+    }
+
+    .choice.is-wrong .reveal-badge {
+      background: #d92d20;
+    }
+
+    .choice-feedback {
+      display: block;
+      padding-left: 8px;
+      border-left: 2px solid var(--color-border-default);
+      font-size: 12px;
+    }
+
+    .short-answer {
+      margin-top: 16px;
+    }
+
+    .short-answer .answer-label {
+      display: flex;
+    }
+
+    .short-answer .show-submission {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .short-answer .submitted-content {
+      padding: 8px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+    }
+
+    .short-answer .expected-answer {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <app-assessments-view>
+    <app-assessment-question-view>
+      <div class="assessment-question-view">
+        <div class="assessment-paginator">
+          <div class="chips">
+            <button type="button" class="chip current correct" aria-label="Question 1">
+              <span class="circle">1</span>
+              <span class="badge" aria-hidden="true">✓</span>
+            </button>
+            <button type="button" class="chip incorrect" aria-label="Question 2">
+              <span class="circle">2</span>
+              <span class="badge" aria-hidden="true">✕</span>
+            </button>
+            <button type="button" class="chip partial" aria-label="Question 3">
+              <span class="circle">3</span>
+              <span class="badge" aria-hidden="true">!</span>
+            </button>
+            <button type="button" class="chip eval-unanswered" aria-label="Question 4">
+              <span class="circle">4</span>
+              <span class="badge" aria-hidden="true">?</span>
+            </button>
+            <button type="button" class="chip instructions" aria-label="Instructions">
+              <span class="circle">i</span>
+              <span class="badge" aria-hidden="true">i</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="cell has-success">
+          <div class="evaluated-answer correct">
+            <div class="header">
+              <span class="text">Answer is Correct</span>
+              <span>Score: 1 / 1</span>
+            </div>
+            <div class="submission-content">
+              <app-assessment-question>
+                <div class="assessment-question">
+                  <div class="mcq">
+                    <fieldset class="choices-fieldset">
+                      <ul class="choices" role="radiogroup">
+                        <li class="choice is-default">
+                          <div class="row">
+                            <span class="radio"></span>
+                            <span class="choice-letter">A.</span>
+                            <span class="choice-text">Wrong option</span>
+                          </div>
+                        </li>
+                        <li class="choice is-correct is-selected">
+                          <div class="row">
+                            <span class="radio is-checked"><span class="radio-dot"></span></span>
+                            <span class="choice-letter">B.</span>
+                            <span class="choice-text">Correct option</span>
+                          </div>
+                          <span class="reveal-badge">Correct</span>
+                        </li>
+                        <li class="choice is-default">
+                          <div class="row">
+                            <span class="radio"></span>
+                            <span class="choice-letter">C.</span>
+                            <span class="choice-text">Another option</span>
+                          </div>
+                        </li>
+                        <li class="choice is-default">
+                          <div class="row">
+                            <span class="checkbox is-checked">
+                              <svg width="10" height="8" viewBox="0 0 10 8" aria-hidden="true">
+                                <path d="M0 4l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"></path>
+                              </svg>
+                            </span>
+                            <span class="choice-letter">D.</span>
+                            <span class="choice-text">Multi-select option</span>
+                          </div>
+                        </li>
+                      </ul>
+                    </fieldset>
+                  </div>
+                </div>
+              </app-assessment-question>
+            </div>
+          </div>
+        </div>
+
+        <div class="cell has-error">
+          <div class="evaluated-answer incorrect">
+            <div class="header">
+              <span class="text">Answer is Incorrect</span>
+              <span>Score: 0 / 1</span>
+            </div>
+            <div class="submission-content">
+              <app-assessment-question>
+                <div class="assessment-question">
+                  <div class="mcq">
+                    <fieldset class="choices-fieldset">
+                      <ul class="choices" role="radiogroup">
+                        <li class="choice is-wrong is-selected">
+                          <div class="row">
+                            <span class="radio is-checked"><span class="radio-dot"></span></span>
+                            <span class="choice-letter">A.</span>
+                            <span class="choice-text">Your wrong pick</span>
+                          </div>
+                          <span class="reveal-badge">Your answer</span>
+                          <span class="choice-feedback">Not quite.</span>
+                        </li>
+                        <li class="choice is-expected">
+                          <div class="row">
+                            <span class="radio"></span>
+                            <span class="choice-letter">B.</span>
+                            <span class="choice-text">Expected option</span>
+                          </div>
+                          <span class="reveal-badge">Expected</span>
+                          <span class="choice-feedback">This is the expected answer.</span>
+                        </li>
+                      </ul>
+                    </fieldset>
+                  </div>
+
+                  <div class="short-answer">
+                    <div class="answer-label"><h3>Your answer</h3></div>
+                    <div class="show-submission">
+                      <div class="submitted-content">A short submitted answer</div>
+                      <div class="expected-answer">
+                        <div class="row">
+                          <span class="grader-label">Expected:</span>
+                          <span class="grader-value">A short expected answer</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </app-assessment-question>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-assessment-question-view>
+  </app-assessments-view>
+</body>
+</html>

@@ -90,6 +90,75 @@ html[data-seek-objectives="on"] app-lesson-view .tab-bar-wrapper:has([data-seek-
   display: none !important;
 }
 
+/* Optional H. Assignment answer practice mode --------------------------- */
+/*
+ * A reviewed assignment reveals the submitted choice, the expected answer,
+ * and green/red correctness styling. When this option is on, those
+ * review-only markers are hidden or neutralised so the questions and options
+ * can be reused for practice. Everything is scoped to the evaluated answer
+ * view, so taking an assignment is never affected.
+ */
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer > .header,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .reveal-badge,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice-feedback,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .short-answer .answer-label,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .short-answer .show-submission,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .short-answer .submitted-content,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .short-answer .expected-answer,
+html[data-seek-answers="on"] app-assessment-question-view .chip.correct .badge,
+html[data-seek-answers="on"] app-assessment-question-view .chip.incorrect .badge,
+html[data-seek-answers="on"] app-assessment-question-view .chip.partial .badge,
+html[data-seek-answers="on"] app-assessment-question-view .chip.eval-unanswered .badge {
+  display: none !important;
+}
+
+/* Remove the green/red option surfaces and the dashed expected state. */
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-correct,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-expected,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-wrong,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice.is-selected {
+  background: var(--color-background-surface-subtle) !important;
+  border-color: transparent !important;
+  border-style: solid !important;
+}
+
+/* Remove the selected-answer marker (filled radio or checked checkbox). */
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice .radio-dot,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice .checkbox svg {
+  display: none !important;
+}
+
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice .radio.is-checked,
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice .checkbox.is-checked {
+  border-color: var(--color-border-default) !important;
+  background: var(--color-background-surface-base) !important;
+  color: transparent !important;
+}
+
+/* Keep the reviewed answer panel neutral instead of green/red. */
+html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer,
+html[data-seek-answers="on"] app-assessment-question-view .cell.has-success,
+html[data-seek-answers="on"] app-assessment-question-view .cell.has-error,
+html[data-seek-answers="on"] app-assessment-question-view .cell.has-warning {
+  border-color: var(--color-border-default) !important;
+}
+
+/* Keep question navigation usable but free of correctness colours/icons. */
+html[data-seek-answers="on"] app-assessment-question-view .chip.correct .circle,
+html[data-seek-answers="on"] app-assessment-question-view .chip.incorrect .circle,
+html[data-seek-answers="on"] app-assessment-question-view .chip.partial .circle,
+html[data-seek-answers="on"] app-assessment-question-view .chip.eval-unanswered .circle {
+  background: var(--color-background-surface-strong) !important;
+  color: var(--color-text-default) !important;
+}
+
+html[data-seek-answers="on"] app-assessment-question-view .chip.correct.current,
+html[data-seek-answers="on"] app-assessment-question-view .chip.incorrect.current,
+html[data-seek-answers="on"] app-assessment-question-view .chip.partial.current,
+html[data-seek-answers="on"] app-assessment-question-view .chip.eval-unanswered.current {
+  border-color: var(--color-icon-default) !important;
+}
+
 /* ----------------------------------------------------------------------- */
 /* G. Premium interface design system ------------------------------------ */
 /* ----------------------------------------------------------------------- */
