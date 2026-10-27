@@ -97,7 +97,7 @@ def check_popup():
 
     check(keys == [
         "unitNav", "overview", "divider",
-        "transcript", "objectives", "answers", "announcements", "forum", "calculator", "header"
+        "header", "transcript", "answers", "objectives", "announcements", "forum", "calculator"
     ], "Ten independent settings are present in the expected order")
 
     default_keys = {"unitNav", "overview", "divider"}

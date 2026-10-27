@@ -15,13 +15,13 @@
     unitNav: true,
     overview: true,
     divider: true,
+    header: false,
     transcript: false,
-    objectives: false,
     answers: false,
+    objectives: false,
     announcements: false,
     forum: false,
     calculator: false,
-    header: false,
     theme: 'system'
   });
 
@@ -29,13 +29,13 @@
     'unitNav',
     'overview',
     'divider',
+    'header',
     'transcript',
-    'objectives',
     'answers',
+    'objectives',
     'announcements',
     'forum',
-    'calculator',
-    'header'
+    'calculator'
   ]);
 
   const THEME_VALUES = Object.freeze(['system', 'light', 'dark', 'black']);

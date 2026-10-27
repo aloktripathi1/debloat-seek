@@ -36,13 +36,13 @@ DEFAULT_SETTINGS = {
     "unitNav": True,
     "overview": True,
     "divider": True,
+    "header": False,
     "transcript": False,
-    "objectives": False,
     "answers": False,
+    "objectives": False,
     "announcements": False,
     "forum": False,
     "calculator": False,
-    "header": False,
     "theme": "system"
 }
 
@@ -54,13 +54,13 @@ ATTRIBUTES = {
     "unitNav": "data-seek-unit-nav",
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
+    "header": "data-seek-header",
     "transcript": "data-seek-transcript",
-    "objectives": "data-seek-objectives",
     "answers": "data-seek-answers",
+    "objectives": "data-seek-objectives",
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
-    "calculator": "data-seek-calculator",
-    "header": "data-seek-header"
+    "calculator": "data-seek-calculator"
 }
 
 TARGETS = {
