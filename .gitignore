@@ -1,8 +1,15 @@
-# Private SEEK DOM snapshots used only for local visual/selector verification
+# Private SEEK DOM snapshots and scratch files. Keep these local only.
+/local/
 /seek.html
 /course-page.html
 /assingment-page.html
 /assignment-page.html
+/scratch/
+
+# Local downloads and packaged builds
+*.zip
+*.crx
+*.pem
 
 # Python and OS artifacts
 __pycache__/

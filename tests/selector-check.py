@@ -13,7 +13,8 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "seek-fixture.html"
 ASSIGNMENT_FIXTURE = ROOT / "tests" / "fixtures" / "assignment-fixture.html"
-REAL_DOM = ROOT / "seek.html"
+LOCAL_DOM = ROOT / "local" / "seek.html"
+REAL_DOM = LOCAL_DOM if LOCAL_DOM.exists() else ROOT / "seek.html"
 
 SELECTORS = {
     "unitNav": 'html[data-seek-unit-nav="on"] nav.unit-nav[aria-label="Previous and next unit"]',
@@ -294,7 +295,7 @@ def test_missing_elements():
 
 def test_real_dom():
     if not REAL_DOM.exists():
-        print("\nReal DOM: skipped (seek.html not found)")
+        print("\nReal DOM: skipped (local/seek.html not found)")
         return
 
     print("\nReal DOM evidence")

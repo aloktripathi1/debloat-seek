@@ -285,6 +285,16 @@ def check_readme():
         check(phrase.lower() in readme.lower(), f"README mentions {phrase}")
 
 
+def check_public_docs():
+    print("\nPublic repository")
+    check((ROOT / "CONTRIBUTING.md").is_file(), "Contributor guide is present")
+    check((ROOT / "LICENSE").is_file(), "License file is present")
+    check("MIT License" in read("LICENSE"), "License is MIT")
+    check((ROOT / "docs" / "popup.png").is_file(), "Popup screenshot is present")
+    check("CONTRIBUTING.md" in read("README.md"),
+          "README links to the contributor guide")
+
+
 def main():
     check_manifest()
     check_syntax()
@@ -293,6 +303,7 @@ def main():
     check_no_remote_code()
     check_css()
     check_readme()
+    check_public_docs()
 
     if failures:
         print(f"\n{len(failures)} check(s) failed.")
