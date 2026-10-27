@@ -6,6 +6,10 @@
 /assignment-page.html
 /scratch/
 
+# Local showcase media. Only the final docs/ asset is published.
+/screenshots/
+/showcase-video.mp4
+
 # Local downloads and packaged builds
 *.zip
 *.crx

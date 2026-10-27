@@ -10,6 +10,14 @@ Current version: **1.2.11**.
 
 It does not call SEEK APIs, send data anywhere, or change course content, submissions, scores, or the lesson/video player.
 
+## Demo
+
+<p align="center">
+  <img src="docs/showcase.gif" alt="Debloat SEEK in action" width="820">
+</p>
+
+Toggle cleanup options from the popup to get a cleaner, full-width lesson view.
+
 ## Features
 
 ### Default cleanup
