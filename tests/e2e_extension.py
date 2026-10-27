@@ -70,10 +70,10 @@ TARGETS = {
     "overview": '.lead button[aria-label="Overview"]',
     "overviewHost": '.lead app-button[label="Overview"]',
     "divider": '.lead > span.divider',
-    "highlightRow": 'app-course-outline-side-nav .child-container.is-open .child-row.selected',
-    "highlightHoverRow": 'app-course-outline-side-nav .child-container.is-open .child-row:not(.selected)',
-    "highlightPanel": 'app-course-outline-side-nav .child-container.is-open',
-    "highlightList": 'app-course-outline-side-nav .child-container.is-open .child-list',
+    "highlightRow": '.child-container.is-open .child-row.selected',
+    "highlightHoverRow": '.child-container.is-open .child-row:not(.selected)',
+    "highlightPanel": '.child-container.is-open',
+    "highlightList": '.child-container.is-open .child-list',
     "highlightDecoy": '#decoy-child-row',
     "transcript": 'app-lesson-view aside.transcript-panel',
     "objectives": 'app-lesson-view .objectives',
@@ -232,7 +232,8 @@ def read_styles(page, selector, pseudo=None):
             const style = getComputedStyle(element, pseudo || null);
             return {
                 background: style.backgroundColor,
-                boxShadow: style.boxShadow
+                boxShadow: style.boxShadow,
+                borderColor: style.borderTopColor
             };
         }""",
         pseudo
@@ -276,7 +277,7 @@ def theme_background_probe(page):
 
 
 def check_lesson_highlight(page, enabled):
-    # The popup is a separate tab; focus SEEK so :hover, :focus, and :active run.
+    # The popup is a separate tab; focus SEEK so :hover runs.
     page.bring_to_front()
     page.wait_for_timeout(100)
 
@@ -284,8 +285,10 @@ def check_lesson_highlight(page, enabled):
     plain_original = read_original_styles(page, TARGETS["highlightHoverRow"])
     panel_original = read_original_styles(page, TARGETS["highlightPanel"])
     list_original = read_original_styles(page, TARGETS["highlightList"])
-    before_original = read_original_styles(page, TARGETS["highlightRow"], "::before")
-    after_original = read_original_styles(page, TARGETS["highlightRow"], "::after")
+    panel_before_original = read_original_styles(page, TARGETS["highlightPanel"], "::before")
+    panel_after_original = read_original_styles(page, TARGETS["highlightPanel"], "::after")
+    list_before_original = read_original_styles(page, TARGETS["highlightList"], "::before")
+    list_after_original = read_original_styles(page, TARGETS["highlightList"], "::after")
     decoy_original = read_original_styles(page, TARGETS["highlightDecoy"])
     interaction_original = theme_background_probe(page)
 
@@ -293,8 +296,10 @@ def check_lesson_highlight(page, enabled):
     plain = read_styles(page, TARGETS["highlightHoverRow"])
     panel = read_styles(page, TARGETS["highlightPanel"])
     list = read_styles(page, TARGETS["highlightList"])
-    before = read_styles(page, TARGETS["highlightRow"], "::before")
-    after = read_styles(page, TARGETS["highlightRow"], "::after")
+    panel_before = read_styles(page, TARGETS["highlightPanel"], "::before")
+    panel_after = read_styles(page, TARGETS["highlightPanel"], "::after")
+    list_before = read_styles(page, TARGETS["highlightList"], "::before")
+    list_after = read_styles(page, TARGETS["highlightList"], "::after")
     decoy = read_styles(page, TARGETS["highlightDecoy"])
     transparent = "rgba(0, 0, 0, 0)"
 
@@ -302,6 +307,13 @@ def check_lesson_highlight(page, enabled):
         for label, value in (
             ("selected lesson row", selected),
             ("non-selected lesson row", plain),
+        ):
+            check(value["background"] == transparent,
+                  f"{label} background is transparent ({value['background']})")
+            check(value["boxShadow"] == "none",
+                  f"{label} shadow is removed ({value['boxShadow']})")
+
+        for label, value in (
             ("expanded week panel", panel),
             ("expanded week panel list", list),
         ):
@@ -309,11 +321,19 @@ def check_lesson_highlight(page, enabled):
                   f"{label} background is transparent ({value['background']})")
             check(value["boxShadow"] == "none",
                   f"{label} shadow is removed ({value['boxShadow']})")
+            check(value["borderColor"] == transparent,
+                  f"{label} border colour is transparent ({value['borderColor']})")
 
-        check(before["background"] == transparent and before["boxShadow"] == "none",
-              f"lesson row ::before is cleared ({before})")
-        check(after["background"] == transparent and after["boxShadow"] == "none",
-              f"lesson row ::after is cleared ({after})")
+        for label, value in (
+            ("expanded week panel ::before", panel_before),
+            ("expanded week panel ::after", panel_after),
+            ("expanded week panel list ::before", list_before),
+            ("expanded week panel list ::after", list_after),
+        ):
+            check(value["background"] == transparent,
+                  f"{label} background is cleared ({value['background']})")
+            check(value["boxShadow"] == "none",
+                  f"{label} shadow is cleared ({value['boxShadow']})")
     else:
         check(selected["background"] == selected_original["background"],
               f"selected lesson row restores SEEK's background ({selected['background']})")
@@ -325,14 +345,22 @@ def check_lesson_highlight(page, enabled):
               f"expanded week panel restores SEEK's background ({panel['background']})")
         check(panel["boxShadow"] == panel_original["boxShadow"],
               f"expanded week panel restores SEEK's shadow ({panel['boxShadow']})")
+        check(panel["borderColor"] == panel_original["borderColor"],
+              f"expanded week panel restores SEEK's border ({panel['borderColor']})")
         check(list["background"] == list_original["background"],
               f"expanded week panel list restores SEEK's background ({list['background']})")
         check(list["boxShadow"] == list_original["boxShadow"],
               f"expanded week panel list restores SEEK's shadow ({list['boxShadow']})")
-        check(before == before_original,
-              f"lesson row ::before restores SEEK's styling ({before})")
-        check(after == after_original,
-              f"lesson row ::after restores SEEK's styling ({after})")
+        check(list["borderColor"] == list_original["borderColor"],
+              f"expanded week panel list restores SEEK's border ({list['borderColor']})")
+        check(panel_before == panel_before_original,
+              f"expanded week panel ::before restores SEEK's styling ({panel_before})")
+        check(panel_after == panel_after_original,
+              f"expanded week panel ::after restores SEEK's styling ({panel_after})")
+        check(list_before == list_before_original,
+              f"expanded week panel list ::before restores SEEK's styling ({list_before})")
+        check(list_after == list_after_original,
+              f"expanded week panel list ::after restores SEEK's styling ({list_after})")
 
     check(decoy["background"] == decoy_original["background"],
           "unrelated selected row keeps SEEK's background")
@@ -346,23 +374,6 @@ def check_lesson_highlight(page, enabled):
     check(hover["background"] == expected_interaction,
           f"lesson row hover uses {'no background' if enabled else 'SEEK styling'} "
           f"({hover['background']})")
-
-    page.focus(TARGETS["highlightHoverRow"])
-    page.wait_for_timeout(50)
-    focused = read_styles(page, TARGETS["highlightHoverRow"])
-    check(focused["background"] == expected_interaction,
-          f"lesson row focus uses {'no background' if enabled else 'SEEK styling'} "
-          f"({focused['background']})")
-
-    page.mouse.down()
-    page.wait_for_timeout(50)
-    active = read_styles(page, TARGETS["highlightHoverRow"])
-    page.mouse.up()
-    check(active["background"] == expected_interaction,
-          f"lesson row active state uses {'no background' if enabled else 'SEEK styling'} "
-          f"({active['background']})")
-
-    page.evaluate("() => document.activeElement && document.activeElement.blur()")
     page.mouse.move(0, 0)
 
 

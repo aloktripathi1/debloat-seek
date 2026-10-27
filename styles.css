@@ -37,30 +37,31 @@ html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider {
 
 /* D. Lesson highlight ---------------------------------------------------- */
 /*
- * Remove the background and shadow treatments from an expanded week panel,
- * every lesson/assignment row inside it, and the rows' pseudo-elements. This
- * covers selected, hover, focus, and active states so no row keeps a tint.
- * Scoped to the outline side navigation; turning the option off removes the
+ * Remove the expanded week's panel highlight, every row highlight inside it,
+ * and possible overlay pseudo-elements. Turning the option off removes the
  * rules and restores SEEK's original styling.
  */
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-list {
+html[data-seek-highlight="on"] .child-container.is-open,
+html[data-seek-highlight="on"] .child-container.is-open .child-list {
   background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+html[data-seek-highlight="on"] .child-container.is-open .child-row,
+html[data-seek-highlight="on"] .child-container.is-open .child-row.selected,
+html[data-seek-highlight="on"] .child-container.is-open .child-row:hover {
+  background: transparent !important;
+  background-color: transparent !important;
   box-shadow: none !important;
 }
 
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:hover,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row.selected,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:focus,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:active {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row::before,
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row::after {
-  background: transparent !important;
+html[data-seek-highlight="on"] .child-container.is-open::before,
+html[data-seek-highlight="on"] .child-container.is-open::after,
+html[data-seek-highlight="on"] .child-container.is-open .child-list::before,
+html[data-seek-highlight="on"] .child-container.is-open .child-list::after {
+  background: none !important;
   box-shadow: none !important;
 }
 

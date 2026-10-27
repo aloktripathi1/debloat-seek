@@ -23,7 +23,7 @@ SELECTORS = {
         'html[data-seek-overview="on"] app-bar.course-bar .lead app-button:has(> button[aria-label="Overview"])'
     ),
     "divider": 'html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider',
-    "highlight": 'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row',
+    "highlight": 'html[data-seek-highlight="on"] .child-container.is-open .child-row',
     "transcript": (
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile, '
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel'
@@ -190,8 +190,6 @@ def test_on_states(soup):
 
     highlights = soup.select(SELECTORS["highlight"])
     check(len(highlights) == 2, "highlight matches every row in the expanded lesson panel")
-    check(all(row.find_parent("app-course-outline-side-nav") is not None for row in highlights),
-          "highlight is scoped inside the course outline side navigation")
     check(all(
         row.find_parent(class_="child-container") is not None
         and "is-open" in row.find_parent(class_="child-container").get("class", [])
@@ -202,11 +200,9 @@ def test_on_states(soup):
     check(soup.select_one(".unit-container:not(.is-open) .child-row") not in highlights,
           "highlight selector does not match rows in collapsed panels")
 
-    panels = soup.select(
-        'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open'
-    )
+    panels = soup.select('html[data-seek-highlight="on"] .child-container.is-open')
     lists = soup.select(
-        'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-list'
+        'html[data-seek-highlight="on"] .child-container.is-open .child-list'
     )
     check(len(panels) == 1, "highlight matches exactly one expanded panel")
     check(len(lists) == 1, "highlight matches exactly one expanded panel list")

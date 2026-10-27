@@ -201,14 +201,19 @@ def check_css():
           "Course header is gated by its own state")
     check(css.count('html[data-seek-highlight="on"]') == 9,
           "Lesson highlight is gated by its own state")
-    check("app-course-outline-side-nav .child-container.is-open" in css,
-          "Lesson highlight is scoped to expanded course-outline panels")
-    check(css.count("background: transparent !important;\n  box-shadow: none !important;") == 3,
-          "Lesson highlight clears panel, row, and pseudo-element surfaces")
-    check(".child-row:focus" in css and ".child-row:active" in css,
-          "Lesson highlight clears focus and active row states")
-    check(".child-row::before" in css and ".child-row::after" in css,
-          "Lesson highlight clears row pseudo-elements")
+    check('html[data-seek-highlight="on"] .child-container.is-open' in css,
+          "Lesson highlight targets expanded child containers")
+    check(css.count("background-color: transparent !important;") == 2,
+          "Lesson highlight clears background-color on panels and rows")
+    check(css.count("box-shadow: none !important;\n  border-color: transparent !important;") == 1,
+          "Lesson highlight clears the panel border colour")
+    check(css.count("background: none !important;") == 1,
+          "Lesson highlight clears panel and list overlay backgrounds")
+    check(".child-container.is-open::before" in css
+          and ".child-container.is-open .child-list::after" in css,
+          "Lesson highlight clears panel and list pseudo-elements")
+    check(".child-row.selected" in css and ".child-row:hover" in css,
+          "Lesson highlight clears selected and hover row states")
     check("rgba(255, 255, 255, 0.06)" not in css and "rgba(255, 255, 255, 0.04)" not in css,
           "Lesson highlight no longer adds a selected-row tint")
     check("data-seek-highlight" in read("content.js"),

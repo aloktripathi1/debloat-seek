@@ -208,13 +208,50 @@
     }
 
     .child-container.is-open {
+      position: relative;
+      border: 1px solid var(--color-border-default);
       background: var(--color-background-surface-strong);
       box-shadow: inset 0 0 0 1px var(--color-border-default);
     }
 
     .child-container.is-open .child-list {
+      position: relative;
+      border: 1px solid var(--color-border-secondary);
       background: var(--color-background-surface-subtle);
       box-shadow: inset 0 0 0 1px var(--color-border-secondary);
+    }
+
+    .child-container.is-open::before,
+    .child-container.is-open::after,
+    .child-container.is-open .child-list::before,
+    .child-container.is-open .child-list::after {
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--color-background-primary-light);
+      box-shadow: 0 0 0 1px var(--color-border-default);
+      pointer-events: none;
+    }
+
+    .child-container.is-open::before {
+      top: 0;
+      left: 0;
+    }
+
+    .child-container.is-open::after {
+      top: 0;
+      right: 0;
+    }
+
+    .child-container.is-open .child-list::before {
+      bottom: 0;
+      left: 0;
+    }
+
+    .child-container.is-open .child-list::after {
+      right: 0;
+      bottom: 0;
     }
 
     .child-list {
@@ -225,7 +262,6 @@
     }
 
     .child-row {
-      position: relative;
       display: flex;
       align-items: flex-start;
       gap: 8px;
@@ -240,35 +276,12 @@
       cursor: pointer;
     }
 
-    .child-row:hover,
-    .child-row:focus,
-    .child-row:active {
+    .child-row:hover {
       background: var(--color-background-primary-light);
     }
 
     .child-row.selected {
       background: color-mix(in srgb, var(--color-background-primary) 12%, transparent);
-    }
-
-    .child-row::before,
-    .child-row::after {
-      content: "";
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: var(--color-background-primary-light);
-      box-shadow: 0 0 0 1px var(--color-border-default);
-      pointer-events: none;
-    }
-
-    .child-row::before {
-      top: 0;
-      left: 0;
-    }
-
-    .child-row::after {
-      right: 0;
-      bottom: 0;
     }
 
     .child-icon {
