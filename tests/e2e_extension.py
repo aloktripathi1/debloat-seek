@@ -286,6 +286,13 @@ def check_assignment_review(page, hidden):
     chip_current = 'app-assessment-question-view .chip.correct.current'
     success_cell = 'app-assessment-question-view .cell.has-success'
     incorrect_panel = 'app-assessment-question-view .evaluated-answer.incorrect'
+    linear_header = ('app-assessment-question-view app-assessment-linear-view '
+                     '.linear-view .evaluated-answer .eval-header')
+    linear_text = ('app-assessment-question-view app-assessment-linear-view '
+                   '.linear-view .evaluated-answer .eval-text')
+    linear_feedback = 'app-assessment-question-view app-assessment-linear-view .linear-view .feedback'
+    linear_incorrect = ('app-assessment-question-view app-assessment-linear-view '
+                        '.linear-view .evaluated-answer.incorrect')
 
     if hidden:
         check_hidden(page, header, True, "reviewed answer header is hidden")
@@ -296,6 +303,11 @@ def check_assignment_review(page, hidden):
         check_hidden(page, answer_label, True, "short-answer label is hidden")
         check_hidden(page, short_answer, True, "submitted and expected short answers are hidden")
         check_hidden(page, chip_badge, True, "question correctness badges are hidden")
+        check_hidden(page, linear_header, True, "list-view verdict header is hidden")
+        check_hidden(page, linear_text, True, "list-view verdict text is hidden")
+        check_hidden(page, linear_feedback, True, "list-view feedback is hidden")
+        check(computed_style(page, linear_incorrect, 'border-color') == 'rgb(223, 228, 237)',
+              "list-view answer panel border is neutralised")
         check_hidden(page, instructions_badge, False, "instructions chip badge stays visible")
         check(computed_style(page, instructions_circle, 'background-color') == 'rgb(224, 242, 254)',
               "instructions chip keeps its own colour")
@@ -329,6 +341,11 @@ def check_assignment_review(page, hidden):
         check_hidden(page, answer_label, False, "short-answer label is visible")
         check_hidden(page, short_answer, False, "submitted and expected short answers are visible")
         check_hidden(page, chip_badge, False, "question correctness badges are visible")
+        check_hidden(page, linear_header, False, "list-view verdict header is visible")
+        check_hidden(page, linear_text, False, "list-view verdict text is visible")
+        check_hidden(page, linear_feedback, False, "list-view feedback is visible")
+        check(computed_style(page, linear_incorrect, 'border-color') == 'rgb(217, 45, 32)',
+              "list-view answer panel keeps SEEK's error border")
         check_hidden(page, instructions_badge, False, "instructions chip badge is visible by default")
 
         check(computed_style(page, wrong_choice, 'background-color') == 'rgb(254, 243, 242)',

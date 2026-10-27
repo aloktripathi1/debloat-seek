@@ -303,6 +303,76 @@
       display: flex;
       flex-direction: column;
     }
+
+    app-assessment-linear-view {
+      display: block;
+      padding: 16px;
+    }
+
+    .linear-view {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .linear-view .question-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 12px;
+    }
+
+    .linear-view .evaluated-answer {
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+    }
+
+    .linear-view .evaluated-answer.correct {
+      border-color: #039855;
+    }
+
+    .linear-view .evaluated-answer.incorrect {
+      border-color: #d92d20;
+    }
+
+    .linear-view .eval-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      border-radius: 8px 8px 0 0;
+      background: #ecfdf3;
+    }
+
+    .linear-view .evaluated-answer.incorrect .eval-header {
+      background: #fee4e2;
+    }
+
+    .linear-view .eval-text {
+      color: #039855;
+    }
+
+    .linear-view .evaluated-answer.incorrect .eval-text {
+      color: #d92d20;
+    }
+
+    .linear-view .feedback {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+    }
+
+    .linear-view .feedback-title {
+      display: flex;
+      padding: 16px 16px 8px;
+    }
+
+    .linear-view .feedback-body {
+      display: block;
+      padding: 8px 16px 16px;
+    }
   </style>
 </head>
 <body>
@@ -439,6 +509,34 @@
             </div>
           </div>
         </div>
+
+        <app-assessment-linear-view>
+          <div class="linear-view">
+            <div class="question-card">
+              <div class="evaluated-answer correct">
+                <div class="eval-header">
+                  <span class="eval-text">Answer is Correct</span>
+                  <span>Score: 1 / 1</span>
+                </div>
+                <div class="submission-content"></div>
+              </div>
+            </div>
+
+            <div class="question-card">
+              <div class="evaluated-answer incorrect">
+                <div class="eval-header">
+                  <span class="eval-text">Answer is Wrong</span>
+                  <span>Score: 0 / 1</span>
+                </div>
+                <div class="submission-content"></div>
+                <div class="feedback">
+                  <div class="feedback-title">Feedback</div>
+                  <div class="feedback-body">The expected answer is B.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </app-assessment-linear-view>
       </div>
     </app-assessment-question-view>
   </app-assessments-view>

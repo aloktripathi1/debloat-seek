@@ -93,12 +93,17 @@ html[data-seek-objectives="on"] app-lesson-view .tab-bar-wrapper:has([data-seek-
 /* Optional H. Assignment answer practice mode --------------------------- */
 /*
  * A reviewed assignment reveals the submitted choice, the expected answer,
- * and green/red correctness styling. When this option is on, those
+ * and green/red correctness styling. The paged view uses `.header`, while the
+ * list view (`app-assessment-linear-view`) uses `.eval-header` / `.eval-text`
+ * and a per-question `.feedback` block. When this option is on, those
  * review-only markers are hidden or neutralised so the questions and options
  * can be reused for practice. Everything is scoped to the evaluated answer
  * view, so taking an assignment is never affected.
  */
 html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer > .header,
+html[data-seek-answers="on"] app-assessment-question-view .linear-view .evaluated-answer .eval-header,
+html[data-seek-answers="on"] app-assessment-question-view .linear-view .evaluated-answer .eval-text,
+html[data-seek-answers="on"] app-assessment-question-view .linear-view .feedback,
 html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .reveal-badge,
 html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .choice-feedback,
 html[data-seek-answers="on"] app-assessment-question-view .evaluated-answer .short-answer .answer-label,

@@ -109,12 +109,27 @@ ASSIGNMENT_SELECTORS = {
         'html[data-seek-answers="on"] app-assessment-question-view .cell.has-warning',
         2
     ),
+    "linearHeader": (
+        'html[data-seek-answers="on"] app-assessment-question-view '
+        'app-assessment-linear-view .linear-view .evaluated-answer .eval-header',
+        2
+    ),
+    "linearText": (
+        'html[data-seek-answers="on"] app-assessment-question-view '
+        'app-assessment-linear-view .linear-view .evaluated-answer .eval-text',
+        2
+    ),
+    "linearFeedback": (
+        'html[data-seek-answers="on"] app-assessment-question-view '
+        'app-assessment-linear-view .linear-view .feedback',
+        1
+    ),
     "evaluatedBorders": (
         'html[data-seek-answers="on"] app-assessment-question-view '
         '.evaluated-answer.correct, '
         'html[data-seek-answers="on"] app-assessment-question-view '
         '.evaluated-answer.incorrect',
-        2
+        4
     )
 }
 
