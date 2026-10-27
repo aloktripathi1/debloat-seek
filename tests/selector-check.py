@@ -46,12 +46,6 @@ SELECTORS = {
     "header": 'html[data-seek-header="on"] app-bar.course-bar'
 }
 
-SIDEBAR_SELECTORS = {
-    "pane": 'html[data-seek-sidebar="on"] app-course-outline .outline-pane',
-    "unit": 'html[data-seek-sidebar="on"] app-course-outline .unit-container',
-    "selected": 'html[data-seek-sidebar="on"] app-course-outline .child-row.selected'
-}
-
 ATTRIBUTES = {
     "unitNav": "data-seek-unit-nav",
     "overview": "data-seek-overview",
@@ -61,8 +55,7 @@ ATTRIBUTES = {
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
-    "header": "data-seek-header",
-    "sidebar": "data-seek-sidebar"
+    "header": "data-seek-header"
 }
 
 failures = []
@@ -163,30 +156,6 @@ def test_on_states(soup):
           "header selector does not match an unrelated app bar")
 
 
-def test_sidebar(soup):
-    print("\nPremium Contents sidebar")
-    set_states(soup, sidebar=False)
-    for key, selector in SIDEBAR_SELECTORS.items():
-        check(len(soup.select(selector)) == 0,
-              f"sidebar {key} selector is gated when the feature is off")
-
-    set_states(soup, sidebar=True)
-    panes = soup.select(SIDEBAR_SELECTORS["pane"])
-    check(len(panes) == 1, "sidebar pane matches exactly one course outline")
-    check(panes[0].find_parent("app-course-outline") is not None,
-          "sidebar pane is scoped inside app-course-outline")
-    check(soup.select_one("#decoy-outline-pane") not in panes,
-          "sidebar selector does not match an unrelated outline pane")
-
-    units = soup.select(SIDEBAR_SELECTORS["unit"])
-    check(len(units) == 2, "sidebar unit selector matches the fixture units")
-
-    selected = soup.select(SIDEBAR_SELECTORS["selected"])
-    check(len(selected) == 1, "sidebar selected-row selector matches the current lesson")
-    check(selected[0].select_one(".child-title") is not None,
-          "sidebar selected row contains a lesson title")
-
-
 def test_badge_variant():
     print("\nAnnouncements badge variants")
     soup = load_fixture()
@@ -217,12 +186,9 @@ def test_missing_elements():
     soup = BeautifulSoup("<html><body><h1>SEEK</h1></body></html>", "html.parser")
     set_states(soup, unitNav=True, overview=True, divider=True,
                transcript=True, objectives=True, announcements=True, forum=True,
-               calculator=True, header=True, sidebar=True)
+               calculator=True, header=True)
     for key, selector in SELECTORS.items():
         check(len(soup.select(selector)) == 0, f"{key} selector is safe on a page without targets")
-    for key, selector in SIDEBAR_SELECTORS.items():
-        check(len(soup.select(selector)) == 0,
-              f"sidebar {key} selector is safe on a page without targets")
 
 
 def test_real_dom():
@@ -234,7 +200,7 @@ def test_real_dom():
     soup = BeautifulSoup(REAL_DOM.read_text(encoding="utf-8"), "html.parser")
     set_states(soup, unitNav=True, overview=True, divider=True,
                transcript=True, objectives=True, announcements=True, forum=True,
-               calculator=True, header=True, sidebar=True)
+               calculator=True, header=True)
 
     expected = {
         "unitNav": 1,
@@ -256,19 +222,6 @@ def test_real_dom():
     check(divider is not None and divider.parent.get("class") == ["lead"],
           "real DOM: divider is the course-bar .lead divider")
 
-    sidebar_panes = soup.select(SIDEBAR_SELECTORS["pane"])
-    check(len(sidebar_panes) == 1,
-          "real DOM: sidebar pane is the app-course-outline aside")
-
-    sidebar_units = soup.select(SIDEBAR_SELECTORS["unit"])
-    check(len(sidebar_units) >= 1,
-          "real DOM: sidebar unit containers are present")
-
-    sidebar_selected = soup.select(SIDEBAR_SELECTORS["selected"])
-    check(len(sidebar_selected) >= 1,
-          "real DOM: at least one selected lesson row is present")
-
-
 def main():
     if not FIXTURE.exists():
         print(f"Fixture not found: {FIXTURE}", file=sys.stderr)
@@ -277,7 +230,6 @@ def main():
     soup = load_fixture()
     test_off_states(soup)
     test_on_states(soup)
-    test_sidebar(soup)
     test_badge_variant()
     test_missing_elements()
     test_real_dom()

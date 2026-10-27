@@ -272,13 +272,6 @@ body::-webkit-scrollbar-thumb {
   margin-top: 2px;
 }
 
-.setting-row-appearance {
-  margin-top: 8px;
-  padding-top: 9px;
-  border-top: 1px solid var(--divider);
-  border-radius: 0 0 10px 10px;
-}
-
 .setting-copy {
   flex: 1 1 auto;
   min-width: 0;

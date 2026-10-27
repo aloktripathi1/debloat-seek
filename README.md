@@ -1,6 +1,6 @@
 # Debloat SEEK
 
-A small Manifest V3 Chrome extension that locally declutters and refines the IIT Madras SEEK course interface. It hides selected UI controls, applies a premium visual system to the Contents sidebar, course overview, and assessment surfaces, and adds System, Light, Dark, and Black themes to SEEK pages. Everything happens in the browser only. It does not change SEEK, call SEEK APIs, send data anywhere, or alter course content, assignment behavior, submission controls, assessment logic, or the lesson player and video portal.
+A small Manifest V3 Chrome extension that locally declutters and refines the IIT Madras SEEK course interface. It hides selected UI controls, applies a premium visual system to the course overview and assessment surfaces, and adds System, Light, Dark, and Black themes to SEEK pages. Everything happens in the browser only. It does not change SEEK, call SEEK APIs, send data anywhere, or alter course content, assignment behavior, submission controls, assessment logic, or the lesson player and video portal.
 
 ## Supported site
 
@@ -19,7 +19,7 @@ The `*` covers every course code and keeps the content script active during in-a
 2. Turn on **Developer mode** (top-right).
 3. Click **Load unpacked**.
 4. Select the `debloat-seek` folder (the folder containing `manifest.json`).
-5. Open or reload SEEK. The extension applies automatically.
+4. Open or reload SEEK. The extension applies automatically.
 
 There is no build step and no dependency to install for normal use.
 
@@ -55,7 +55,6 @@ Click the Debloat SEEK icon in the Chrome toolbar to open the popup.
 | Option | What it does |
 | --- | --- |
 | Theme | **System** follows your operating system, **Light** uses SEEK's light palette, **Dark** uses SEEK's soft dark palette, and **Black** replaces SEEK's dark surfaces with true black and near-black surfaces for low-glare reading. This setting changes SEEK pages only. |
-| Premium Contents sidebar | Refines `app-course-outline` with calmer spacing, clearer unit and lesson hierarchy, a subtle selected-lesson state, better focus rings, and a thin scrollbar. It does not hide or reorder any lesson. |
 
 The theme setting is stored with the other preferences and is applied to open SEEK tabs immediately. The extension sets SEEK's root `data-theme` attribute so SEEK's own components switch palettes, then layers Black-mode surface overrides on top. If you later change SEEK's own Appearance menu, the extension's saved theme remains authoritative. The extension popup itself keeps its own light/dark appearance based on your operating-system preference; the theme choice does not recolor the popup.
 
@@ -63,7 +62,6 @@ The theme setting is stored with the other preferences and is applied to open SE
 
 While the extension is active, it also applies a shared visual system to SEEK course surfaces:
 
-- A Premium Contents sidebar with clearer unit and lesson hierarchy and refined focus states.
 - Course overview cards with a clear title hierarchy, quiet metadata pills, a slim progress bar, a restrained primary **Continue learning** action, module cards with a subtle hover lift, and a single supporting upcoming-work rail. On desktop the empty left rail is removed so the course card and modules lead; below 992 px the rail moves below the course contents.
 - Assessment start and submission surfaces with readable instructions, a focused score summary, a compact toolbar, and quiet test-case cards.
 
@@ -90,11 +88,11 @@ The system uses shared spacing, radius, typography, surface, shadow, and motion 
 
 Each toggle is independent. Turning one option off does not change the others.
 
-**Restore defaults** sets the three default cleanups and the Premium Contents sidebar back on, the six optional cleanups back off, and the theme back to **System**. It does not uninstall or reset the extension.
+**Restore defaults** sets the three default cleanups back on, the six optional cleanups back off, and the theme back to **System**. It does not uninstall or reset the extension.
 
 ## How settings are saved and restored
 
-Settings are stored under one key, `debloatSeek.settings.v1`, using `chrome.storage.sync` as the primary store and `chrome.storage.local` as a fallback. The payload records a timestamp so the newest copy wins if sync and local ever disagree. The payload contains ten boolean preferences and one theme string (`system`, `light`, `dark`, or `black`).
+Settings are stored under one key, `debloatSeek.settings.v1`, using `chrome.storage.sync` as the primary store and `chrome.storage.local` as a fallback. The payload records a timestamp so the newest copy wins if sync and local ever disagree. The payload contains nine boolean preferences and one theme string (`system`, `light`, `dark`, or `black`).
 
 - Safe defaults are used when no stored settings exist or a stored value is missing/invalid.
 - The popup writes a complete settings snapshot on every change. Saves are chained so rapid toggling cannot write an older snapshot after a newer one.
@@ -119,7 +117,6 @@ The content script sets state attributes on `<html>`:
   data-seek-forum="off"
   data-seek-calculator="off"
   data-seek-header="off"
-  data-seek-sidebar="on"
   data-seek-theme-setting="black"
   data-seek-theme="black"
   data-theme="dark">
@@ -158,7 +155,6 @@ The selector evidence used for this build was the supplied `seek.html` DOM snaps
 | Forum | `app-button[label="Forum"]` and `:has(> button[aria-label="Forum"])` scoped to `nav.actions[aria-label="Course actions"]` | Does not match unrelated Forum controls elsewhere on the page. |
 | Calculator | `app-button[label="Calculator"]` and `:has(> button[aria-label="Calculator"])` scoped to `nav.actions[aria-label="Course actions"]` | Does not match unrelated Calculator controls elsewhere on the page. |
 | Course header bar | `app-bar.course-bar` | Hides the whole course bar host. Optional and off by default. |
-| Premium sidebar | `app-course-outline .outline-pane`, `.outline-header`, `.outline-nav`, `.unit-container`, `.unit-header`, `.child-list`, `.child-row.selected`, and related child classes | Scoped to the Contents component. Only spacing, hierarchy, and selected/focus states change; no lesson is hidden or reordered. |
 | Premium lesson surface | `.lesson-view`, `.content-column`, `.video-container`, `.tab-bar-wrapper`, `.objectives`, and `.transcript-panel` | Not restyled. The lesson player keeps SEEK's original layout and behavior. |
 | Course overview | `app-course-overview .overview-page`, `.overview-card`, `.course-header`, `.module-card`, `.widget`, and `.due-item` | Scoped to the course overview component. Cards remain links or buttons with their original handlers. |
 | Assessments | `app-assessments-view .pa-start-page`, `.assessment-instructions`, `.submission-overview`, `.submission-toolbar`, and `.test-case-card` | Styling only. Submission controls and assessment logic are untouched. |
@@ -181,12 +177,12 @@ If SEEK changes its UI and an option stops working:
 2. Look for stable classes, accessible labels, semantic attributes, or a specific parent container. Avoid generated `_ngcontent-*` attributes.
 3. Update the relevant rule in `styles.css`. Keep the `html[data-seek-*="on"]` gate so the popup toggle remains reversible.
 4. Keep the selector narrow. Prefer a unique parent plus an accessible label or data attribute over a broad class selector.
-5. Reload the extension at `chrome://extensions` and reload SEEK.
-6. In DevTools, confirm the root state attributes are present:
+4. Reload the extension at `chrome://extensions` and reload SEEK.
+5. In DevTools, confirm the root state attributes are present:
    ```js
    document.documentElement.dataset
    ```
-7. Run the selector checks:
+6. Run the selector checks:
    ```bash
    python3 tests/selector-check.py
    ```
@@ -204,9 +200,9 @@ python3 tests/static-check.py
 python3 tests/e2e_extension.py
 ```
 
-- `selector-check.py` checks every selector against a privacy-safe DOM fixture and, when present, the supplied `seek.html` snapshot. It covers off states, target identity, decoys, badge-count changes, calculator/header targeting, the scoped Contents sidebar, and missing elements.
-- `static-check.py` checks the Manifest V3 configuration, permissions, origin/path restriction, popup structure, theme/sidebar settings, JavaScript syntax, absence of remote code, CSS gating, shared design tokens, reduced-motion/focus rules, Black-mode tokens, and README requirements.
-- `e2e_extension.py` loads the unpacked extension in Playwright with Chrome for Testing. It serves the lesson fixture from both real SEEK origins and separate course-overview and assessment fixtures. It verifies defaults, all ten independent toggles, all four theme choices, live popup-to-content-script updates, badge changes, persistence after reload and browser restart, automatic application on newly opened course tabs, restoration, Angular-style node replacement, missing elements, origin restriction, that the stock lesson page keeps SEEK's original layout, Contents sidebar geometry, course overview cards (including the primary action, module status/progress, and responsive supporting rail), assessment surfaces, keyboard focus rings, hover lift, and the reduced-motion fallback.
+- `selector-check.py` checks every selector against a privacy-safe DOM fixture and, when present, the supplied `seek.html` snapshot. It covers off states, target identity, decoys, badge-count changes, calculator/header targeting, and missing elements.
+- `static-check.py` checks the Manifest V3 configuration, permissions, origin/path restriction, popup structure, theme settings, JavaScript syntax, absence of remote code, CSS gating, shared design tokens, reduced-motion/focus rules, Black-mode tokens, and README requirements.
+- `e2e_extension.py` loads the unpacked extension in Playwright with Chrome for Testing. It serves the lesson fixture from both real SEEK origins and separate course-overview and assessment fixtures. It verifies defaults, all nine independent toggles, all four theme choices, live popup-to-content-script updates, badge changes, persistence after reload and browser restart, automatic application on newly opened course tabs, restoration, Angular-style node replacement, missing elements, origin restriction, that the stock lesson page keeps SEEK's original layout, course overview cards (including the primary action, module status/progress, and responsive supporting rail), assessment surfaces, keyboard focus rings, hover lift, and the reduced-motion fallback.
 
 Chrome for Testing is needed because branded Google Chrome 137+ ignores `--load-extension`:
 
@@ -222,9 +218,9 @@ Automated checks were run in this development environment:
 
 - Manifest JSON parsing and all static checks passed, including the shared design tokens, scoped overview/assessment rules, focus states, and reduced-motion fallback.
 - All selector checks passed against the fixture and the supplied `seek.html` snapshot.
-- The Playwright browser test passed against the lesson fixture served at both `https://seek.study.iitm.ac.in` and `https://seek.onlinedegree.iitm.ac.in`, plus the course-overview and assessment fixtures. It covered the default three elements, the Premium Contents sidebar, all ten toggles, all four themes, live storage updates, persistence after reload, restore defaults, badge-count changes, automatic application on newly opened course tabs, node replacement, missing elements, non-SEEK origin exclusion, the stock lesson layout, sidebar geometry, overview cards and their responsive supporting rail, assessment surfaces, focus rings, hover lift, and reduced motion.
+- The Playwright browser test passed against the lesson fixture served at both `https://seek.study.iitm.ac.in` and `https://seek.onlinedegree.iitm.ac.in`, plus the course-overview and assessment fixtures. It covered the default three elements, all nine toggles, all four themes, live storage updates, persistence after reload, restore defaults, badge-count changes, automatic application on newly opened course tabs, node replacement, missing elements, non-SEEK origin exclusion, the stock lesson layout, overview cards and their responsive supporting rail, assessment surfaces, focus rings, hover lift, and reduced motion.
 - A visual pass with the supplied lesson and course-overview snapshots was checked at desktop, tablet, and phone widths in Light and Black. Dark-mode tokens were injected into the local lesson snapshot for that check because it does not include SEEK's external palette stylesheet.
-- A live-origin injection check confirmed the content script runs on both hosts and exposes the ten state attributes plus the resolved theme attributes. The check stopped at the login screen because no SEEK credentials were used.
+- A live-origin injection check confirmed the content script runs on both hosts and exposes the nine state attributes plus the resolved theme attributes. The check stopped at the login screen because no SEEK credentials were used.
 
 The browser test uses a local fixture, not the live authenticated SEEK application. A final manual pass on a real SEEK account is still required.
 
@@ -235,27 +231,25 @@ After loading the extension in Chrome:
 1. Open a SEEK course lesson on each supported host.
 2. Confirm the Previous/Next bar, Overview button, and the divider beside Overview are hidden.
 3. Confirm the transcript panel, Announcements button, Forum button, Calculator button, and course header bar are still visible.
-4. Confirm the Contents sidebar has the refined spacing, unit/lesson hierarchy, selected-lesson treatment, and focus rings, with no lesson hidden or reordered.
-5. Confirm the course bar, lesson title bar, video frame, tab control, objectives card, and transcript panel look exactly as SEEK renders them — the extension does not restyle the lesson player. Check that the video still plays, tabs switch, and transcript cues still seek the video.
-6. Open a course overview page and confirm the course card, module cards, and upcoming-work widget use the shared surfaces. Hover a module card and use Tab to confirm the subtle lift and visible focus ring.
-7. Open an assessment start page and confirm the instructions, score summary, toolbar, and test cases are readable. Run or submit only in a test course where that is safe; confirm the controls still work.
-8. Use Tab through the course bar, Contents rows, lesson tabs, module cards, and assessment controls. Every interactive element should show a visible focus ring.
-9. Enable your operating system's reduced-motion setting and confirm SEEK's transitions become effectively instant.
-10. Open the popup. Choose **Dark**. SEEK should switch to the soft dark palette without a reload. The popup should keep its own system light/dark appearance.
-11. Choose **Black**. SEEK surfaces should become true black or near black. The popup should not turn black.
-12. Choose **Light**. SEEK should switch to the light palette. Choose **System** and confirm SEEK follows the operating-system preference. The popup should continue to follow the operating system independently.
-13. Enable **Video Transcript panel**. The transcript panel should disappear without a reload.
-14. Enable **Announcements**. The announcements trigger, including a badge variant, should disappear. The announcements panel's close button should remain unaffected.
-15. Enable **Forum**. Only the Forum button in the course actions should disappear.
-16. Enable **Calculator**. Only the Calculator button in the course actions should disappear.
-17. Enable **Course header bar**. The entire course bar should disappear.
-18. Disable each optional toggle. The corresponding element should return.
-19. Disable **Previous/Next navigation**, **Overview button**, and **Target divider** one at a time. Only the matching element should return.
-20. Disable **Premium Contents sidebar**. The sidebar should return to SEEK's original spacing and states without hiding anything.
-21. Reload the page and confirm the settings and theme persist.
-22. Navigate between units and courses, and between the two supported hosts. Confirm the settings continue to apply after Angular rerenders.
-23. Click **Restore defaults** and confirm the three default cleanups and Premium Contents sidebar return to on, the optional cleanups return to off, and the theme returns to System.
-24. Reopen the course overview and assessment pages and confirm the redesigned surfaces, submission controls, content, and required navigation still work.
+4. Confirm the course bar, lesson title bar, video frame, tab control, objectives card, and transcript panel look exactly as SEEK renders them — the extension does not restyle the lesson player. Check that the video still plays, tabs switch, and transcript cues still seek the video.
+5. Open a course overview page and confirm the course card, module cards, and upcoming-work widget use the shared surfaces. Hover a module card and use Tab to confirm the subtle lift and visible focus ring.
+6. Open an assessment start page and confirm the instructions, score summary, toolbar, and test cases are readable. Run or submit only in a test course where that is safe; confirm the controls still work.
+7. Use Tab through the course bar, lesson tabs, module cards, and assessment controls. Every interactive element should show a visible focus ring.
+8. Enable your operating system's reduced-motion setting and confirm SEEK's transitions become effectively instant.
+9. Open the popup. Choose **Dark**. SEEK should switch to the soft dark palette without a reload. The popup should keep its own system light/dark appearance.
+10. Choose **Black**. SEEK surfaces should become true black or near black. The popup should not turn black.
+11. Choose **Light**. SEEK should switch to the light palette. Choose **System** and confirm SEEK follows the operating-system preference. The popup should continue to follow the operating system independently.
+12. Enable **Video Transcript panel**. The transcript panel should disappear without a reload.
+13. Enable **Announcements**. The announcements trigger, including a badge variant, should disappear. The announcements panel's close button should remain unaffected.
+14. Enable **Forum**. Only the Forum button in the course actions should disappear.
+15. Enable **Calculator**. Only the Calculator button in the course actions should disappear.
+16. Enable **Course header bar**. The entire course bar should disappear.
+17. Disable each optional toggle. The corresponding element should return.
+18. Disable **Previous/Next navigation**, **Overview button**, and **Target divider** one at a time. Only the matching element should return.
+20. Reload the page and confirm the settings and theme persist.
+21. Navigate between units and courses, and between the two supported hosts. Confirm the settings continue to apply after Angular rerenders.
+22. Click **Restore defaults** and confirm the three default cleanups return to on, the optional cleanups return to off, and the theme returns to System.
+23. Reopen the course overview and assessment pages and confirm the redesigned surfaces, submission controls, content, and required navigation still work.
 
 ## Known limitations
 
@@ -263,7 +257,6 @@ After loading the extension in Chrome:
 - The divider selector relies on the current `app-bar.course-bar .lead` structure. That is the main selector most likely to need an update.
 - The Announcements badge is matched by the stable `Announcements` prefix, not by a notification count. If SEEK changes that label entirely, update the fallback.
 - The extension includes responsive rules for the overview and assessment surfaces. The Contents drawer on phones is still controlled by SEEK's own layout; if SEEK uses a different mobile component, the extension falls back to SEEK's styling.
-- The sidebar refinement depends on the current `app-course-outline` class names. If SEEK renames those classes, the sidebar keeps SEEK's original look rather than breaking.
 - The course overview and assessment refinements depend on the current stable class names such as `.overview-card`, `.module-card`, and `.submission-overview`. If SEEK renames them, those surfaces keep SEEK's original styling rather than breaking. The lesson player is never restyled.
 - Theme overrides cover SEEK's own surfaces and components. Embedded third-party content such as a YouTube player, PDF viewer, or external editor may keep its own light or dark appearance.
 - The extension's theme takes precedence over SEEK's own Appearance menu. SEEK's menu may therefore show a different selected option until you choose a new one there. Set the SEEK theme to System if you want SEEK to follow the OS. The extension popup is not affected by this setting.
@@ -278,5 +271,5 @@ After loading the extension in Chrome:
 - Permissions: `storage` only.
 - Host access: limited by the content-script `matches` patterns to `https://seek.study.iitm.ac.in/*` and `https://seek.onlinedegree.iitm.ac.in/*`.
 - No remote scripts, external dependencies, analytics, telemetry, `fetch`, or network requests.
-- No SEEK data is read, stored, or transmitted by the extension. Only the ten boolean preferences and the theme choice are stored.
+- No SEEK data is read, stored, or transmitted by the extension. Only the nine boolean preferences and the theme choice are stored.
 - The content script runs in the top frame only and does not change assignment content, submission behavior, assessment logic, or course data.

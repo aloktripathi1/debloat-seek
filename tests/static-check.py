@@ -95,11 +95,11 @@ def check_popup():
     keys = [element.get("data-setting") for element in inputs]
 
     check(keys == [
-        "sidebar", "unitNav", "overview", "divider",
+        "unitNav", "overview", "divider",
         "transcript", "objectives", "announcements", "forum", "calculator", "header"
-    ], "Ten independent settings are present in the expected order")
+    ], "Nine independent settings are present in the expected order")
 
-    default_keys = {"unitNav", "overview", "divider", "sidebar"}
+    default_keys = {"unitNav", "overview", "divider"}
     for element in inputs:
         key = element.get("data-setting")
         checked = element.has_attr("checked")
@@ -127,7 +127,7 @@ def check_popup():
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 10, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 9, "Every setting has a clickable label row")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
@@ -138,7 +138,6 @@ def check_settings_model():
     print("\nSettings model")
     settings_js = read("settings.js")
 
-    check("sidebar: true" in settings_js, "Premium sidebar is enabled by default")
     check("theme: 'system'" in settings_js, "System theme is the safe default")
     check("THEME_VALUES" in settings_js, "Theme values are declared once")
     check("'system', 'light', 'dark', 'black'" in settings_js,
@@ -205,12 +204,6 @@ def check_css():
     check('aria-label^="Announcements"' in css,
           "Announcements label fallback uses a stable prefix, not a hardcoded count")
     check("display: none !important;" in css, "Targets are hidden through CSS rather than deletion")
-    check(css.count('html[data-seek-sidebar="on"]') >= 20,
-          "Premium sidebar rules are gated by their own state")
-    check("app-course-outline .outline-pane" in css,
-          "Sidebar styling is scoped to the course outline component")
-    check("app-course-outline .child-row.selected" in css,
-          "Selected lesson rows receive the refined state")
     check('html[data-seek-theme="black"]:root' in css,
           "Black mode overrides SEEK's theme tokens with higher specificity")
     check("--color-background-surface-base: #000000;" in css,
@@ -259,7 +252,6 @@ def check_readme():
         "Objectives",
         "Course header bar",
         "Black",
-        "Premium Contents sidebar",
         "System"
     ]
 

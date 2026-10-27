@@ -35,8 +35,7 @@
     announcements: 'data-seek-announcements',
     forum: 'data-seek-forum',
     calculator: 'data-seek-calculator',
-    header: 'data-seek-header',
-    sidebar: 'data-seek-sidebar'
+    header: 'data-seek-header'
   });
 
   const SEEK_THEME_ATTRIBUTE = 'data-theme';

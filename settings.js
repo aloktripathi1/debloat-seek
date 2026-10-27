@@ -21,7 +21,6 @@
     forum: false,
     calculator: false,
     header: false,
-    sidebar: true,
     theme: 'system'
   });
 
@@ -34,8 +33,7 @@
     'announcements',
     'forum',
     'calculator',
-    'header',
-    'sidebar'
+    'header'
   ]);
 
   const THEME_VALUES = Object.freeze(['system', 'light', 'dark', 'black']);

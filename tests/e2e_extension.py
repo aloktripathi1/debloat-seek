@@ -41,7 +41,6 @@ DEFAULT_SETTINGS = {
     "forum": False,
     "calculator": False,
     "header": False,
-    "sidebar": True,
     "theme": "system"
 }
 
@@ -58,8 +57,7 @@ ATTRIBUTES = {
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
-    "header": "data-seek-header",
-    "sidebar": "data-seek-sidebar"
+    "header": "data-seek-header"
 }
 
 TARGETS = {
@@ -74,10 +72,7 @@ TARGETS = {
     "announcements": 'nav.actions app-button[data-announcements-trigger]',
     "forum": 'nav.actions app-button[label="Forum"]',
     "calculator": 'nav.actions app-button[label="Calculator"]',
-    "header": 'app-bar.course-bar',
-    "sidebarPane": 'app-course-outline .outline-pane',
-    "sidebarUnit": 'app-course-outline .unit-container',
-    "sidebarLesson": 'app-course-outline .child-row'
+    "header": 'app-bar.course-bar'
 }
 
 failures = []
@@ -219,28 +214,8 @@ def check_theme(page, expected_setting):
     return expected_resolved
 
 
-def check_sidebar(page, enabled):
-    expected_radius = "14px" if enabled else "0px"
-
-    page.wait_for_function(
-        """([selector, expected]) => {
-            const element = document.querySelector(selector);
-            return element && getComputedStyle(element).borderRadius === expected;
-        }""",
-        arg=[TARGETS["sidebarUnit"], expected_radius],
-        timeout=5000
-    )
-
-    radius = computed_style(page, TARGETS["sidebarUnit"], "border-radius")
-    check(radius == expected_radius,
-          f"premium sidebar {'active' if enabled else 'inactive'} (unit radius: {radius})")
-    check_hidden(page, TARGETS["sidebarPane"], False, "sidebar pane remains visible")
-    check_hidden(page, TARGETS["sidebarLesson"], False, "sidebar lessons remain visible")
-
-
 def check_default_page(page, theme="system"):
     resolved_theme = check_theme(page, theme)
-    check_sidebar(page, True)
     check(theme_surface(page) == expected_theme_surface(resolved_theme),
           f"page surface matches {resolved_theme} theme")
 
@@ -288,33 +263,6 @@ def check_stock_lesson(page):
     check_hidden(page, "#decoy-objectives", False, "unrelated objectives panel")
 
 
-def check_contents_sidebar(page):
-    checks = [
-        ('app-course-outline .outline-pane', 'width', '290px', 'Contents sidebar uses the shared width'),
-        ('app-course-outline .unit-container', 'border-radius', '14px', 'Contents units use the shared radius'),
-        ('app-course-outline .child-row', 'border-radius', '8px', 'Contents lessons use the compact radius')
-    ]
-
-    for selector, property_name, expected, label in checks:
-        actual = computed_style(page, selector, property_name)
-        check(actual == expected, f"{label} ({property_name}: {actual})")
-
-    page.locator('app-course-outline .child-row').first.focus()
-    check(computed_style(page, 'app-course-outline .child-row', 'outline-width') == '2px',
-          "Contents lessons have a visible keyboard focus ring")
-    check(computed_style(page, 'app-course-outline .child-row', 'outline-style') == 'solid',
-          "Contents lesson focus ring is solid")
-
-    page.emulate_media(reduced_motion='reduce')
-    page.wait_for_timeout(50)
-    durations = computed_style(page, 'app-course-outline .child-row', 'transition-duration')
-    check(
-        all(float(part.strip().rstrip('s')) <= 0.001 for part in durations.split(',') if part.strip()),
-        f"reduced motion removes long transitions ({durations})"
-    )
-    page.emulate_media(reduced_motion='no-preference', color_scheme='light')
-
-
 def check_overview_redesign(page):
     checks = [
         ('.overview-page', 'padding', '24px', 'course overview uses the page rhythm'),
@@ -347,6 +295,15 @@ def check_overview_redesign(page):
     page.locator('.module-card').first.focus()
     check(computed_style(page, '.module-card', 'outline-width') == '2px',
           "module cards have a visible keyboard focus ring")
+
+    page.emulate_media(reduced_motion='reduce')
+    page.wait_for_timeout(50)
+    durations = computed_style(page, '.module-card', 'transition-duration')
+    check(
+        all(float(part.strip().rstrip('s')) <= 0.001 for part in durations.split(',') if part.strip()),
+        f"reduced motion removes long transitions ({durations})"
+    )
+    page.emulate_media(reduced_motion='no-preference', color_scheme='light')
 
     check(computed_style(page, '.continue-learning .btn', 'border-radius') == '8px',
           "course overview primary action uses the compact radius")
@@ -553,9 +510,8 @@ def main():
                 print("\nInitial defaults")
                 check_default_page(page)
 
-                print("\nStock lesson page and Contents sidebar")
+                print("\nStock lesson page")
                 check_stock_lesson(page)
-                check_contents_sidebar(page)
 
                 page.goto("https://seek.study.iitm.ac.in/courses/overview", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)
@@ -638,13 +594,6 @@ def main():
                       f"SEEK follows system theme ({resolved_system})")
                 check(popup_surface(popup) == popup_system_surface,
                       "extension panel still follows the operating system")
-
-                print("\nPremium Contents sidebar")
-                check_sidebar(page, True)
-                set_toggle(popup, page, "sidebar", False)
-                check_sidebar(page, False)
-                set_toggle(popup, page, "sidebar", True)
-                check_sidebar(page, True)
 
                 print("\nOptional toggles are independent")
                 set_toggle(popup, page, "transcript", True)
@@ -757,7 +706,6 @@ def main():
                 check_hidden(page, TARGETS["divider"], False, "divider restored")
 
                 print("\nAll-off persistence and Restore defaults")
-                set_toggle(popup, page, "sidebar", False)
                 page.reload(wait_until="domcontentloaded")
                 all_off = {key: False for key in BOOLEAN_SETTINGS}
                 wait_for_root(page, all_off)
@@ -766,7 +714,6 @@ def main():
                 check_hidden(page, TARGETS["divider"], False, "divider visible after all-off reload")
                 check_hidden(page, TARGETS["calculator"], False, "calculator visible after all-off reload")
                 check_hidden(page, TARGETS["header"], False, "course header visible after all-off reload")
-                check_sidebar(page, False)
                 check_theme(page, "system")
 
                 fresh = context.new_page()

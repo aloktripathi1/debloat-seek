@@ -140,8 +140,6 @@ html[data-seek-cleaner="active"] {
   --seek-shadow-md: 0 10px 30px -24px rgba(16, 24, 40, 0.4);
   --seek-shadow-lg: 0 24px 60px -40px rgba(16, 24, 40, 0.55);
 
-  --seek-header-height: 5.6rem;
-  --seek-sidebar-width: 29rem;
 }
 
 html[data-seek-theme="dark"] {
@@ -310,7 +308,7 @@ html[data-seek-cleaner="active"] .account-panel .panel-action {
   color: var(--seek-text) !important;
   font-family: var(--seek-font-sans) !important;
   font-size: 1.3rem !important;
-  transition: background-color var(--seek-duration-fast) var(--seek-ease) !important;
+  transition: background-color var(--seek-duration-fast) var(--seek-ease);
 }
 
 html[data-seek-cleaner="active"] .account-panel .panel-action:hover {
@@ -536,7 +534,7 @@ html[data-seek-cleaner="active"] app-course-overview .module-card {
   transition:
     border-color var(--seek-duration) var(--seek-ease),
     box-shadow var(--seek-duration) var(--seek-ease),
-    transform var(--seek-duration) var(--seek-ease) !important;
+    transform var(--seek-duration) var(--seek-ease);
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-card:hover {
@@ -615,7 +613,7 @@ html[data-seek-cleaner="active"] app-course-overview .module-status[data-status=
 
 html[data-seek-cleaner="active"] app-course-overview .module-chevron {
   color: var(--seek-text-muted) !important;
-  transition: transform var(--seek-duration) var(--seek-ease), color var(--seek-duration) var(--seek-ease) !important;
+  transition: transform var(--seek-duration) var(--seek-ease), color var(--seek-duration) var(--seek-ease);
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-card:hover .module-chevron {
@@ -710,7 +708,7 @@ html[data-seek-cleaner="active"] app-course-overview .widget-title {
 html[data-seek-cleaner="active"] app-course-overview .due-item {
   padding: var(--seek-space-3) var(--seek-space-2) !important;
   border-radius: var(--seek-radius-sm) !important;
-  transition: background-color var(--seek-duration-fast) var(--seek-ease) !important;
+  transition: background-color var(--seek-duration-fast) var(--seek-ease);
 }
 
 html[data-seek-cleaner="active"] app-course-overview .due-item:hover {
@@ -824,12 +822,6 @@ html[data-seek-cleaner="active"] app-assessments-view .test-case-pill:focus-visi
 }
 
 /* Responsive adjustments ------------------------------------------------- */
-@media (max-width: 1199.98px) {
-  html[data-seek-cleaner="active"] {
-    --seek-sidebar-width: 27rem;
-  }
-}
-
 @media (max-width: 991.98px) {
   html[data-seek-cleaner="active"] app-course-overview .overview-page:not(.no-side) .overview-side {
     position: static !important;
@@ -961,217 +953,6 @@ html[data-seek-cleaner="active"] app-assessments-view .test-case-pill:focus-visi
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-  }
-}
-
-/* ----------------------------------------------------------------------- */
-/* H. Premium Contents sidebar ------------------------------------------- */
-/* ----------------------------------------------------------------------- */
-/*
- * SEEK's course-outline component is a stable, semantic surface: app-course-
- * outline > aside.outline-pane > app-course-outline-side-nav. These rules add
- * hierarchy and spacing only. They do not hide or move any navigation target.
- */
-html[data-seek-sidebar="on"] app-course-outline .outline-pane {
-  flex-basis: var(--seek-sidebar-width, 29rem);
-  background: var(--seek-surface-subtle, var(--color-background-surface-subtle)) !important;
-  border-right-color: var(--seek-border, var(--color-border-secondary)) !important;
-  box-shadow: none;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-header {
-  height: var(--seek-header-height, 5.6rem) !important;
-  padding: 0 1.4rem 0 2rem !important;
-  background: var(--seek-surface, var(--color-background-surface-base)) !important;
-  border-bottom-color: var(--seek-border, var(--color-border-secondary)) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-title {
-  gap: 0.8rem !important;
-  color: var(--color-text-secondary) !important;
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-title-icon {
-  color: var(--color-icon-secondary) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-nav {
-  padding: 1rem 0.8rem 1.6rem !important;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border-default) transparent;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-container {
-  margin: 0.2rem 0.4rem !important;
-  border-left: 0 !important;
-  border-radius: var(--seek-radius-lg, 1.4rem) !important;
-  background: transparent !important;
-  transition:
-    background-color var(--seek-duration, 180ms) var(--seek-ease, ease),
-    box-shadow var(--seek-duration, 180ms) var(--seek-ease, ease) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open {
-  background: var(--seek-surface, var(--color-background-surface-base)) !important;
-  box-shadow:
-    inset 2px 0 0 color-mix(in srgb, var(--color-background-primary) 55%, transparent),
-    0 1px 2px rgba(0, 0, 0, 0.04) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-header {
-  padding: 0.9rem 1.2rem !important;
-  border-radius: var(--seek-radius-md, 1rem) !important;
-  color: var(--seek-text-muted, var(--color-text-secondary)) !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.01em !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-header:hover {
-  background: var(--seek-surface-raised, var(--color-background-surface-stronger)) !important;
-  color: var(--seek-text, var(--color-text-default)) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-title {
-  font-size: 1.3rem !important;
-  font-weight: 500 !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open .unit-title {
-  font-size: 1.35rem !important;
-  font-weight: 600 !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-count {
-  padding: 0.2rem 0.6rem !important;
-  border: 0 !important;
-  border-radius: var(--seek-radius-pill, 999px) !important;
-  background: var(--seek-surface-raised, var(--color-background-surface-stronger)) !important;
-  color: var(--seek-text-muted, var(--color-text-secondary)) !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-chevron {
-  color: var(--color-icon-secondary) !important;
-  transition:
-    transform var(--seek-duration, 180ms) var(--seek-ease, ease),
-    color var(--seek-duration, 180ms) var(--seek-ease, ease) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-header:hover .unit-chevron,
-html[data-seek-sidebar="on"] app-course-outline .unit-container.is-open .unit-chevron {
-  color: var(--color-icon-primary) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-list {
-  gap: 0.1rem !important;
-  padding: 0 0.6rem 0.8rem 1.4rem !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row {
-  position: relative !important;
-  gap: 0.8rem !important;
-  padding: 0.7rem 0.9rem !important;
-  border: 1px solid transparent !important;
-  border-radius: var(--seek-radius-sm, 0.8rem) !important;
-  transition:
-    background-color var(--seek-duration-fast, 150ms) var(--seek-ease, ease),
-    border-color var(--seek-duration-fast, 150ms) var(--seek-ease, ease),
-    color var(--seek-duration-fast, 150ms) var(--seek-ease, ease) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row:hover {
-  background: var(--seek-surface-raised, var(--color-background-surface-stronger)) !important;
-  border-color: transparent !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row.selected {
-  padding-left: 1.1rem !important;
-  background: color-mix(
-    in srgb,
-    var(--color-background-primary) 10%,
-    var(--seek-surface, var(--color-background-surface-base))
-  ) !important;
-  border-color: color-mix(
-    in srgb,
-    var(--color-background-primary) 16%,
-    var(--seek-border, var(--color-border-secondary))
-  ) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row.selected::before {
-  content: "";
-  position: absolute;
-  top: 0.7rem;
-  bottom: 0.7rem;
-  left: 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--color-background-primary);
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-icon {
-  margin-top: 0.1rem !important;
-  color: var(--color-icon-secondary) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row.selected .child-icon {
-  color: var(--color-icon-primary) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-title {
-  font-size: 1.3rem !important;
-  font-weight: 400 !important;
-  line-height: 1.35 !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row.selected .child-title {
-  font-weight: 600 !important;
-  color: var(--color-text-default) !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-type {
-  color: var(--color-text-secondary) !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.07em !important;
-  text-transform: uppercase !important;
-  opacity: 0.78;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .status-icon {
-  color: var(--color-icon-success-strong) !important;
-  opacity: 0.65;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .child-row:hover .status-icon,
-html[data-seek-sidebar="on"] app-course-outline .child-row.selected .status-icon {
-  opacity: 1;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .unit-header:focus-visible,
-html[data-seek-sidebar="on"] app-course-outline .child-row:focus-visible {
-  outline: 2px solid var(--color-border-focus) !important;
-  outline-offset: -2px !important;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-nav::-webkit-scrollbar {
-  width: 6px;
-}
-
-html[data-seek-sidebar="on"] app-course-outline .outline-nav::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: var(--color-border-default);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-seek-sidebar="on"] app-course-outline .unit-container,
-  html[data-seek-sidebar="on"] app-course-outline .unit-chevron,
-  html[data-seek-sidebar="on"] app-course-outline .child-row {
-    transition: none !important;
   }
 }
 
