@@ -48,7 +48,7 @@ Not on the Chrome Web Store yet. Install it manually:
 3. Open `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
 5. Click **Load unpacked**.
-6. Select the `extension` folder inside the extracted folder. It contains `manifest.json`.
+6. Select the extracted folder that contains `manifest.json`.
 7. Pin **Debloat SEEK** from the Chrome extensions menu, open SEEK, and reload the tab.
 
 Works in Chrome and other Chromium browsers such as Edge and Brave. **It is not a Firefox extension.**
@@ -70,7 +70,7 @@ Everything is local. There is no remote code, analytics, or SEEK API access. Tur
 
 ## Development
 
-There is no build step. Load the `extension/` folder directly with **Load unpacked**.
+There is no build step. Load the repository folder directly with **Load unpacked**.
 
 Run the checks from the repository root:
 

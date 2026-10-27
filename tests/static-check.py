@@ -15,7 +15,6 @@ import sys
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTENSION = ROOT / "extension"
 SOURCE_URL = "https://github.com/aloktripathi1/debloat-seek"
 SEEK_ORIGINS = [
     "https://seek.study.iitm.ac.in/*",
@@ -34,12 +33,7 @@ def check(condition, message):
 
 
 def read(name):
-    path = ROOT / name
-
-    if not path.exists():
-        path = EXTENSION / name
-
-    return path.read_text(encoding="utf-8")
+    return (ROOT / name).read_text(encoding="utf-8")
 
 
 def check_manifest():
@@ -74,7 +68,7 @@ def check_manifest():
     ]
 
     for name in required_files:
-        check((EXTENSION / name).exists(), f"extension/{name} exists")
+        check((ROOT / name).exists(), f"{name} exists")
 
     check((ROOT / "README.md").exists(), "README.md exists")
 
@@ -89,11 +83,11 @@ def check_syntax():
 
     for name in ["settings.js", "content.js", "popup.js", "background.js"]:
         result = subprocess.run(
-            [node, "--check", str(EXTENSION / name)],
+            [node, "--check", str(ROOT / name)],
             capture_output=True,
             text=True
         )
-        check(result.returncode == 0, f"extension/{name} parses successfully")
+        check(result.returncode == 0, f"{name} parses successfully")
 
 
 def check_popup():

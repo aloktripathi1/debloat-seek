@@ -16,10 +16,10 @@ Private DOM snapshots belong in the gitignored `local/` folder, for example `loc
 1. Fork and clone the repository.
 2. Open `chrome://extensions`.
 3. Turn on **Developer mode**.
-4. Click **Load unpacked** and select the `extension/` folder.
+4. Click **Load unpacked** and select the repository folder.
 5. Open or reload SEEK after changing files.
 
-There is no build step. The runtime extension lives in `extension/`; tests and documentation stay at the repository root.
+There is no build step. The extension runtime, tests, and documentation live together at the repository root.
 
 ## Tests
 
