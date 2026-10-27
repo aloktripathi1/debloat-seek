@@ -95,11 +95,11 @@ def check_popup():
     keys = [element.get("data-setting") for element in inputs]
 
     check(keys == [
-        "unitNav", "overview", "divider",
+        "unitNav", "overview", "divider", "highlight",
         "transcript", "objectives", "answers", "announcements", "forum", "calculator", "header"
-    ], "Ten independent settings are present in the expected order")
+    ], "Eleven independent settings are present in the expected order")
 
-    default_keys = {"unitNav", "overview", "divider"}
+    default_keys = {"unitNav", "overview", "divider", "highlight"}
     for element in inputs:
         key = element.get("data-setting")
         checked = element.has_attr("checked")
@@ -127,7 +127,7 @@ def check_popup():
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 10, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 11, "Every setting has a clickable label row")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
@@ -138,6 +138,7 @@ def check_settings_model():
     print("\nSettings model")
     settings_js = read("settings.js")
 
+    check("highlight: true" in settings_js, "Lesson highlight is on by default")
     check("answers: false" in settings_js, "Assignment answer hiding is off by default")
     check("theme: 'system'" in settings_js, "System theme is the safe default")
     check("THEME_VALUES" in settings_js, "Theme values are declared once")
@@ -198,6 +199,16 @@ def check_css():
           "Calculator selectors are gated by their own state")
     check(css.count('html[data-seek-header="on"]') == 1,
           "Course header is gated by its own state")
+    check(css.count('html[data-seek-highlight="on"]') == 3,
+          "Lesson highlight is gated by its own state")
+    check("app-course-outline-side-nav .child-row" in css,
+          "Lesson highlight is scoped to the course outline rows")
+    check("rgba(255, 255, 255, 0.06)" in css and "rgba(255, 255, 255, 0.04)" in css,
+          "Lesson highlight uses the requested overlay tones")
+    check("transition: background-color 180ms ease;" in css,
+          "Lesson highlight uses the requested transition")
+    check("data-seek-highlight" in read("content.js"),
+          "Content script exposes the lesson highlight state")
     check(css.count('html[data-seek-answers="on"]') >= 20,
           "Assignment answer hiding is gated by its own state")
     check("app-assessment-question-view .evaluated-answer" in css,
@@ -261,6 +272,7 @@ def check_readme():
         "Known limitations",
         "Calculator",
         "Objectives",
+        "Lesson Highlight",
         "Assignment",
         "Course header bar",
         "Black",

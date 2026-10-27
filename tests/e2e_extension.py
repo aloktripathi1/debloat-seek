@@ -36,6 +36,7 @@ DEFAULT_SETTINGS = {
     "unitNav": True,
     "overview": True,
     "divider": True,
+    "highlight": True,
     "transcript": False,
     "objectives": False,
     "answers": False,
@@ -54,6 +55,7 @@ ATTRIBUTES = {
     "unitNav": "data-seek-unit-nav",
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
+    "highlight": "data-seek-highlight",
     "transcript": "data-seek-transcript",
     "objectives": "data-seek-objectives",
     "answers": "data-seek-answers",
@@ -68,6 +70,9 @@ TARGETS = {
     "overview": '.lead button[aria-label="Overview"]',
     "overviewHost": '.lead app-button[label="Overview"]',
     "divider": '.lead > span.divider',
+    "highlightRow": 'app-course-outline-side-nav .child-row.selected',
+    "highlightHoverRow": 'app-course-outline-side-nav .child-row:not(.selected)',
+    "highlightDecoy": '#decoy-child-row',
     "transcript": 'app-lesson-view aside.transcript-panel',
     "objectives": 'app-lesson-view .objectives',
     "objectivesTab": 'app-lesson-view [data-seek-objectives-tab]',
@@ -219,6 +224,75 @@ def check_theme(page, expected_setting):
     return expected_resolved
 
 
+def read_original_row_styles(page, selector):
+    return page.evaluate(
+        """(selector) => {
+            const source = document.querySelector(selector);
+            const clone = source.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.removeAttribute('data-seek-highlight');
+            document.body.appendChild(clone);
+            const style = getComputedStyle(clone);
+            const result = {
+                background: style.backgroundColor,
+                border: style.borderTopColor,
+                transition: style.transitionDuration
+            };
+            clone.remove();
+            return result;
+        }""",
+        selector
+    )
+
+
+def check_lesson_highlight(page, enabled):
+    # The popup is a separate tab; focus SEEK so transitions and :hover run.
+    page.bring_to_front()
+    page.wait_for_timeout(250)
+    selected_original = read_original_row_styles(page, TARGETS["highlightRow"])
+    plain_original = read_original_row_styles(page, TARGETS["highlightHoverRow"])
+
+    background = computed_style(page, TARGETS["highlightRow"], 'background-color')
+    border = computed_style(page, TARGETS["highlightRow"], 'border-top-color')
+    transition = computed_style(page, TARGETS["highlightRow"], 'transition-duration')
+
+    if enabled:
+        check(background == 'rgba(255, 255, 255, 0.06)',
+              f"selected lesson row uses the highlight tint ({background})")
+        check(border == 'rgba(0, 0, 0, 0)',
+              f"selected lesson row clears its border colour ({border})")
+        check(computed_style(page, TARGETS["highlightRow"], 'box-shadow') == 'none',
+              "selected lesson row clears its shadow")
+        check(transition == '0.18s',
+              f"lesson rows animate the background ({transition})")
+        check(computed_style(page, TARGETS["highlightRow"], 'transition-property') == 'background-color',
+              "lesson rows transition only the background")
+        check(computed_style(page, TARGETS["highlightRow"], 'transition-timing-function') == 'ease',
+              "lesson rows use the requested easing")
+    else:
+        check(background == selected_original["background"],
+              f"selected lesson row restores SEEK's background ({background})")
+        check(border == selected_original["border"],
+              f"selected lesson row restores SEEK's border ({border})")
+        check(transition == selected_original["transition"],
+              f"lesson rows restore SEEK's transition ({transition})")
+
+    check(computed_style(page, TARGETS["highlightDecoy"], 'background-color')
+          == selected_original["background"],
+          "unrelated selected row keeps SEEK's background")
+    check(computed_style(page, TARGETS["highlightDecoy"], 'transition-duration')
+          == selected_original["transition"],
+          "unrelated selected row keeps SEEK's transition")
+
+    page.hover(TARGETS["highlightHoverRow"])
+    page.wait_for_timeout(250)
+    hover_background = computed_style(page, TARGETS["highlightHoverRow"], 'background-color')
+    expected_hover = 'rgba(255, 255, 255, 0.04)' if enabled else plain_original["background"]
+    check(hover_background == expected_hover,
+          f"lesson row hover uses {'the highlight tint' if enabled else 'SEEK styling'} ({hover_background})")
+    page.mouse.move(0, 0)
+
+
 def check_default_page(page, theme="system"):
     resolved_theme = check_theme(page, theme)
     check(theme_surface(page) == expected_theme_surface(resolved_theme),
@@ -228,6 +302,7 @@ def check_default_page(page, theme="system"):
     check_hidden(page, TARGETS["overview"], True, "Overview button")
     check_hidden(page, TARGETS["overviewHost"], True, "Overview component host")
     check_hidden(page, TARGETS["divider"], True, "course-bar divider")
+    check_lesson_highlight(page, True)
     check_hidden(page, TARGETS["transcript"], False, "transcript panel")
     check_hidden(page, TARGETS["announcements"], False, "announcements trigger")
     check_hidden(page, TARGETS["forum"], False, "forum trigger")
@@ -661,8 +736,19 @@ def main():
                 )
 
                 check(get_popup_states(popup) == BOOLEAN_SETTINGS, "popup starts with safe boolean defaults")
+                check(popup.locator("#summary").inner_text() == "4 on · 7 off",
+                      "popup summary reports four on and seven off")
                 check(get_popup_theme(popup) == "system", "popup starts in System theme")
                 check(get_stored_settings(popup) == DEFAULT_SETTINGS, "defaults are persisted in chrome.storage.sync")
+
+                print("\nLesson highlight toggle")
+                set_toggle(popup, page, "highlight", False)
+                check_lesson_highlight(page, False)
+                set_toggle(popup, page, "highlight", True)
+                check_lesson_highlight(page, True)
+                page.reload(wait_until="domcontentloaded")
+                wait_for_root(page, BOOLEAN_SETTINGS)
+                check_lesson_highlight(page, True)
 
                 print("\nTheme modes")
                 popup_system_surface = expected_popup_surface(popup)
@@ -840,11 +926,15 @@ def main():
                 set_toggle(popup, page, "divider", False)
                 check_hidden(page, TARGETS["divider"], False, "divider restored")
 
+                set_toggle(popup, page, "highlight", False)
+                check_lesson_highlight(page, False)
+
                 print("\nAll-off persistence and Restore defaults")
                 page.reload(wait_until="domcontentloaded")
                 all_off = {key: False for key in BOOLEAN_SETTINGS}
                 wait_for_root(page, all_off)
                 check_hidden(page, TARGETS["unitNav"], False, "unit navigation visible after all-off reload")
+                check_lesson_highlight(page, False)
                 check_hidden(page, TARGETS["overview"], False, "Overview visible after all-off reload")
                 check_hidden(page, TARGETS["divider"], False, "divider visible after all-off reload")
                 check_hidden(page, TARGETS["calculator"], False, "calculator visible after all-off reload")
@@ -860,6 +950,7 @@ def main():
                              "saved settings apply on a newly opened course tab")
                 check_hidden(fresh, TARGETS["divider"], False,
                              "saved cleanup settings apply without opening the popup")
+                check_lesson_highlight(fresh, False)
                 check_theme(fresh, "system")
                 fresh.close()
 

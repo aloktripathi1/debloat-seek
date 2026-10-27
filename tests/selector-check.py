@@ -23,6 +23,7 @@ SELECTORS = {
         'html[data-seek-overview="on"] app-bar.course-bar .lead app-button:has(> button[aria-label="Overview"])'
     ),
     "divider": 'html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider',
+    "highlight": 'html[data-seek-highlight="on"] app-course-outline-side-nav .child-row.selected',
     "transcript": (
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile, '
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel'
@@ -51,6 +52,7 @@ ATTRIBUTES = {
     "unitNav": "data-seek-unit-nav",
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
+    "highlight": "data-seek-highlight",
     "transcript": "data-seek-transcript",
     "objectives": "data-seek-objectives",
     "answers": "data-seek-answers",
@@ -162,7 +164,7 @@ def test_off_states(soup):
 
 def test_on_states(soup):
     print("\nOn states and target identity")
-    set_states(soup, unitNav=True, overview=True, divider=True,
+    set_states(soup, unitNav=True, overview=True, divider=True, highlight=True,
                transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True)
 
@@ -185,6 +187,13 @@ def test_on_states(soup):
     actions_divider = soup.select_one("nav.actions > span.divider")
     check(actions_divider not in dividers,
           "divider selector does not match the course-actions divider")
+
+    highlights = soup.select(SELECTORS["highlight"])
+    check(len(highlights) == 1, "highlight matches exactly one selected lesson row")
+    check(highlights[0].find_parent("app-course-outline-side-nav") is not None,
+          "highlight is scoped inside the course outline side navigation")
+    check(soup.select_one("#decoy-child-row") not in highlights,
+          "highlight selector does not match an unrelated selected row")
 
     transcripts = soup.select(SELECTORS["transcript"])
     check(len(transcripts) == 1, "transcript matches exactly one panel")
@@ -285,7 +294,7 @@ def test_assignment_answers():
 def test_missing_elements():
     print("\nMissing elements")
     soup = BeautifulSoup("<html><body><h1>SEEK</h1></body></html>", "html.parser")
-    set_states(soup, unitNav=True, overview=True, divider=True,
+    set_states(soup, unitNav=True, overview=True, divider=True, highlight=True,
                transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True)
     for key, selector in SELECTORS.items():
@@ -299,7 +308,7 @@ def test_real_dom():
 
     print("\nReal DOM evidence")
     soup = BeautifulSoup(REAL_DOM.read_text(encoding="utf-8"), "html.parser")
-    set_states(soup, unitNav=True, overview=True, divider=True,
+    set_states(soup, unitNav=True, overview=True, divider=True, highlight=True,
                transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True)
 
@@ -307,6 +316,7 @@ def test_real_dom():
         "unitNav": 1,
         "overview": 2,
         "divider": 1,
+        "highlight": 1,
         "transcript": 1,
         "objectives": 1,
         "announcements": 1,

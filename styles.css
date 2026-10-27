@@ -35,6 +35,26 @@ html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider {
   display: none !important;
 }
 
+/* D. Lesson highlight ---------------------------------------------------- */
+/*
+ * Tint the selected lesson row in the course outline and add a quiet hover
+ * cue. Scoped to the outline side navigation so other rows and controls keep
+ * their original styling. Turning the option off removes these rules.
+ */
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-row.selected {
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  border-color: transparent;
+}
+
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-row {
+  transition: background-color 180ms ease;
+}
+
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 /* Optional A. Video transcript panel ------------------------------------- */
 html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile,
 html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel {

@@ -30,6 +30,7 @@
     unitNav: 'data-seek-unit-nav',
     overview: 'data-seek-overview',
     divider: 'data-seek-divider',
+    highlight: 'data-seek-highlight',
     transcript: 'data-seek-transcript',
     objectives: 'data-seek-objectives',
     answers: 'data-seek-answers',
