@@ -745,6 +745,18 @@ def main():
                 check_sidebar(page, False)
                 check_theme(page, "system")
 
+                fresh = context.new_page()
+                fresh.on("pageerror", lambda error: page_errors.append(f"fresh: {error}"))
+                fresh.emulate_media(color_scheme="light")
+                fresh.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
+                wait_for_root(fresh, all_off)
+                check_hidden(fresh, TARGETS["unitNav"], False,
+                             "saved settings apply on a newly opened course tab")
+                check_hidden(fresh, TARGETS["divider"], False,
+                             "saved cleanup settings apply without opening the popup")
+                check_theme(fresh, "system")
+                fresh.close()
+
                 popup.close()
                 popup = open_popup(context, extension_id)
                 check(get_popup_states(popup) == all_off,

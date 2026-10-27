@@ -143,18 +143,6 @@ body::-webkit-scrollbar-thumb {
   letter-spacing: -0.015em;
 }
 
-.local-badge {
-  padding: 2px 7px;
-  border: 1px solid var(--accent-border);
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
 .settings-section {
   margin-top: 12px;
   padding: 10px;
