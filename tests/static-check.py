@@ -219,12 +219,8 @@ def check_css():
           "Shared large radius token is declared")
     check("--seek-duration: 180ms;" in css,
           "Shared motion duration is declared")
-    check("--seek-reading-max: 92rem;" in css,
-          "Lesson reading width is capped")
-    check(".lesson-view .content-column" in css,
-          "Lesson content column is scoped and readable")
-    check(".lesson-view .transcript-panel" in css,
-          "Transcript panel uses the shared surface")
+    check(".lesson-view .video-container" not in css,
+          "Video player and lesson surfaces are left untouched")
     check("app-course-overview .module-card" in css,
           "Course overview module cards are styled")
     check("app-course-overview .module-status" in css,

@@ -172,7 +172,7 @@ def expected_theme_surface(resolved_theme):
 
 def expected_popup_surface(popup):
     return popup.evaluate(
-        "() => matchMedia('(prefers-color-scheme: dark)').matches ? '#080d15' : '#f4f7fb'"
+        "() => matchMedia('(prefers-color-scheme: dark)').matches ? '#131417' : '#f2f3f4'"
     )
 
 
@@ -262,18 +262,23 @@ def check_default_page(page, theme="system"):
     check_hidden(page, 'button[aria-label="Close announcements"]', False, "announcements panel close button")
 
 
-def check_lesson_redesign(page):
+def check_stock_lesson(page):
     checks = [
-        ('app-bar.course-bar .app-bar', 'height', '56px', 'course bar uses the compact header height'),
-        ('.unit-view .title-bar', 'height', '56px', 'lesson title bar aligns with the header'),
-        ('.unit-view .title-bar .title', 'font-size', '15px', 'lesson title uses the interface type scale'),
-        ('.lesson-view', 'padding', '24px', 'lesson surface has comfortable padding'),
-        ('.lesson-view', 'gap', '16px', 'lesson columns use consistent spacing'),
-        ('.lesson-view .content-column', 'max-width', '920px', 'lesson reading column stays readable'),
-        ('.lesson-view .video-container', 'border-radius', '14px', 'video player uses the shared radius'),
-        ('.lesson-view .tab-bar-wrapper', 'border-radius', '10px', 'lesson tabs use the compact radius'),
-        ('.lesson-view .objectives', 'border-radius', '14px', 'objectives panel uses the shared radius'),
-        ('.lesson-view .transcript-panel', 'width', '340px', 'transcript panel has a stable width'),
+        ('.lesson-view', 'padding', '16px', "lesson surface keeps SEEK's original padding"),
+        ('.lesson-view', 'gap', '8px', "lesson surface keeps SEEK's original column gap"),
+        ('.unit-view .title-bar .title', 'font-size', '14px',
+         "lesson title keeps SEEK's original type scale"),
+        ('.lesson-view .video-container', 'border-radius', '0px',
+         "video player keeps SEEK's original shape")
+    ]
+
+    for selector, property_name, expected, label in checks:
+        actual = computed_style(page, selector, property_name)
+        check(actual == expected, f"{label} ({property_name}: {actual})")
+
+
+def check_contents_sidebar(page):
+    checks = [
         ('app-course-outline .outline-pane', 'width', '290px', 'Contents sidebar uses the shared width'),
         ('app-course-outline .unit-container', 'border-radius', '14px', 'Contents units use the shared radius'),
         ('app-course-outline .child-row', 'border-radius', '8px', 'Contents lessons use the compact radius')
@@ -537,8 +542,9 @@ def main():
                 print("\nInitial defaults")
                 check_default_page(page)
 
-                print("\nRedesigned course surfaces")
-                check_lesson_redesign(page)
+                print("\nStock lesson page and Contents sidebar")
+                check_stock_lesson(page)
+                check_contents_sidebar(page)
 
                 page.goto("https://seek.study.iitm.ac.in/courses/overview", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)
