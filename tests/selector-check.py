@@ -23,7 +23,7 @@ SELECTORS = {
         'html[data-seek-overview="on"] app-bar.course-bar .lead app-button:has(> button[aria-label="Overview"])'
     ),
     "divider": 'html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider',
-    "highlight": 'html[data-seek-highlight="on"] app-course-outline-side-nav .child-row.selected',
+    "highlight": 'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row',
     "transcript": (
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile, '
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel'
@@ -189,11 +189,27 @@ def test_on_states(soup):
           "divider selector does not match the course-actions divider")
 
     highlights = soup.select(SELECTORS["highlight"])
-    check(len(highlights) == 1, "highlight matches exactly one selected lesson row")
-    check(highlights[0].find_parent("app-course-outline-side-nav") is not None,
+    check(len(highlights) == 2, "highlight matches every row in the expanded lesson panel")
+    check(all(row.find_parent("app-course-outline-side-nav") is not None for row in highlights),
           "highlight is scoped inside the course outline side navigation")
+    check(all(
+        row.find_parent(class_="child-container") is not None
+        and "is-open" in row.find_parent(class_="child-container").get("class", [])
+        for row in highlights
+    ), "highlight only matches rows inside an expanded panel")
     check(soup.select_one("#decoy-child-row") not in highlights,
           "highlight selector does not match an unrelated selected row")
+    check(soup.select_one(".unit-container:not(.is-open) .child-row") not in highlights,
+          "highlight selector does not match rows in collapsed panels")
+
+    panels = soup.select(
+        'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open'
+    )
+    lists = soup.select(
+        'html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-list'
+    )
+    check(len(panels) == 1, "highlight matches exactly one expanded panel")
+    check(len(lists) == 1, "highlight matches exactly one expanded panel list")
 
     transcripts = soup.select(SELECTORS["transcript"])
     check(len(transcripts) == 1, "transcript matches exactly one panel")
@@ -316,7 +332,7 @@ def test_real_dom():
         "unitNav": 1,
         "overview": 2,
         "divider": 1,
-        "highlight": 1,
+        "highlight": 24,
         "transcript": 1,
         "objectives": 1,
         "announcements": 1,

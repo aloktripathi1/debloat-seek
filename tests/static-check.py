@@ -199,14 +199,18 @@ def check_css():
           "Calculator selectors are gated by their own state")
     check(css.count('html[data-seek-header="on"]') == 1,
           "Course header is gated by its own state")
-    check(css.count('html[data-seek-highlight="on"]') == 3,
+    check(css.count('html[data-seek-highlight="on"]') == 9,
           "Lesson highlight is gated by its own state")
-    check("app-course-outline-side-nav .child-row" in css,
-          "Lesson highlight is scoped to the course outline rows")
-    check("rgba(255, 255, 255, 0.06)" in css and "rgba(255, 255, 255, 0.04)" in css,
-          "Lesson highlight uses the requested overlay tones")
-    check("transition: background-color 180ms ease;" in css,
-          "Lesson highlight uses the requested transition")
+    check("app-course-outline-side-nav .child-container.is-open" in css,
+          "Lesson highlight is scoped to expanded course-outline panels")
+    check(css.count("background: transparent !important;\n  box-shadow: none !important;") == 3,
+          "Lesson highlight clears panel, row, and pseudo-element surfaces")
+    check(".child-row:focus" in css and ".child-row:active" in css,
+          "Lesson highlight clears focus and active row states")
+    check(".child-row::before" in css and ".child-row::after" in css,
+          "Lesson highlight clears row pseudo-elements")
+    check("rgba(255, 255, 255, 0.06)" not in css and "rgba(255, 255, 255, 0.04)" not in css,
+          "Lesson highlight no longer adds a selected-row tint")
     check("data-seek-highlight" in read("content.js"),
           "Content script exposes the lesson highlight state")
     check(css.count('html[data-seek-answers="on"]') >= 20,

@@ -70,8 +70,10 @@ TARGETS = {
     "overview": '.lead button[aria-label="Overview"]',
     "overviewHost": '.lead app-button[label="Overview"]',
     "divider": '.lead > span.divider',
-    "highlightRow": 'app-course-outline-side-nav .child-row.selected',
-    "highlightHoverRow": 'app-course-outline-side-nav .child-row:not(.selected)',
+    "highlightRow": 'app-course-outline-side-nav .child-container.is-open .child-row.selected',
+    "highlightHoverRow": 'app-course-outline-side-nav .child-container.is-open .child-row:not(.selected)',
+    "highlightPanel": 'app-course-outline-side-nav .child-container.is-open',
+    "highlightList": 'app-course-outline-side-nav .child-container.is-open .child-list',
     "highlightDecoy": '#decoy-child-row',
     "transcript": 'app-lesson-view aside.transcript-panel',
     "objectives": 'app-lesson-view .objectives',
@@ -224,72 +226,143 @@ def check_theme(page, expected_setting):
     return expected_resolved
 
 
-def read_original_row_styles(page, selector):
-    return page.evaluate(
-        """(selector) => {
-            const source = document.querySelector(selector);
-            const clone = source.cloneNode(true);
-            clone.removeAttribute('id');
-            clone.removeAttribute('data-seek-highlight');
-            document.body.appendChild(clone);
-            const style = getComputedStyle(clone);
-            const result = {
+def read_styles(page, selector, pseudo=None):
+    return page.locator(selector).first.evaluate(
+        """(element, pseudo) => {
+            const style = getComputedStyle(element, pseudo || null);
+            return {
                 background: style.backgroundColor,
-                border: style.borderTopColor,
-                transition: style.transitionDuration
+                boxShadow: style.boxShadow
             };
-            clone.remove();
-            return result;
         }""",
-        selector
+        pseudo
+    )
+
+
+def read_original_styles(page, selector, pseudo=None):
+    current = page.evaluate(
+        "() => document.documentElement.getAttribute('data-seek-highlight')"
+    )
+    page.evaluate(
+        "() => document.documentElement.setAttribute('data-seek-highlight', 'off')"
+    )
+
+    try:
+        return read_styles(page, selector, pseudo)
+    finally:
+        page.evaluate(
+            """(value) => {
+                if (value === null) {
+                    document.documentElement.removeAttribute('data-seek-highlight');
+                } else {
+                    document.documentElement.setAttribute('data-seek-highlight', value);
+                }
+            }""",
+            current
+        )
+
+
+def theme_background_probe(page):
+    return page.evaluate(
+        """() => {
+            const probe = document.createElement('div');
+            probe.style.background = 'var(--color-background-primary-light)';
+            document.body.appendChild(probe);
+            const value = getComputedStyle(probe).backgroundColor;
+            probe.remove();
+            return value;
+        }"""
     )
 
 
 def check_lesson_highlight(page, enabled):
-    # The popup is a separate tab; focus SEEK so transitions and :hover run.
+    # The popup is a separate tab; focus SEEK so :hover, :focus, and :active run.
     page.bring_to_front()
-    page.wait_for_timeout(250)
-    selected_original = read_original_row_styles(page, TARGETS["highlightRow"])
-    plain_original = read_original_row_styles(page, TARGETS["highlightHoverRow"])
+    page.wait_for_timeout(100)
 
-    background = computed_style(page, TARGETS["highlightRow"], 'background-color')
-    border = computed_style(page, TARGETS["highlightRow"], 'border-top-color')
-    transition = computed_style(page, TARGETS["highlightRow"], 'transition-duration')
+    selected_original = read_original_styles(page, TARGETS["highlightRow"])
+    plain_original = read_original_styles(page, TARGETS["highlightHoverRow"])
+    panel_original = read_original_styles(page, TARGETS["highlightPanel"])
+    list_original = read_original_styles(page, TARGETS["highlightList"])
+    before_original = read_original_styles(page, TARGETS["highlightRow"], "::before")
+    after_original = read_original_styles(page, TARGETS["highlightRow"], "::after")
+    decoy_original = read_original_styles(page, TARGETS["highlightDecoy"])
+    interaction_original = theme_background_probe(page)
+
+    selected = read_styles(page, TARGETS["highlightRow"])
+    plain = read_styles(page, TARGETS["highlightHoverRow"])
+    panel = read_styles(page, TARGETS["highlightPanel"])
+    list = read_styles(page, TARGETS["highlightList"])
+    before = read_styles(page, TARGETS["highlightRow"], "::before")
+    after = read_styles(page, TARGETS["highlightRow"], "::after")
+    decoy = read_styles(page, TARGETS["highlightDecoy"])
+    transparent = "rgba(0, 0, 0, 0)"
 
     if enabled:
-        check(background == 'rgba(255, 255, 255, 0.06)',
-              f"selected lesson row uses the highlight tint ({background})")
-        check(border == 'rgba(0, 0, 0, 0)',
-              f"selected lesson row clears its border colour ({border})")
-        check(computed_style(page, TARGETS["highlightRow"], 'box-shadow') == 'none',
-              "selected lesson row clears its shadow")
-        check(transition == '0.18s',
-              f"lesson rows animate the background ({transition})")
-        check(computed_style(page, TARGETS["highlightRow"], 'transition-property') == 'background-color',
-              "lesson rows transition only the background")
-        check(computed_style(page, TARGETS["highlightRow"], 'transition-timing-function') == 'ease',
-              "lesson rows use the requested easing")
-    else:
-        check(background == selected_original["background"],
-              f"selected lesson row restores SEEK's background ({background})")
-        check(border == selected_original["border"],
-              f"selected lesson row restores SEEK's border ({border})")
-        check(transition == selected_original["transition"],
-              f"lesson rows restore SEEK's transition ({transition})")
+        for label, value in (
+            ("selected lesson row", selected),
+            ("non-selected lesson row", plain),
+            ("expanded week panel", panel),
+            ("expanded week panel list", list),
+        ):
+            check(value["background"] == transparent,
+                  f"{label} background is transparent ({value['background']})")
+            check(value["boxShadow"] == "none",
+                  f"{label} shadow is removed ({value['boxShadow']})")
 
-    check(computed_style(page, TARGETS["highlightDecoy"], 'background-color')
-          == selected_original["background"],
+        check(before["background"] == transparent and before["boxShadow"] == "none",
+              f"lesson row ::before is cleared ({before})")
+        check(after["background"] == transparent and after["boxShadow"] == "none",
+              f"lesson row ::after is cleared ({after})")
+    else:
+        check(selected["background"] == selected_original["background"],
+              f"selected lesson row restores SEEK's background ({selected['background']})")
+        check(selected["boxShadow"] == selected_original["boxShadow"],
+              f"selected lesson row restores SEEK's shadow ({selected['boxShadow']})")
+        check(plain["background"] == plain_original["background"],
+              f"non-selected lesson row restores SEEK's background ({plain['background']})")
+        check(panel["background"] == panel_original["background"],
+              f"expanded week panel restores SEEK's background ({panel['background']})")
+        check(panel["boxShadow"] == panel_original["boxShadow"],
+              f"expanded week panel restores SEEK's shadow ({panel['boxShadow']})")
+        check(list["background"] == list_original["background"],
+              f"expanded week panel list restores SEEK's background ({list['background']})")
+        check(list["boxShadow"] == list_original["boxShadow"],
+              f"expanded week panel list restores SEEK's shadow ({list['boxShadow']})")
+        check(before == before_original,
+              f"lesson row ::before restores SEEK's styling ({before})")
+        check(after == after_original,
+              f"lesson row ::after restores SEEK's styling ({after})")
+
+    check(decoy["background"] == decoy_original["background"],
           "unrelated selected row keeps SEEK's background")
-    check(computed_style(page, TARGETS["highlightDecoy"], 'transition-duration')
-          == selected_original["transition"],
-          "unrelated selected row keeps SEEK's transition")
+    check(decoy["boxShadow"] == decoy_original["boxShadow"],
+          "unrelated selected row keeps SEEK's shadow")
 
     page.hover(TARGETS["highlightHoverRow"])
-    page.wait_for_timeout(250)
-    hover_background = computed_style(page, TARGETS["highlightHoverRow"], 'background-color')
-    expected_hover = 'rgba(255, 255, 255, 0.04)' if enabled else plain_original["background"]
-    check(hover_background == expected_hover,
-          f"lesson row hover uses {'the highlight tint' if enabled else 'SEEK styling'} ({hover_background})")
+    page.wait_for_timeout(50)
+    hover = read_styles(page, TARGETS["highlightHoverRow"])
+    expected_interaction = transparent if enabled else interaction_original
+    check(hover["background"] == expected_interaction,
+          f"lesson row hover uses {'no background' if enabled else 'SEEK styling'} "
+          f"({hover['background']})")
+
+    page.focus(TARGETS["highlightHoverRow"])
+    page.wait_for_timeout(50)
+    focused = read_styles(page, TARGETS["highlightHoverRow"])
+    check(focused["background"] == expected_interaction,
+          f"lesson row focus uses {'no background' if enabled else 'SEEK styling'} "
+          f"({focused['background']})")
+
+    page.mouse.down()
+    page.wait_for_timeout(50)
+    active = read_styles(page, TARGETS["highlightHoverRow"])
+    page.mouse.up()
+    check(active["background"] == expected_interaction,
+          f"lesson row active state uses {'no background' if enabled else 'SEEK styling'} "
+          f"({active['background']})")
+
+    page.evaluate("() => document.activeElement && document.activeElement.blur()")
     page.mouse.move(0, 0)
 
 

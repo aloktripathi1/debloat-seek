@@ -37,22 +37,31 @@ html[data-seek-divider="on"] app-bar.course-bar .lead > span.divider {
 
 /* D. Lesson highlight ---------------------------------------------------- */
 /*
- * Tint the selected lesson row in the course outline and add a quiet hover
- * cue. Scoped to the outline side navigation so other rows and controls keep
- * their original styling. Turning the option off removes these rules.
+ * Remove the background and shadow treatments from an expanded week panel,
+ * every lesson/assignment row inside it, and the rows' pseudo-elements. This
+ * covers selected, hover, focus, and active states so no row keeps a tint.
+ * Scoped to the outline side navigation; turning the option off removes the
+ * rules and restores SEEK's original styling.
  */
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-row.selected {
-  background: rgba(255, 255, 255, 0.06) !important;
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-list {
+  background: transparent !important;
   box-shadow: none !important;
-  border-color: transparent;
 }
 
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-row {
-  transition: background-color 180ms ease;
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:hover,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row.selected,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:focus,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row:active {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-html[data-seek-highlight="on"] app-course-outline-side-nav .child-row:hover {
-  background: rgba(255, 255, 255, 0.04);
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row::before,
+html[data-seek-highlight="on"] app-course-outline-side-nav .child-container.is-open .child-row::after {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 /* Optional A. Video transcript panel ------------------------------------- */
