@@ -26,6 +26,7 @@ SELECTORS = {
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel.hidden-mobile, '
         'html[data-seek-transcript="on"] app-lesson-view aside.transcript-panel'
     ),
+    "objectives": 'html[data-seek-objectives="on"] app-lesson-view .objectives',
     "announcements": (
         'html[data-seek-announcements="on"] app-button[data-announcements-trigger], '
         'html[data-seek-announcements="on"] nav.actions[aria-label="Course actions"] app-button[label="Announcements"], '
@@ -56,6 +57,7 @@ ATTRIBUTES = {
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
     "transcript": "data-seek-transcript",
+    "objectives": "data-seek-objectives",
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
@@ -93,7 +95,7 @@ def test_off_states(soup):
 def test_on_states(soup):
     print("\nOn states and target identity")
     set_states(soup, unitNav=True, overview=True, divider=True,
-               transcript=True, announcements=True, forum=True,
+               transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True)
 
     unit_navs = soup.select(SELECTORS["unitNav"])
@@ -122,6 +124,13 @@ def test_on_states(soup):
           "transcript is scoped inside app-lesson-view")
     check(soup.select_one("#decoy-transcript") not in transcripts,
           "transcript selector does not match an unrelated transcript panel")
+
+    objectives = soup.select(SELECTORS["objectives"])
+    check(len(objectives) == 1, "objectives matches exactly one panel")
+    check(objectives[0].find_parent("app-lesson-view") is not None,
+          "objectives panel is scoped inside app-lesson-view")
+    check(soup.select_one("#decoy-objectives") not in objectives,
+          "objectives selector does not match an unrelated objectives panel")
 
     announcements = soup.select(SELECTORS["announcements"])
     check(len(announcements) == 1, "announcements matches exactly one trigger")
@@ -207,7 +216,7 @@ def test_missing_elements():
     print("\nMissing elements")
     soup = BeautifulSoup("<html><body><h1>SEEK</h1></body></html>", "html.parser")
     set_states(soup, unitNav=True, overview=True, divider=True,
-               transcript=True, announcements=True, forum=True,
+               transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True, sidebar=True)
     for key, selector in SELECTORS.items():
         check(len(soup.select(selector)) == 0, f"{key} selector is safe on a page without targets")
@@ -224,7 +233,7 @@ def test_real_dom():
     print("\nReal DOM evidence")
     soup = BeautifulSoup(REAL_DOM.read_text(encoding="utf-8"), "html.parser")
     set_states(soup, unitNav=True, overview=True, divider=True,
-               transcript=True, announcements=True, forum=True,
+               transcript=True, objectives=True, announcements=True, forum=True,
                calculator=True, header=True, sidebar=True)
 
     expected = {
@@ -232,6 +241,7 @@ def test_real_dom():
         "overview": 2,
         "divider": 1,
         "transcript": 1,
+        "objectives": 1,
         "announcements": 1,
         "forum": 1,
         "calculator": 1,

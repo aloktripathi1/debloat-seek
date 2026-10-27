@@ -96,8 +96,8 @@ def check_popup():
 
     check(keys == [
         "sidebar", "unitNav", "overview", "divider",
-        "transcript", "announcements", "forum", "calculator", "header"
-    ], "Nine independent settings are present in the expected order")
+        "transcript", "objectives", "announcements", "forum", "calculator", "header"
+    ], "Ten independent settings are present in the expected order")
 
     default_keys = {"unitNav", "overview", "divider", "sidebar"}
     for element in inputs:
@@ -127,7 +127,7 @@ def check_popup():
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 9, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 10, "Every setting has a clickable label row")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
@@ -185,6 +185,12 @@ def check_css():
     check(css.count('html[data-seek-overview="on"]') == 3, "Overview selectors are gated by their own state")
     check(css.count('html[data-seek-divider="on"]') == 1, "Divider is gated by its own state")
     check(css.count('html[data-seek-transcript="on"]') == 2, "Transcript selectors are gated by their own state")
+    check(css.count('html[data-seek-objectives="on"]') == 4,
+          "Objectives selectors are gated by their own state")
+    check("app-lesson-view .objectives" in css,
+          "Objectives panel hiding is scoped to the lesson view")
+    check("data-seek-objectives-tab" in css and "data-seek-objectives-tab" in read("content.js"),
+          "Objectives tab is tagged by the content script and matched by CSS")
     check(css.count('html[data-seek-announcements="on"]') == 4,
           "Announcements selectors are gated by their own state")
     check(css.count('html[data-seek-forum="on"]') == 3, "Forum selectors are gated by their own state")
@@ -250,6 +256,7 @@ def check_readme():
         "Troubleshooting",
         "Known limitations",
         "Calculator",
+        "Objectives",
         "Course header bar",
         "Black",
         "Premium Contents sidebar",

@@ -36,6 +36,7 @@ DEFAULT_SETTINGS = {
     "overview": True,
     "divider": True,
     "transcript": False,
+    "objectives": False,
     "announcements": False,
     "forum": False,
     "calculator": False,
@@ -53,6 +54,7 @@ ATTRIBUTES = {
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
     "transcript": "data-seek-transcript",
+    "objectives": "data-seek-objectives",
     "announcements": "data-seek-announcements",
     "forum": "data-seek-forum",
     "calculator": "data-seek-calculator",
@@ -66,6 +68,9 @@ TARGETS = {
     "overviewHost": '.lead app-button[label="Overview"]',
     "divider": '.lead > span.divider',
     "transcript": 'app-lesson-view aside.transcript-panel',
+    "objectives": 'app-lesson-view .objectives',
+    "objectivesTab": 'app-lesson-view [data-seek-objectives-tab]',
+    "objectivesOnlyBar": 'app-lesson-view [data-seek-objectives-only]',
     "announcements": 'nav.actions app-button[data-announcements-trigger]',
     "forum": 'nav.actions app-button[label="Forum"]',
     "calculator": 'nav.actions app-button[label="Calculator"]',
@@ -275,6 +280,12 @@ def check_stock_lesson(page):
     for selector, property_name, expected, label in checks:
         actual = computed_style(page, selector, property_name)
         check(actual == expected, f"{label} ({property_name}: {actual})")
+
+    check_hidden(page, TARGETS["objectives"], False, "objectives panel stays visible by default")
+    check_hidden(page, TARGETS["objectivesTab"], False, "objectives tab stays visible by default")
+    check_hidden(page, TARGETS["objectivesOnlyBar"], False,
+                 "objectives-only tab bar stays visible by default")
+    check_hidden(page, "#decoy-objectives", False, "unrelated objectives panel")
 
 
 def check_contents_sidebar(page):
@@ -641,6 +652,19 @@ def main():
                 check_hidden(page, TARGETS["announcements"], False, "announcements unaffected by transcript")
                 check_hidden(page, TARGETS["forum"], False, "forum unaffected by transcript")
                 check_hidden(page, TARGETS["unitNav"], True, "unit navigation unaffected by transcript")
+
+                set_toggle(popup, page, "objectives", True)
+                check_hidden(page, TARGETS["objectives"], True, "objectives panel after enabling")
+                check_hidden(page, TARGETS["objectivesTab"], True, "objectives tab after enabling")
+                check_hidden(page, TARGETS["objectivesOnlyBar"], True,
+                             "objectives-only tab bar after enabling")
+                check_hidden(page, "#decoy-objectives", False, "unrelated objectives panel unaffected")
+                check_hidden(page, TARGETS["announcements"], False, "announcements unaffected by objectives")
+                check_hidden(page, TARGETS["forum"], False, "forum unaffected by objectives")
+
+                set_toggle(popup, page, "objectives", False)
+                check_hidden(page, TARGETS["objectives"], False, "objectives panel restored")
+                check_hidden(page, TARGETS["objectivesTab"], False, "objectives tab restored")
 
                 set_toggle(popup, page, "announcements", True)
                 check_hidden(page, TARGETS["announcements"], True, "announcements after enabling")

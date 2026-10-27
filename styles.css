@@ -75,6 +75,21 @@ html[data-seek-header="on"] app-bar.course-bar {
   display: none !important;
 }
 
+/* Optional G. Objectives tab and panel ----------------------------------- */
+/*
+ * SEEK's Objectives tab carries no stable class of its own. The content script
+ * tags the tab by its visible label (attribute only, never deletion or inline
+ * style) so it can be hidden together with its panel. A tab bar that contains
+ * nothing but Objectives is hidden as a whole; a shared bar keeps its other
+ * tabs, so the tab slider is hidden there to avoid a floating indicator.
+ */
+html[data-seek-objectives="on"] app-lesson-view [data-seek-objectives-tab],
+html[data-seek-objectives="on"] app-lesson-view [data-seek-objectives-only],
+html[data-seek-objectives="on"] app-lesson-view .objectives,
+html[data-seek-objectives="on"] app-lesson-view .tab-bar-wrapper:has([data-seek-objectives-tab]) .tab-slider {
+  display: none !important;
+}
+
 /* ----------------------------------------------------------------------- */
 /* G. Premium interface design system ------------------------------------ */
 /* ----------------------------------------------------------------------- */

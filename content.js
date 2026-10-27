@@ -31,6 +31,7 @@
     overview: 'data-seek-overview',
     divider: 'data-seek-divider',
     transcript: 'data-seek-transcript',
+    objectives: 'data-seek-objectives',
     announcements: 'data-seek-announcements',
     forum: 'data-seek-forum',
     calculator: 'data-seek-calculator',
@@ -45,6 +46,102 @@
   let currentSettings = null;
   let systemThemeMedia = null;
   let rootThemeObserver = null;
+  let tabObserver = null;
+  let tabScanScheduled = false;
+
+  const OBJECTIVES_TAB_ATTRIBUTE = 'data-seek-objectives-tab';
+  const OBJECTIVES_ONLY_ATTRIBUTE = 'data-seek-objectives-only';
+
+  // SEEK's Objectives tab has no stable hook of its own, so identify it by its
+  // visible label and tag it for the stylesheet. Only attributes are written:
+  // the tab, its panel, and every handler stay in place.
+  function markObjectivesTabs() {
+    const bars = document.querySelectorAll('app-lesson-view .tab-bar-wrapper');
+
+    for (const bar of bars) {
+      const tabs = bar.querySelectorAll('button.tab-item');
+      let otherTabs = 0;
+
+      for (const tab of tabs) {
+        const isObjectives = (tab.textContent || '').trim().toLowerCase() === 'objectives';
+
+        if (isObjectives) {
+          tab.setAttribute(OBJECTIVES_TAB_ATTRIBUTE, '');
+        } else {
+          tab.removeAttribute(OBJECTIVES_TAB_ATTRIBUTE);
+          otherTabs += 1;
+        }
+      }
+
+      const host = bar.closest('app-tab-bar') || bar;
+
+      if (tabs.length > 0 && otherTabs === 0) {
+        host.setAttribute(OBJECTIVES_ONLY_ATTRIBUTE, '');
+      } else {
+        host.removeAttribute(OBJECTIVES_ONLY_ATTRIBUTE);
+      }
+    }
+  }
+
+  function scheduleObjectivesScan() {
+    if (tabScanScheduled) {
+      return;
+    }
+
+    tabScanScheduled = true;
+
+    const run = () => {
+      tabScanScheduled = false;
+
+      if (document.querySelector('app-lesson-view')) {
+        markObjectivesTabs();
+      }
+    };
+
+    if (typeof globalThis.requestAnimationFrame === 'function') {
+      globalThis.requestAnimationFrame(run);
+    } else {
+      globalThis.setTimeout(run, 50);
+    }
+  }
+
+  function watchLessonTabs() {
+    if (tabObserver) {
+      return;
+    }
+
+    if (!document.body) {
+      document.addEventListener('DOMContentLoaded', watchLessonTabs, { once: true });
+      return;
+    }
+
+    // Angular re-renders the lesson view; re-tag the tab whenever the tab bar
+    // or a lesson view is inserted. Attribute writes are not observed, so this
+    // cannot loop.
+    tabObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type !== 'childList') {
+          continue;
+        }
+
+        for (const node of [...mutation.addedNodes, ...mutation.removedNodes]) {
+          if (node.nodeType !== 1) {
+            continue;
+          }
+
+          if (
+            node.matches('.tab-bar-wrapper, .tab-item, app-tab-bar, app-lesson-view')
+            || node.querySelector('.tab-bar-wrapper, .tab-item, app-tab-bar, app-lesson-view')
+          ) {
+            scheduleObjectivesScan();
+            return;
+          }
+        }
+      }
+    });
+
+    tabObserver.observe(document.body, { childList: true, subtree: true });
+  }
 
   function resolveTheme(theme) {
     if (theme === 'system') {
@@ -180,6 +277,8 @@
 
     watchSystemTheme();
     watchSeekTheme();
+    watchLessonTabs();
+    markObjectivesTabs();
     chrome.storage.onChanged.addListener(handleStorageChange);
   }
 
@@ -191,5 +290,7 @@
 
     watchSystemTheme();
     watchSeekTheme();
+    watchLessonTabs();
+    markObjectivesTabs();
   });
 })();
