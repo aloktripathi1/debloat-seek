@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static checks for the Debloat SEEK extension.
 
-Run from the extension directory:
+Run from the repository root:
     python3 tests/static-check.py
 """
 
@@ -15,6 +15,7 @@ import sys
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
+EXTENSION = ROOT / "extension"
 SOURCE_URL = "https://github.com/aloktripathi1/debloat-seek"
 SEEK_ORIGINS = [
     "https://seek.study.iitm.ac.in/*",
@@ -33,7 +34,12 @@ def check(condition, message):
 
 
 def read(name):
-    return (ROOT / name).read_text(encoding="utf-8")
+    path = ROOT / name
+
+    if not path.exists():
+        path = EXTENSION / name
+
+    return path.read_text(encoding="utf-8")
 
 
 def check_manifest():
@@ -64,12 +70,13 @@ def check_manifest():
     required_files = [
         "manifest.json", "settings.js", "content.js", "styles.css",
         "popup.html", "popup.css", "popup.js", "background.js",
-        "icons/icon16.png", "icons/icon32.png", "icons/icon48.png", "icons/icon128.png",
-        "README.md"
+        "icons/icon16.png", "icons/icon32.png", "icons/icon48.png", "icons/icon128.png"
     ]
 
     for name in required_files:
-        check((ROOT / name).exists(), f"{name} exists")
+        check((EXTENSION / name).exists(), f"extension/{name} exists")
+
+    check((ROOT / "README.md").exists(), "README.md exists")
 
 
 def check_syntax():
@@ -82,11 +89,11 @@ def check_syntax():
 
     for name in ["settings.js", "content.js", "popup.js", "background.js"]:
         result = subprocess.run(
-            [node, "--check", str(ROOT / name)],
+            [node, "--check", str(EXTENSION / name)],
             capture_output=True,
             text=True
         )
-        check(result.returncode == 0, f"{name} parses successfully")
+        check(result.returncode == 0, f"extension/{name} parses successfully")
 
 
 def check_popup():

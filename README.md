@@ -1,6 +1,6 @@
 # Debloat SEEK
 
-Declutter and theme the IITM Online Degree SEEK portal.
+Customize the IITM BS Degree SEEK Portal.
 
 [Download latest ZIP](https://github.com/aloktripathi1/debloat-seek/archive/refs/heads/main.zip) · [Contributing](CONTRIBUTING.md) · [MIT License](LICENSE)
 
@@ -41,7 +41,7 @@ It does not call SEEK APIs, send data anywhere, or change course content, submis
 
 ## Popup
 
-![Debloat SEEK popup](docs/popup.png)
+<img src="docs/popup.png" alt="Debloat SEEK popup" width="360">
 
 ## Install
 
@@ -52,7 +52,7 @@ Not on the Chrome Web Store yet. Install it manually:
 3. Open `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
 5. Click **Load unpacked**.
-6. Select the extracted folder that contains `manifest.json`.
+6. Select the `extension` folder inside the extracted folder. It contains `manifest.json`.
 7. Pin **Debloat SEEK** from the Chrome extensions menu, open SEEK, and reload the tab.
 
 Works in Chrome and other Chromium browsers such as Edge and Brave. It is not a Firefox extension.
@@ -74,7 +74,7 @@ Everything is local. There is no remote code, analytics, or SEEK API access. Tur
 
 ## Development
 
-There is no build step. Load the repository folder directly with **Load unpacked**.
+There is no build step. Load the `extension/` folder directly with **Load unpacked**.
 
 Run the checks from the repository root:
 
@@ -108,7 +108,8 @@ Please keep private SEEK snapshots and personal data out of the public repositor
 
 ## Disclaimer
 
-Beta and unofficial. Not affiliated with IIT Madras; "IITM" only describes the portal this extension works with. SEEK can change at any time, so verify that the page looks correct after updates.
+- Beta and unofficial. Not affiliated with IIT Madras; "IITM" only describes the portal this extension works with.
+- Though our aim is to keep the SEEK portal cleaner and uncluttered no matter how much it keeps changing, SEEK updates may temporarily affect an option. Verify that the page looks correct after updates.
 
 ## License
 

@@ -21,6 +21,7 @@ import time
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
+EXTENSION = ROOT / "extension"
 FIXTURE = (ROOT / "tests" / "fixtures" / "seek-fixture.html").read_text(encoding="utf-8")
 OVERVIEW_FIXTURE = (ROOT / "tests" / "fixtures" / "course-overview-fixture.html").read_text(encoding="utf-8")
 ASSESSMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assessment-fixture.html").read_text(encoding="utf-8")
@@ -583,8 +584,8 @@ def main():
                 headless=True,
                 executable_path=chrome,
                 args=[
-                    f"--disable-extensions-except={ROOT}",
-                    f"--load-extension={ROOT}",
+                    f"--disable-extensions-except={EXTENSION}",
+                    f"--load-extension={EXTENSION}",
                     "--no-first-run",
                     "--no-default-browser-check"
                 ]
