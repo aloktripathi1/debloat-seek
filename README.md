@@ -2,7 +2,7 @@
 
 Declutter and customize the IITM BS Degree SEEK Portal.
 
-[Download latest ZIP](https://github.com/aloktripathi1/debloat-seek/archive/refs/heads/main.zip) · [Contributing](CONTRIBUTING.md) · [MIT License](LICENSE)
+[Download latest release](https://github.com/aloktripathi1/debloat-seek/releases/latest) · [Contributing](CONTRIBUTING.md) · [MIT License](LICENSE)
 
 Current version: **1.2.11**.
 
@@ -43,7 +43,7 @@ It does not call SEEK APIs, send data anywhere, or change course content, submis
 
 Not on the Chrome Web Store yet. Install it manually:
 
-1. Download the ZIP using the link above, or open the [GitHub repository](https://github.com/aloktripathi1/debloat-seek), click **Code**, then **Download ZIP**.
+1. Download the ZIP from the latest release using the link above, or open the [GitHub repository](https://github.com/aloktripathi1/debloat-seek), click **Code**, then **Download ZIP**.
 2. Extract the ZIP. On Windows, right-click it and choose **Extract All**. On macOS, double-click it.
 3. Open `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
