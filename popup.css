@@ -127,6 +127,7 @@ body::-webkit-scrollbar-thumb {
 
 .hero-copy {
   min-width: 0;
+  flex: 1;
 }
 
 .hero-title-row {
@@ -141,6 +142,36 @@ body::-webkit-scrollbar-thumb {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.015em;
+}
+
+.source-link {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.source-link:hover {
+  border-color: var(--accent-border);
+  background: var(--row-hover);
+  color: var(--text);
+}
+
+.source-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.source-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
 }
 
 .settings-section {

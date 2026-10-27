@@ -36,7 +36,6 @@ DEFAULT_SETTINGS = {
     "unitNav": True,
     "overview": True,
     "divider": True,
-    "highlight": True,
     "transcript": False,
     "objectives": False,
     "answers": False,
@@ -55,7 +54,6 @@ ATTRIBUTES = {
     "unitNav": "data-seek-unit-nav",
     "overview": "data-seek-overview",
     "divider": "data-seek-divider",
-    "highlight": "data-seek-highlight",
     "transcript": "data-seek-transcript",
     "objectives": "data-seek-objectives",
     "answers": "data-seek-answers",
@@ -70,11 +68,6 @@ TARGETS = {
     "overview": '.lead button[aria-label="Overview"]',
     "overviewHost": '.lead app-button[label="Overview"]',
     "divider": '.lead > span.divider',
-    "highlightRow": '.child-container.is-open .child-row.selected',
-    "highlightHoverRow": '.child-container.is-open .child-row:not(.selected)',
-    "highlightPanel": '.child-container.is-open',
-    "highlightList": '.child-container.is-open .child-list',
-    "highlightDecoy": '#decoy-child-row',
     "transcript": 'app-lesson-view aside.transcript-panel',
     "objectives": 'app-lesson-view .objectives',
     "objectivesTab": 'app-lesson-view [data-seek-objectives-tab]',
@@ -226,157 +219,6 @@ def check_theme(page, expected_setting):
     return expected_resolved
 
 
-def read_styles(page, selector, pseudo=None):
-    return page.locator(selector).first.evaluate(
-        """(element, pseudo) => {
-            const style = getComputedStyle(element, pseudo || null);
-            return {
-                background: style.backgroundColor,
-                boxShadow: style.boxShadow,
-                borderColor: style.borderTopColor
-            };
-        }""",
-        pseudo
-    )
-
-
-def read_original_styles(page, selector, pseudo=None):
-    current = page.evaluate(
-        "() => document.documentElement.getAttribute('data-seek-highlight')"
-    )
-    page.evaluate(
-        "() => document.documentElement.setAttribute('data-seek-highlight', 'off')"
-    )
-
-    try:
-        return read_styles(page, selector, pseudo)
-    finally:
-        page.evaluate(
-            """(value) => {
-                if (value === null) {
-                    document.documentElement.removeAttribute('data-seek-highlight');
-                } else {
-                    document.documentElement.setAttribute('data-seek-highlight', value);
-                }
-            }""",
-            current
-        )
-
-
-def theme_background_probe(page):
-    return page.evaluate(
-        """() => {
-            const probe = document.createElement('div');
-            probe.style.background = 'var(--color-background-primary-light)';
-            document.body.appendChild(probe);
-            const value = getComputedStyle(probe).backgroundColor;
-            probe.remove();
-            return value;
-        }"""
-    )
-
-
-def check_lesson_highlight(page, enabled):
-    # The popup is a separate tab; focus SEEK so :hover runs.
-    page.bring_to_front()
-    page.wait_for_timeout(100)
-
-    selected_original = read_original_styles(page, TARGETS["highlightRow"])
-    plain_original = read_original_styles(page, TARGETS["highlightHoverRow"])
-    panel_original = read_original_styles(page, TARGETS["highlightPanel"])
-    list_original = read_original_styles(page, TARGETS["highlightList"])
-    panel_before_original = read_original_styles(page, TARGETS["highlightPanel"], "::before")
-    panel_after_original = read_original_styles(page, TARGETS["highlightPanel"], "::after")
-    list_before_original = read_original_styles(page, TARGETS["highlightList"], "::before")
-    list_after_original = read_original_styles(page, TARGETS["highlightList"], "::after")
-    decoy_original = read_original_styles(page, TARGETS["highlightDecoy"])
-    interaction_original = theme_background_probe(page)
-
-    selected = read_styles(page, TARGETS["highlightRow"])
-    plain = read_styles(page, TARGETS["highlightHoverRow"])
-    panel = read_styles(page, TARGETS["highlightPanel"])
-    list = read_styles(page, TARGETS["highlightList"])
-    panel_before = read_styles(page, TARGETS["highlightPanel"], "::before")
-    panel_after = read_styles(page, TARGETS["highlightPanel"], "::after")
-    list_before = read_styles(page, TARGETS["highlightList"], "::before")
-    list_after = read_styles(page, TARGETS["highlightList"], "::after")
-    decoy = read_styles(page, TARGETS["highlightDecoy"])
-    transparent = "rgba(0, 0, 0, 0)"
-
-    if enabled:
-        for label, value in (
-            ("selected lesson row", selected),
-            ("non-selected lesson row", plain),
-        ):
-            check(value["background"] == transparent,
-                  f"{label} background is transparent ({value['background']})")
-            check(value["boxShadow"] == "none",
-                  f"{label} shadow is removed ({value['boxShadow']})")
-
-        for label, value in (
-            ("expanded week panel", panel),
-            ("expanded week panel list", list),
-        ):
-            check(value["background"] == transparent,
-                  f"{label} background is transparent ({value['background']})")
-            check(value["boxShadow"] == "none",
-                  f"{label} shadow is removed ({value['boxShadow']})")
-            check(value["borderColor"] == transparent,
-                  f"{label} border colour is transparent ({value['borderColor']})")
-
-        for label, value in (
-            ("expanded week panel ::before", panel_before),
-            ("expanded week panel ::after", panel_after),
-            ("expanded week panel list ::before", list_before),
-            ("expanded week panel list ::after", list_after),
-        ):
-            check(value["background"] == transparent,
-                  f"{label} background is cleared ({value['background']})")
-            check(value["boxShadow"] == "none",
-                  f"{label} shadow is cleared ({value['boxShadow']})")
-    else:
-        check(selected["background"] == selected_original["background"],
-              f"selected lesson row restores SEEK's background ({selected['background']})")
-        check(selected["boxShadow"] == selected_original["boxShadow"],
-              f"selected lesson row restores SEEK's shadow ({selected['boxShadow']})")
-        check(plain["background"] == plain_original["background"],
-              f"non-selected lesson row restores SEEK's background ({plain['background']})")
-        check(panel["background"] == panel_original["background"],
-              f"expanded week panel restores SEEK's background ({panel['background']})")
-        check(panel["boxShadow"] == panel_original["boxShadow"],
-              f"expanded week panel restores SEEK's shadow ({panel['boxShadow']})")
-        check(panel["borderColor"] == panel_original["borderColor"],
-              f"expanded week panel restores SEEK's border ({panel['borderColor']})")
-        check(list["background"] == list_original["background"],
-              f"expanded week panel list restores SEEK's background ({list['background']})")
-        check(list["boxShadow"] == list_original["boxShadow"],
-              f"expanded week panel list restores SEEK's shadow ({list['boxShadow']})")
-        check(list["borderColor"] == list_original["borderColor"],
-              f"expanded week panel list restores SEEK's border ({list['borderColor']})")
-        check(panel_before == panel_before_original,
-              f"expanded week panel ::before restores SEEK's styling ({panel_before})")
-        check(panel_after == panel_after_original,
-              f"expanded week panel ::after restores SEEK's styling ({panel_after})")
-        check(list_before == list_before_original,
-              f"expanded week panel list ::before restores SEEK's styling ({list_before})")
-        check(list_after == list_after_original,
-              f"expanded week panel list ::after restores SEEK's styling ({list_after})")
-
-    check(decoy["background"] == decoy_original["background"],
-          "unrelated selected row keeps SEEK's background")
-    check(decoy["boxShadow"] == decoy_original["boxShadow"],
-          "unrelated selected row keeps SEEK's shadow")
-
-    page.hover(TARGETS["highlightHoverRow"])
-    page.wait_for_timeout(50)
-    hover = read_styles(page, TARGETS["highlightHoverRow"])
-    expected_interaction = transparent if enabled else interaction_original
-    check(hover["background"] == expected_interaction,
-          f"lesson row hover uses {'no background' if enabled else 'SEEK styling'} "
-          f"({hover['background']})")
-    page.mouse.move(0, 0)
-
-
 def check_default_page(page, theme="system"):
     resolved_theme = check_theme(page, theme)
     check(theme_surface(page) == expected_theme_surface(resolved_theme),
@@ -386,7 +228,6 @@ def check_default_page(page, theme="system"):
     check_hidden(page, TARGETS["overview"], True, "Overview button")
     check_hidden(page, TARGETS["overviewHost"], True, "Overview component host")
     check_hidden(page, TARGETS["divider"], True, "course-bar divider")
-    check_lesson_highlight(page, True)
     check_hidden(page, TARGETS["transcript"], False, "transcript panel")
     check_hidden(page, TARGETS["announcements"], False, "announcements trigger")
     check_hidden(page, TARGETS["forum"], False, "forum trigger")
@@ -820,19 +661,13 @@ def main():
                 )
 
                 check(get_popup_states(popup) == BOOLEAN_SETTINGS, "popup starts with safe boolean defaults")
-                check(popup.locator("#summary").inner_text() == "4 on · 7 off",
-                      "popup summary reports four on and seven off")
+                check(popup.locator("#summary").inner_text() == "3 on · 7 off",
+                      "popup summary reports three on and seven off")
+                check(popup.locator("a.source-link").get_attribute("href")
+                      == "https://github.com/aloktripathi1/debloat-seek",
+                      "popup links to the public source repository")
                 check(get_popup_theme(popup) == "system", "popup starts in System theme")
                 check(get_stored_settings(popup) == DEFAULT_SETTINGS, "defaults are persisted in chrome.storage.sync")
-
-                print("\nLesson highlight toggle")
-                set_toggle(popup, page, "highlight", False)
-                check_lesson_highlight(page, False)
-                set_toggle(popup, page, "highlight", True)
-                check_lesson_highlight(page, True)
-                page.reload(wait_until="domcontentloaded")
-                wait_for_root(page, BOOLEAN_SETTINGS)
-                check_lesson_highlight(page, True)
 
                 print("\nTheme modes")
                 popup_system_surface = expected_popup_surface(popup)
@@ -1010,15 +845,11 @@ def main():
                 set_toggle(popup, page, "divider", False)
                 check_hidden(page, TARGETS["divider"], False, "divider restored")
 
-                set_toggle(popup, page, "highlight", False)
-                check_lesson_highlight(page, False)
-
                 print("\nAll-off persistence and Restore defaults")
                 page.reload(wait_until="domcontentloaded")
                 all_off = {key: False for key in BOOLEAN_SETTINGS}
                 wait_for_root(page, all_off)
                 check_hidden(page, TARGETS["unitNav"], False, "unit navigation visible after all-off reload")
-                check_lesson_highlight(page, False)
                 check_hidden(page, TARGETS["overview"], False, "Overview visible after all-off reload")
                 check_hidden(page, TARGETS["divider"], False, "divider visible after all-off reload")
                 check_hidden(page, TARGETS["calculator"], False, "calculator visible after all-off reload")
@@ -1034,7 +865,6 @@ def main():
                              "saved settings apply on a newly opened course tab")
                 check_hidden(fresh, TARGETS["divider"], False,
                              "saved cleanup settings apply without opening the popup")
-                check_lesson_highlight(fresh, False)
                 check_theme(fresh, "system")
                 fresh.close()
 

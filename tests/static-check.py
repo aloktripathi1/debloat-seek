@@ -15,6 +15,7 @@ import sys
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_URL = "https://github.com/aloktripathi1/debloat-seek"
 SEEK_ORIGINS = [
     "https://seek.study.iitm.ac.in/*",
     "https://seek.onlinedegree.iitm.ac.in/*"
@@ -95,11 +96,11 @@ def check_popup():
     keys = [element.get("data-setting") for element in inputs]
 
     check(keys == [
-        "unitNav", "overview", "divider", "highlight",
+        "unitNav", "overview", "divider",
         "transcript", "objectives", "answers", "announcements", "forum", "calculator", "header"
-    ], "Eleven independent settings are present in the expected order")
+    ], "Ten independent settings are present in the expected order")
 
-    default_keys = {"unitNav", "overview", "divider", "highlight"}
+    default_keys = {"unitNav", "overview", "divider"}
     for element in inputs:
         key = element.get("data-setting")
         checked = element.has_attr("checked")
@@ -127,7 +128,15 @@ def check_popup():
     check(soup.select_one("#restore-defaults") is not None, "Restore defaults control is present")
     check(soup.select_one("#status[role='status'][aria-live='polite']") is not None,
           "Accessible live status message is present")
-    check(len(soup.select("label.setting-row")) == 11, "Every setting has a clickable label row")
+    check(len(soup.select("label.setting-row")) == 10, "Every setting has a clickable label row")
+    source_link = soup.select_one(f"a.source-link[href='{SOURCE_URL}']")
+    check(source_link is not None, "Popup links to the public source repository")
+    check(source_link is not None and source_link.get("target") == "_blank",
+          "Source link opens in a new tab")
+    check(source_link is not None and "noopener" in (source_link.get("rel") or []),
+          "Source link uses rel=noopener")
+    check(source_link is not None and bool(source_link.get("aria-label")),
+          "Source link has an accessible label")
     check(soup.select_one("script[src='settings.js']") is not None,
           "Popup loads the shared settings helper")
     check(soup.select_one("script[src='popup.js']") is not None,
@@ -138,7 +147,6 @@ def check_settings_model():
     print("\nSettings model")
     settings_js = read("settings.js")
 
-    check("highlight: true" in settings_js, "Lesson highlight is on by default")
     check("answers: false" in settings_js, "Assignment answer hiding is off by default")
     check("theme: 'system'" in settings_js, "System theme is the safe default")
     check("THEME_VALUES" in settings_js, "Theme values are declared once")
@@ -168,6 +176,10 @@ def check_no_remote_code():
 
     for name in scanned:
         text = read(name)
+
+        if name == "popup.html":
+            text = text.replace(SOURCE_URL, "")
+
         for pattern in forbidden:
             check(re.search(pattern, text) is None, f"{name} has no match for {pattern}")
 
@@ -199,25 +211,6 @@ def check_css():
           "Calculator selectors are gated by their own state")
     check(css.count('html[data-seek-header="on"]') == 1,
           "Course header is gated by its own state")
-    check(css.count('html[data-seek-highlight="on"]') == 9,
-          "Lesson highlight is gated by its own state")
-    check('html[data-seek-highlight="on"] .child-container.is-open' in css,
-          "Lesson highlight targets expanded child containers")
-    check(css.count("background-color: transparent !important;") == 2,
-          "Lesson highlight clears background-color on panels and rows")
-    check(css.count("box-shadow: none !important;\n  border-color: transparent !important;") == 1,
-          "Lesson highlight clears the panel border colour")
-    check(css.count("background: none !important;") == 1,
-          "Lesson highlight clears panel and list overlay backgrounds")
-    check(".child-container.is-open::before" in css
-          and ".child-container.is-open .child-list::after" in css,
-          "Lesson highlight clears panel and list pseudo-elements")
-    check(".child-row.selected" in css and ".child-row:hover" in css,
-          "Lesson highlight clears selected and hover row states")
-    check("rgba(255, 255, 255, 0.06)" not in css and "rgba(255, 255, 255, 0.04)" not in css,
-          "Lesson highlight no longer adds a selected-row tint")
-    check("data-seek-highlight" in read("content.js"),
-          "Content script exposes the lesson highlight state")
     check(css.count('html[data-seek-answers="on"]') >= 20,
           "Assignment answer hiding is gated by its own state")
     check("app-assessment-question-view .evaluated-answer" in css,
@@ -281,7 +274,7 @@ def check_readme():
         "Known limitations",
         "Calculator",
         "Objectives",
-        "Lesson Highlight",
+        "GitHub",
         "Assignment",
         "Course header bar",
         "Black",
