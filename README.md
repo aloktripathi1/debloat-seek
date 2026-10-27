@@ -1,12 +1,8 @@
 # Debloat SEEK
 
-Customize the IITM BS Degree SEEK Portal.
+Declutter and customize the IITM BS Degree SEEK Portal.
 
 [Download latest ZIP](https://github.com/aloktripathi1/debloat-seek/archive/refs/heads/main.zip) · [Contributing](CONTRIBUTING.md) · [MIT License](LICENSE)
-
-![Version](https://img.shields.io/badge/version-1.2.11-7A1734)
-![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-4285F4)
-![License](https://img.shields.io/badge/license-MIT-2ea44f)
 
 Current version: **1.2.11**.
 
@@ -16,13 +12,13 @@ It does not call SEEK APIs, send data anywhere, or change course content, submis
 
 ## Features
 
-### Default cleanup (on by default)
+### Default cleanup
 
 - Hide the Previous/Next unit navigation
 - Hide the Overview button
 - Hide the target divider
 
-### Optional cleanup (off by default)
+### Optional cleanup
 
 - Hide the course header bar
 - Hide the video transcript panel
@@ -55,7 +51,7 @@ Not on the Chrome Web Store yet. Install it manually:
 6. Select the `extension` folder inside the extracted folder. It contains `manifest.json`.
 7. Pin **Debloat SEEK** from the Chrome extensions menu, open SEEK, and reload the tab.
 
-Works in Chrome and other Chromium browsers such as Edge and Brave. It is not a Firefox extension.
+Works in Chrome and other Chromium browsers such as Edge and Brave. **It is not a Firefox extension.**
 
 ## Usage
 
@@ -108,8 +104,8 @@ Please keep private SEEK snapshots and personal data out of the public repositor
 
 ## Disclaimer
 
-- Beta and unofficial. Not affiliated with IIT Madras; "IITM" only describes the portal this extension works with.
-- Though our aim is to keep the SEEK portal cleaner and uncluttered no matter how much it keeps changing, SEEK updates may temporarily affect an option. Verify that the page looks correct after updates.
+- This extension is not affiliated with IIT Madras. “IITM” is used only to describe the portal it supports.
+- SEEK updates may temporarily affect some features. The extension aims to keep the portal clean and customizable as it evolves.
 
 ## License
 
