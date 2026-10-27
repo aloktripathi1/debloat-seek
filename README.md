@@ -13,10 +13,10 @@ It does not call SEEK APIs, send data anywhere, or change course content, submis
 ## Demo
 
 <p align="center">
-  <img src="docs/showcase.gif" alt="Debloat SEEK cleanup sequence" width="820">
+  <img src="docs/showcase.gif" alt="Debloat SEEK Black theme and cleanup sequence" width="820">
 </p>
 
-Watch Previous/Next, Overview, the target divider, the course header, and the video transcript disappear one by one.
+The demo switches to the Black theme, then hides Previous/Next, Overview, the target divider, the course header, and the video transcript one by one.
 
 ## Features
 
