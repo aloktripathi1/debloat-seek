@@ -143,6 +143,409 @@
     tabObserver.observe(document.body, { childList: true, subtree: true });
   }
 
+  /*
+   * SEEK's outline component calls revealSelected() whenever the route query
+   * params change. That helper scrolls .outline-nav to the selected lesson and
+   * keeps re-scrolling for 1.5s through a ResizeObserver, so switching course
+   * tabs yanks the sidebar back to the last lesson. Keep the learner's scroll
+   * position and expanded units instead.
+   *
+   * Content scripts run in an isolated world, so patching Element.scrollTo here
+   * would not intercept SEEK's own call. The guard therefore watches the
+   * outline's scroll events, distinguishes learner intent from SEEK's reveal,
+   * and restores the last learner position. It only touches .outline-nav.
+   */
+  const OUTLINE_STATE_PREFIX = 'debloatSeek.outline.';
+  const OUTLINE_RESTORE_WINDOW_MS = 1800;
+  const OUTLINE_SAVE_DELAY_MS = 120;
+  const OUTLINE_SETTLE_DELAY_MS = 180;
+  const OUTLINE_INTENT_MS = 1600;
+  const OUTLINE_TOUCH_MS = 2500;
+  const OUTLINE_POINTER_MS = 400;
+
+  let outlineObserver = null;
+  let outlinePointerGuardInstalled = false;
+  const initializedOutlines = new WeakSet();
+  const outlineStates = new WeakMap();
+  const activeOutlines = new Set();
+
+  function outlineStorageKey() {
+    const match = globalThis.location
+      && globalThis.location.pathname.match(/^\/courses\/([^/]+)/i);
+
+    return match ? OUTLINE_STATE_PREFIX + match[1] : null;
+  }
+
+  function currentOutlineId() {
+    try {
+      return new URL(globalThis.location.href).searchParams.get('id');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function readOutlineState() {
+    const key = outlineStorageKey();
+
+    if (!key) {
+      return null;
+    }
+
+    try {
+      const raw = globalThis.sessionStorage.getItem(key);
+
+      if (!raw) {
+        return null;
+      }
+
+      const state = JSON.parse(raw);
+
+      if (
+        !state
+        || typeof state.scrollTop !== 'number'
+        || !Array.isArray(state.units)
+      ) {
+        return null;
+      }
+
+      return state;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveOutlineState(nav) {
+    const key = outlineStorageKey();
+
+    if (!key || !nav || !nav.isConnected) {
+      return;
+    }
+
+    const units = Array.from(nav.querySelectorAll('.unit-container')).map((unit, index) => ({
+      index,
+      title: (unit.querySelector('.unit-title')?.textContent || '').trim(),
+      open: unit.classList.contains('is-open')
+    }));
+
+    try {
+      globalThis.sessionStorage.setItem(key, JSON.stringify({
+        scrollTop: Math.round(nav.scrollTop),
+        selectedId: currentOutlineId(),
+        units,
+        updatedAt: Date.now()
+      }));
+    } catch (error) {
+      // sessionStorage can be unavailable in privacy modes. The sidebar still
+      // works, it just falls back to SEEK's default reveal behaviour.
+    }
+  }
+
+  function outlineStateFor(nav) {
+    let state = outlineStates.get(nav);
+
+    if (!state) {
+      state = {
+        guardTarget: null,
+        lastId: currentOutlineId(),
+        intentUntil: 0,
+        pointerDown: false,
+        settleTimer: 0,
+        saveTimer: 0,
+        restore: { cancelled: false }
+      };
+      outlineStates.set(nav, state);
+    }
+
+    return state;
+  }
+
+  function scheduleOutlineSave(nav) {
+    const state = outlineStateFor(nav);
+
+    if (state.saveTimer) {
+      globalThis.clearTimeout(state.saveTimer);
+    }
+
+    state.saveTimer = globalThis.setTimeout(() => {
+      state.saveTimer = 0;
+      saveOutlineState(nav);
+    }, OUTLINE_SAVE_DELAY_MS);
+  }
+
+  function scheduleOutlineSettle(nav) {
+    const state = outlineStateFor(nav);
+
+    if (state.settleTimer) {
+      globalThis.clearTimeout(state.settleTimer);
+    }
+
+    state.settleTimer = globalThis.setTimeout(() => {
+      state.settleTimer = 0;
+
+      if (!nav.isConnected || state.pointerDown) {
+        return;
+      }
+
+      state.guardTarget = nav.scrollTop;
+      state.lastId = currentOutlineId();
+      saveOutlineState(nav);
+    }, OUTLINE_SETTLE_DELAY_MS);
+  }
+
+  function markOutlineIntent(nav, duration) {
+    const state = outlineStateFor(nav);
+
+    state.intentUntil = Math.max(state.intentUntil, Date.now() + duration);
+    state.restore.cancelled = true;
+  }
+
+  function releaseOutlinePointer() {
+    for (const nav of activeOutlines) {
+      if (!nav.isConnected) {
+        activeOutlines.delete(nav);
+        continue;
+      }
+
+      const state = outlineStates.get(nav);
+
+      if (!state || !state.pointerDown) {
+        continue;
+      }
+
+      state.pointerDown = false;
+      markOutlineIntent(nav, OUTLINE_POINTER_MS);
+      scheduleOutlineSettle(nav);
+    }
+  }
+
+  function installOutlinePointerGuard() {
+    if (
+      outlinePointerGuardInstalled
+      || typeof globalThis.addEventListener !== 'function'
+    ) {
+      return;
+    }
+
+    outlinePointerGuardInstalled = true;
+    globalThis.addEventListener('pointerup', releaseOutlinePointer, { passive: true });
+    globalThis.addEventListener('pointercancel', releaseOutlinePointer, { passive: true });
+    globalThis.addEventListener('touchend', releaseOutlinePointer, { passive: true });
+  }
+
+  function applyOutlineExpansion(nav, state) {
+    const units = Array.from(nav.querySelectorAll('.unit-container'));
+    const byTitle = new Map();
+
+    for (const unit of units) {
+      const title = (unit.querySelector('.unit-title')?.textContent || '').trim();
+
+      if (title) {
+        byTitle.set(title, unit);
+      }
+    }
+
+    for (const saved of state.units) {
+      const indexed = Number.isInteger(saved.index) ? units[saved.index] : null;
+      const indexedTitle = indexed
+        ? (indexed.querySelector('.unit-title')?.textContent || '').trim()
+        : '';
+      const unit = indexed && (!saved.title || indexedTitle === saved.title)
+        ? indexed
+        : byTitle.get(saved.title);
+
+      if (!unit) {
+        continue;
+      }
+
+      if (unit.classList.contains('is-open') !== Boolean(saved.open)) {
+        unit.querySelector('.unit-header')?.click();
+      }
+    }
+  }
+
+  function restoreOutlineState(nav, saved) {
+    const state = outlineStateFor(nav);
+    const currentId = currentOutlineId();
+    const sameSelection = currentId === null || saved.selectedId === currentId;
+
+    // A different lesson is a deliberate navigation. Let SEEK expand its parent
+    // unit and reveal it instead of restoring the previous position.
+    if (!sameSelection) {
+      state.guardTarget = null;
+      state.lastId = currentId;
+      return;
+    }
+
+    state.restore = { cancelled: false };
+    state.guardTarget = saved.scrollTop;
+    state.lastId = currentId;
+
+    const apply = () => {
+      if (state.restore.cancelled || !nav.isConnected) {
+        return;
+      }
+
+      applyOutlineExpansion(nav, saved);
+      nav.scrollTop = saved.scrollTop;
+    };
+
+    apply();
+
+    if (typeof globalThis.requestAnimationFrame === 'function') {
+      globalThis.requestAnimationFrame(apply);
+    }
+
+    // SEEK applies its own expansion and reveal after the first render. Run
+    // again once those settle so the saved state wins.
+    globalThis.setTimeout(apply, 300);
+    globalThis.setTimeout(apply, OUTLINE_RESTORE_WINDOW_MS - 100);
+  }
+
+  function initOutlineNav(nav) {
+    if (initializedOutlines.has(nav)) {
+      return;
+    }
+
+    initializedOutlines.add(nav);
+    activeOutlines.add(nav);
+    installOutlinePointerGuard();
+
+    const state = outlineStateFor(nav);
+    const markIntent = (duration) => markOutlineIntent(nav, duration);
+
+    nav.addEventListener('wheel', () => markIntent(OUTLINE_INTENT_MS), { passive: true });
+    nav.addEventListener('touchstart', () => markIntent(OUTLINE_TOUCH_MS), { passive: true });
+    nav.addEventListener('touchmove', () => markIntent(OUTLINE_TOUCH_MS), { passive: true });
+    nav.addEventListener('keydown', () => markIntent(OUTLINE_INTENT_MS));
+
+    nav.addEventListener('pointerdown', (event) => {
+      if (event.target instanceof Element && event.target.closest('button')) {
+        return;
+      }
+
+      state.pointerDown = true;
+      markIntent(OUTLINE_INTENT_MS);
+    }, { passive: true });
+
+    nav.addEventListener('scroll', () => {
+      const now = Date.now();
+      const id = currentOutlineId();
+      const userDriven = state.pointerDown || now < state.intentUntil;
+
+      if (userDriven) {
+        state.guardTarget = nav.scrollTop;
+        state.lastId = id;
+        scheduleOutlineSave(nav);
+        scheduleOutlineSettle(nav);
+        return;
+      }
+
+      if (id !== state.lastId) {
+        // The learner moved to another lesson. Let SEEK reveal it, then protect
+        // the new position.
+        state.lastId = id;
+        state.guardTarget = null;
+        scheduleOutlineSettle(nav);
+        return;
+      }
+
+      if (
+        state.guardTarget !== null
+        && Math.abs(nav.scrollTop - state.guardTarget) > 1
+      ) {
+        // Same lesson: this is SEEK's redundant re-reveal after a tab change.
+        nav.scrollTop = state.guardTarget;
+        return;
+      }
+
+      scheduleOutlineSettle(nav);
+    }, { passive: true });
+
+    nav.addEventListener('click', (event) => {
+      if (!(event.target instanceof Element)) {
+        return;
+      }
+
+      if (event.target.closest('.child-row')) {
+        // Let SEEK reveal the chosen lesson. The new id also passes the guard.
+        markIntent(OUTLINE_INTENT_MS * 2);
+        state.guardTarget = null;
+        state.lastId = null;
+        scheduleOutlineSave(nav);
+        return;
+      }
+
+      if (event.target.closest('.unit-header')) {
+        // Programmatic clicks come from restoring saved expansion. They must
+        // not cancel the rest of the restore sequence.
+        if (!event.isTrusted) {
+          return;
+        }
+
+        markIntent(OUTLINE_POINTER_MS);
+        scheduleOutlineSave(nav);
+      }
+    });
+
+    const saved = readOutlineState();
+
+    if (saved) {
+      restoreOutlineState(nav, saved);
+    } else {
+      state.guardTarget = null;
+      state.lastId = currentOutlineId();
+    }
+  }
+
+  function watchOutline() {
+    if (outlineObserver) {
+      return;
+    }
+
+    if (!document.body) {
+      document.addEventListener('DOMContentLoaded', watchOutline, { once: true });
+      return;
+    }
+
+    const scan = () => {
+      for (const nav of activeOutlines) {
+        if (!nav.isConnected) {
+          activeOutlines.delete(nav);
+        }
+      }
+
+      for (const nav of document.querySelectorAll('app-course-outline .outline-nav')) {
+        initOutlineNav(nav);
+      }
+    };
+
+    scan();
+
+    outlineObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type !== 'childList') {
+          continue;
+        }
+
+        for (const node of mutation.addedNodes) {
+          if (node.nodeType !== 1) {
+            continue;
+          }
+
+          if (
+            node.matches?.('.outline-nav')
+            || node.querySelector?.('.outline-nav')
+          ) {
+            scan();
+            return;
+          }
+        }
+      }
+    });
+
+    outlineObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
   function resolveTheme(theme) {
     if (theme === 'system') {
       return globalThis.matchMedia
@@ -278,6 +681,7 @@
     watchSystemTheme();
     watchSeekTheme();
     watchLessonTabs();
+    watchOutline();
     markObjectivesTabs();
     chrome.storage.onChanged.addListener(handleStorageChange);
   }
@@ -291,6 +695,7 @@
     watchSystemTheme();
     watchSeekTheme();
     watchLessonTabs();
+    watchOutline();
     markObjectivesTabs();
   });
 })();

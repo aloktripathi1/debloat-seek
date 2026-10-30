@@ -40,7 +40,9 @@ The demo switches to the Black theme, then hides Previous/Next, Overview, the ta
 
 - **System**, **Light**, **Dark**, and **Black** themes
 - Cleaner course overview and assessment layouts
-- The lesson/video player, tabs, objectives, transcript, and course bar keep SEEK's original layout and behaviour
+- A calmer course shell with a clearer contents sidebar, course bar, lesson tabs, objectives, and transcript
+- The contents sidebar keeps your scroll position and expanded units when you switch course tabs
+- The lesson/video player and its playback behaviour stay untouched
 - Settings sync through `chrome.storage.sync` and apply automatically when SEEK opens
 
 ## Popup
@@ -72,7 +74,7 @@ Click the Debloat SEEK icon in the toolbar.
 
 ## How it works
 
-The content script sets state attributes on `<html>`, and `styles.css` hides or restyles matching SEEK elements. Elements are not deleted, and Angular can rerender the page without breaking the cleanup.
+The content script sets state attributes on `<html>`, and `styles.css` hides or restyles matching SEEK elements. Elements are not deleted, and Angular can rerender the page without breaking the cleanup. The contents sidebar also keeps its scroll position and expanded units in `sessionStorage` for the current tab.
 
 Everything is local. There is no remote code, analytics, or SEEK API access. Turning an option off removes its CSS rule and restores SEEK's original styling.
 

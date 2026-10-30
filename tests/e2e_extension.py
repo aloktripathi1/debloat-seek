@@ -268,6 +268,208 @@ def check_stock_lesson(page):
     check_hidden(page, "#decoy-objectives", False, "unrelated objectives panel")
 
 
+def check_workspace_redesign(page):
+    checks = [
+        ('.outline-title', 'font-size', '11px', "contents label uses the compact type scale"),
+        ('.unit-header', 'border-top-left-radius', '8px', "unit headers use the shared radius"),
+        ('.child-row', 'border-top-left-radius', '8px', "lesson rows use the shared radius"),
+        ('.title-bar', 'padding', '12px 24px', "lesson header uses the workspace rhythm"),
+        ('.tab-bar-wrapper', 'border-top-left-radius', '10px', "lesson tabs use the shared radius"),
+        ('.tab-item', 'height', '32px', "lesson tabs use a compact height"),
+        ('.transcript-panel', 'border-top-left-radius', '10px',
+         "transcript panel uses the shared radius")
+    ]
+
+    for selector, property_name, expected, label in checks:
+        actual = computed_style(page, selector, property_name)
+        check(actual == expected, f"{label} ({property_name}: {actual})")
+
+
+def check_sidebar_stability(page):
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            if (!nav) return;
+
+            // Constrain the list and add height so it scrolls like a full course.
+            nav.style.height = '600px';
+            nav.style.flex = '0 0 auto';
+
+            const filler = document.createElement('div');
+            filler.dataset.sidebarFiller = '';
+            filler.style.height = '1600px';
+            nav.appendChild(filler);
+
+            // Mimic SEEK's own unit toggle so expansion restoration is visible.
+            if (!window.__seekOutlineToggle) {
+                window.__seekOutlineToggle = true;
+                document.addEventListener('click', (event) => {
+                    const header = event.target.closest('.unit-header');
+                    if (!header) return;
+
+                    const unit = header.closest('.unit-container');
+                    const open = !unit.classList.contains('is-open');
+                    unit.classList.toggle('is-open', open);
+                    header.setAttribute('aria-expanded', String(open));
+
+                    const child = unit.querySelector('.child-container');
+                    if (child) {
+                        child.classList.toggle('is-open', open);
+                        if (open) child.removeAttribute('inert');
+                        else child.setAttribute('inert', '');
+                    }
+                });
+            }
+        }"""
+    )
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.scrollTop = 0;
+            nav.scrollTo({top: 300, behavior: 'auto'});
+        }"""
+    )
+    page.wait_for_timeout(300)
+    allowed = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(allowed == 300, f"sidebar keeps the first reveal (scrollTop: {allowed})")
+
+    page.wait_for_timeout(1800)
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.scrollTo({top: 0, behavior: 'auto'});
+        }"""
+    )
+    page.wait_for_timeout(150)
+    suppressed = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(suppressed == 300, f"sidebar ignores a same-lesson re-reveal (scrollTop: {suppressed})")
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.dispatchEvent(new WheelEvent('wheel', {bubbles: true}));
+            nav.scrollTop = 500;
+        }"""
+    )
+    page.wait_for_timeout(400)
+
+    state = page.evaluate(
+        """() => {
+            const key = 'debloatSeek.outline.' + location.pathname.split('/')[2];
+            return JSON.parse(sessionStorage.getItem(key) || 'null');
+        }"""
+    )
+    check(isinstance(state, dict) and state.get("scrollTop") == 500,
+          "sidebar stores the learner's scroll position")
+    check(isinstance(state, dict) and len(state.get("units", [])) == 2,
+          "sidebar stores expanded units")
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            const clone = nav.cloneNode(true);
+            clone.scrollTop = 0;
+
+            const firstUnit = clone.querySelector('.unit-container');
+            if (firstUnit) {
+                firstUnit.classList.remove('is-open');
+                const header = firstUnit.querySelector('.unit-header');
+                if (header) header.setAttribute('aria-expanded', 'false');
+                const child = firstUnit.querySelector('.child-container');
+                if (child) {
+                    child.classList.remove('is-open');
+                    child.setAttribute('inert', '');
+                }
+            }
+
+            nav.replaceWith(clone);
+        }"""
+    )
+    page.wait_for_timeout(500)
+
+    scroll_restored = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(scroll_restored == 500,
+          f"sidebar restores scroll after a remount (scrollTop: {scroll_restored})")
+
+    expanded = page.evaluate(
+        """() => {
+            const unit = document.querySelector('app-course-outline .unit-container');
+            return unit ? unit.classList.contains('is-open') : false;
+        }"""
+    )
+    check(expanded, "sidebar restores expanded units after a remount")
+
+    page.evaluate(
+        """() => {
+            history.pushState({}, '', '/courses/test?tab=outline&id=43');
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.scrollTo({top: 700, behavior: 'auto'});
+        }"""
+    )
+    page.wait_for_timeout(300)
+    different_lesson = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(different_lesson == 700,
+          f"sidebar lets a different lesson reveal (scrollTop: {different_lesson})")
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.scrollTo({top: 200, behavior: 'auto'});
+        }"""
+    )
+    page.wait_for_timeout(150)
+    same_lesson = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(same_lesson == 700,
+          f"sidebar protects the new lesson position (scrollTop: {same_lesson})")
+
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            const units = Array.from(nav.querySelectorAll('.unit-container')).map((unit, index) => ({
+                index,
+                title: (unit.querySelector('.unit-title')?.textContent || '').trim(),
+                open: unit.classList.contains('is-open')
+            }));
+
+            sessionStorage.setItem('debloatSeek.outline.test', JSON.stringify({
+                scrollTop: 100,
+                selectedId: '42',
+                units,
+                updatedAt: Date.now()
+            }));
+
+            const clone = nav.cloneNode(true);
+            clone.scrollTop = 0;
+            nav.replaceWith(clone);
+        }"""
+    )
+    page.wait_for_timeout(100)
+    page.evaluate(
+        """() => {
+            const nav = document.querySelector('app-course-outline .outline-nav');
+            nav.scrollTo({top: 700, behavior: 'auto'});
+        }"""
+    )
+    page.wait_for_timeout(300)
+    fresh_lesson = page.evaluate(
+        """() => document.querySelector('app-course-outline .outline-nav').scrollTop"""
+    )
+    check(fresh_lesson == 700,
+          f"sidebar does not restore a previous lesson position (scrollTop: {fresh_lesson})")
+
+
 def check_assignment_review(page, hidden):
     header = 'app-assessment-question-view .evaluated-answer > .header'
     badge = 'app-assessment-question-view .evaluated-answer .reveal-badge'
@@ -611,6 +813,17 @@ def main():
 
                 print("\nStock lesson page")
                 check_stock_lesson(page)
+
+                print("\nWorkspace redesign")
+                check_workspace_redesign(page)
+
+                print("\nSidebar stability")
+                page.goto(
+                    "https://seek.study.iitm.ac.in/courses/test?tab=outline&id=42",
+                    wait_until="domcontentloaded"
+                )
+                wait_for_root(page, BOOLEAN_SETTINGS)
+                check_sidebar_stability(page)
 
                 page.goto("https://seek.study.iitm.ac.in/courses/overview", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)

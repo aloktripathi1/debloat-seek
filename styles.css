@@ -1031,6 +1031,497 @@ html[data-seek-cleaner="active"] app-assessments-view .test-case-pill:focus-visi
 }
 
 /* ----------------------------------------------------------------------- */
+/* H. Course workspace --------------------------------------------------- */
+/* ----------------------------------------------------------------------- */
+/*
+ * The course workspace is a three-part shell: the course bar, the contents
+ * sidebar, and the lesson surface. These rules keep the shell quiet so the
+ * lesson itself stays the focus. They only use SEEK's semantic classes, so
+ * Angular can re-render any part of the workspace without losing the styling.
+ */
+
+/* Course bar ------------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-bar.course-bar .app-bar {
+  gap: var(--seek-space-3);
+  padding: 0 var(--seek-space-4);
+  background: var(--seek-surface);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar .heading {
+  gap: var(--seek-space-2);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar .title {
+  padding: 0 var(--seek-space-2);
+  border-radius: var(--seek-radius-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: background-color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar .title:hover {
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar nav.actions {
+  gap: 2px;
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar .profile {
+  border-color: var(--seek-border);
+  transition:
+    border-color var(--seek-duration-fast) var(--seek-ease),
+    background-color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar .profile:hover {
+  border-color: var(--seek-border-strong);
+  background: var(--seek-surface-subtle);
+}
+
+/* Contents sidebar ------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-course-outline .outline-layout {
+  background: var(--seek-surface);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-pane {
+  border-right-color: var(--seek-border);
+  background: var(--seek-surface);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-header {
+  padding: 0 var(--seek-space-2) 0 var(--seek-space-4);
+  border-bottom-color: var(--seek-border);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-title {
+  gap: 10px;
+  color: var(--seek-text-muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-title-icon {
+  display: inline-flex;
+  color: var(--seek-text-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-header .btn {
+  min-height: 2.8rem;
+  padding: 0 var(--seek-space-2);
+  border: 0;
+  background: transparent;
+  color: var(--seek-text-muted);
+  font-size: 1.15rem;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-header .btn:hover {
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-nav {
+  padding: var(--seek-space-2) 0 var(--seek-space-4);
+  scrollbar-width: thin;
+  scrollbar-color: var(--seek-border-strong) transparent;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-nav::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-nav::-webkit-scrollbar-thumb {
+  border: 0.2rem solid transparent;
+  border-radius: var(--seek-radius-pill);
+  background: var(--seek-border-strong);
+  background-clip: padding-box;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-container {
+  border-left-width: 0;
+  border-left-color: transparent;
+  transition: background-color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-container.is-open {
+  border-left-color: transparent;
+  background: transparent;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-header {
+  gap: var(--seek-space-2);
+  margin: 2px var(--seek-space-2);
+  padding: var(--seek-space-2) var(--seek-space-2);
+  border-radius: var(--seek-radius-sm);
+  color: var(--seek-text-muted);
+  transition:
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-header:hover {
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-container.is-open .unit-header {
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-chevron {
+  color: var(--seek-text-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-title {
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-container.is-open .unit-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-count {
+  color: var(--seek-text-subtle);
+  font-size: 1.05rem;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-list {
+  gap: 2px;
+  padding: 2px var(--seek-space-2) var(--seek-space-2) var(--seek-space-3);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row {
+  gap: 10px;
+  padding: var(--seek-space-2) 10px;
+  border-radius: var(--seek-radius-sm);
+  transition:
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row:hover {
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row.selected {
+  background: color-mix(in srgb, var(--seek-accent) 9%, transparent);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row.selected .child-title {
+  font-weight: 600;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-icon {
+  margin-top: 2px;
+  color: var(--seek-text-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row.selected .child-icon {
+  color: var(--seek-text-muted);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-title {
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-type {
+  color: var(--seek-text-subtle);
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .status-icon {
+  opacity: 0.5;
+  transition: opacity var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .child-row:hover .status-icon,
+html[data-seek-cleaner="active"] app-course-outline .child-row.selected .status-icon {
+  opacity: 1;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-layout.is-outline-collapsed .outline-pane {
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .outline-layout.is-outline-collapsed .outline-header {
+  border-bottom-color: transparent;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-header:focus-visible,
+html[data-seek-cleaner="active"] app-course-outline .child-row:focus-visible {
+  outline: 2px solid var(--seek-focus) !important;
+  outline-offset: -2px !important;
+}
+
+/* Previous / Next unit bar ----------------------------------------------- */
+html[data-seek-cleaner="active"] app-course-outline nav.unit-nav {
+  border-top-color: var(--seek-border);
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-row {
+  gap: var(--seek-space-3);
+  padding: var(--seek-space-2) var(--seek-space-4);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-button {
+  height: 4.4rem;
+  border-color: var(--seek-border);
+  border-radius: var(--seek-radius-md);
+  background: var(--seek-surface);
+  transition:
+    border-color var(--seek-duration-fast) var(--seek-ease),
+    background-color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-button:hover {
+  border-color: var(--seek-border-strong);
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next {
+  border-color: transparent;
+  background: var(--seek-accent);
+  color: var(--seek-on-accent);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next:hover {
+  border-color: transparent;
+  background: var(--seek-accent);
+  filter: brightness(1.08);
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-label {
+  color: var(--seek-text-subtle);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next .unit-nav-label {
+  color: inherit;
+  opacity: 0.85;
+}
+
+html[data-seek-cleaner="active"] app-course-outline .unit-nav-title {
+  font-size: 1.3rem;
+}
+
+/* Lesson header ---------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-course-unit-view .title-bar {
+  padding: var(--seek-space-3) var(--seek-space-5);
+  border-bottom-color: var(--seek-border);
+  background: var(--seek-surface);
+}
+
+html[data-seek-cleaner="active"] app-course-unit-view .title-bar .title-icon {
+  color: var(--seek-text-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-unit-view .title-bar .title {
+  letter-spacing: -0.01em;
+}
+
+html[data-seek-cleaner="active"] app-course-unit-view .mobile-header {
+  border-bottom-color: var(--seek-border);
+}
+
+html[data-seek-cleaner="active"] app-course-unit-view .mobile-header .parent-title {
+  color: var(--seek-text-subtle);
+  letter-spacing: 0.06em;
+}
+
+/* Lesson surface --------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-lesson-view .content-column,
+html[data-seek-cleaner="active"] app-lesson-view .objectives-full,
+html[data-seek-cleaner="active"] app-course-unit-view .unit-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--seek-border-strong) transparent;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .content-column::-webkit-scrollbar,
+html[data-seek-cleaner="active"] app-course-unit-view .unit-body::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .content-column::-webkit-scrollbar-thumb,
+html[data-seek-cleaner="active"] app-course-unit-view .unit-body::-webkit-scrollbar-thumb {
+  border: 0.2rem solid transparent;
+  border-radius: var(--seek-radius-pill);
+  background: var(--seek-border-strong);
+  background-clip: padding-box;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view app-tab-bar.tab-bar {
+  margin: var(--seek-space-3) 0;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled {
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--seek-border);
+  border-radius: var(--seek-radius-md);
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-scroller {
+  gap: 4px;
+  padding: 2px;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-item {
+  height: 3.2rem;
+  padding: 0 var(--seek-space-3);
+  border-radius: var(--seek-radius-sm);
+  color: var(--seek-text-muted);
+  font-family: var(--seek-font-sans);
+  font-size: 1.3rem;
+  font-weight: 500;
+  transition:
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-item:hover:not(.active):not(.disabled) {
+  background: color-mix(in srgb, var(--seek-surface) 60%, transparent);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-item.active {
+  color: var(--seek-text);
+  font-weight: 600;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-slider {
+  top: 2px;
+  height: 3.2rem;
+  border: 1px solid var(--seek-border);
+  border-radius: var(--seek-radius-sm);
+  background: var(--seek-surface);
+  box-shadow: var(--seek-shadow-sm);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .tab-item:focus-visible {
+  outline: 2px solid var(--seek-focus) !important;
+  outline-offset: -2px !important;
+}
+
+/* Objectives ------------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body {
+  padding: var(--seek-space-3) var(--seek-space-1) var(--seek-space-2);
+  color: var(--seek-text);
+  font-size: 1.4rem;
+  line-height: 1.7;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body > :first-child {
+  margin-top: 0;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body > :last-child {
+  margin-bottom: 0;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body h1,
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body h2,
+html[data-seek-cleaner="active"] app-lesson-view .objectives .body h3 {
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .objectives .empty-state {
+  padding: 56px var(--seek-space-4) 40px;
+  color: var(--seek-text-muted);
+  font-size: 1.3rem;
+}
+
+/* Transcript ------------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel {
+  border-color: var(--seek-border);
+  border-radius: var(--seek-radius-md);
+  background: var(--seek-surface);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .panel-header {
+  padding: 10px var(--seek-space-3);
+  border-bottom-color: var(--seek-border);
+  background: var(--seek-surface-subtle);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .language-label {
+  color: var(--seek-text-muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue-list {
+  padding: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--seek-border-strong) transparent;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue-list::-webkit-scrollbar {
+  width: 0.8rem;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue-list::-webkit-scrollbar-thumb {
+  border: 0.2rem solid transparent;
+  border-radius: var(--seek-radius-pill);
+  background: var(--seek-border-strong);
+  background-clip: padding-box;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue {
+  width: 100%;
+  margin: 1px 0;
+  padding: var(--seek-space-2) 10px;
+  border: 0;
+  border-radius: var(--seek-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue:hover {
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue.active {
+  border-left: 0;
+  border-radius: var(--seek-radius-sm);
+  background: color-mix(in srgb, var(--seek-accent) 9%, transparent);
+  box-shadow: inset 2px 0 0 var(--seek-accent);
+  color: var(--seek-text);
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue .timestamp {
+  color: var(--seek-text-subtle);
+  font-size: 1.1rem;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue .text {
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue.active .timestamp,
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue.active .text {
+  color: var(--seek-text);
+}
+
+/* ----------------------------------------------------------------------- */
 /* I. Black mode --------------------------------------------------------- */
 /* ----------------------------------------------------------------------- */
 /*
