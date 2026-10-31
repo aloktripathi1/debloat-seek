@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SEEK quiz fixture</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-text-default: #242424;
+      --color-text-secondary: #5d687e;
+      --color-text-on-primary: #ffffff;
+      --color-background-surface-base: #ffffff;
+      --color-background-surface-subtle: #f9f9fa;
+      --color-background-primary: #494f69;
+      --color-border-default: #dfe4ed;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font-family: Roboto, sans-serif;
+    }
+
+    app-assessments-view,
+    app-assessment-question-view {
+      display: block;
+    }
+
+    .quiz-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .quiz-head {
+      margin-bottom: 16px;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      min-width: 36px;
+      height: 36px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-secondary);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      border-color: var(--color-background-primary);
+      background: var(--color-background-primary);
+      color: var(--color-text-on-primary);
+    }
+
+    .backend-html {
+      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    app-assessment-question {
+      display: block;
+      padding: 16px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 10px;
+      background: var(--color-background-surface-subtle);
+    }
+
+    app-assessment-question legend {
+      margin-bottom: 12px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .options [role="radio"] {
+      padding: 10px 12px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 8px;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font: inherit;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .options [role="radio"][aria-checked="true"] {
+      border-color: var(--color-background-primary);
+      box-shadow: inset 0 0 0 1px var(--color-background-primary);
+    }
+
+    app-submission-timer,
+    app-save-status {
+      display: inline-block;
+      margin-top: 16px;
+      margin-right: 12px;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <app-assessments-view>
+    <app-assessment-question-view>
+      <div class="quiz-shell">
+        <div class="quiz-head">Question 1 / 3</div>
+        <div class="chips" role="tablist" aria-label="Questions">
+          <button class="chip active" type="button" role="tab" aria-selected="true">1</button>
+          <button class="chip" type="button" role="tab" aria-selected="false">2</button>
+          <button class="chip" type="button" role="tab" aria-selected="false">3</button>
+        </div>
+        <div class="backend-html"></div>
+        <app-assessment-question></app-assessment-question>
+        <app-submission-timer>12:34</app-submission-timer>
+        <app-save-status>Saved</app-save-status>
+      </div>
+    </app-assessment-question-view>
+  </app-assessments-view>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const questions = [
+        {
+          stem: 'Which search strategy expands the lowest-cost node first?',
+          options: ['Breadth-first search', 'Uniform-cost search', 'Depth-first search']
+        },
+        {
+          stem: 'Which data structure does breadth-first search use?',
+          options: ['Stack', 'Queue', 'Priority queue']
+        },
+        {
+          stem: 'What does an admissible heuristic guarantee?',
+          options: ['It never overestimates the true cost', 'It always finds the shortest path', 'It removes the need to search']
+        }
+      ];
+
+      const chips = [...document.querySelectorAll('.chip')];
+      const head = document.querySelector('.quiz-head');
+      const stem = document.querySelector('.backend-html');
+      const live = document.querySelector('app-assessment-question');
+      const state = questions.map(() => ({ selected: null }));
+      let current = 0;
+
+      function render() {
+        const question = questions[current];
+        head.textContent = `Question ${current + 1} / ${questions.length}`;
+        stem.innerHTML = `<p>${question.stem}</p>`;
+        live.innerHTML = `<legend>${question.stem}</legend><div class="options">${
+          question.options.map((label, index) => (
+            `<button type="button" role="radio" aria-checked="${
+              state[current].selected === index ? 'true' : 'false'
+            }" data-option="${index}">${label}</button>`
+          )).join('')
+        }</div>`;
+        chips.forEach((chip, index) => {
+          chip.classList.toggle('active', index === current);
+          chip.setAttribute('aria-selected', index === current ? 'true' : 'false');
+        });
+      }
+
+      chips.forEach((chip, index) => {
+        chip.addEventListener('click', () => {
+          current = index;
+          render();
+        });
+      });
+
+      live.addEventListener('click', (event) => {
+        const option = event.target.closest('[role="radio"]');
+        if (!option) return;
+        state[current].selected = Number(option.dataset.option);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -6,7 +6,7 @@ Declutter and customize the IITM BS Degree SEEK Portal.
 
 Current version: **1.2.11**.
 
-**Unofficial, beta, not affiliated with IIT Madras.** Debloat SEEK is a free, local-only Chrome extension that hides clutter, cleans up the course overview and assessment pages, adds themes, and can hide assignment answers for practice.
+**Unofficial, beta, not affiliated with IIT Madras.** Debloat SEEK is a free, local-only Chrome extension that hides clutter, cleans up the course overview and assessment pages, adds themes, shows every quiz question at once, and can hide assignment answers for practice.
 
 It does not call SEEK APIs, send data anywhere, or change course content, submissions, scores, or the lesson/video player.
 
@@ -35,6 +35,13 @@ The demo switches to the Black theme, then hides Previous/Next, Overview, the ta
 - Hide announcements
 - Hide the Forum button
 - Hide the Calculator button
+
+### Quiz helper
+
+- **Show all questions** captures every quiz question into one bottom sheet
+- Answer in the sheet; changes are mirrored back to the live quiz
+- Refresh, print or save as PDF, and reopen with `Alt+Q` on a quiz page
+- Adapted from the [unfold](https://github.com/civiks/unfold-iitm) extension
 
 ### Interface
 
@@ -117,6 +124,7 @@ Please keep private SEEK snapshots and personal data out of the public repositor
 
 - This extension is not affiliated with IIT Madras. “IITM” is used only to describe the portal it supports.
 - SEEK updates may temporarily affect some features. The extension aims to keep the portal clean and customizable as it evolves.
+
 
 ## License
 

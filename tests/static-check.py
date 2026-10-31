@@ -45,16 +45,34 @@ def check_manifest():
     check("host_permissions" not in manifest, "No extra host permissions are requested")
 
     scripts = manifest.get("content_scripts", [])
-    check(len(scripts) == 1, "Exactly one content script entry is declared")
+    check(len(scripts) == 2, "Two content script entries are declared")
 
-    if scripts:
-        entry = scripts[0]
+    for entry in scripts:
         check(entry.get("matches") == SEEK_ORIGINS,
-              "Content script is restricted to the two supported SEEK origins")
-        check(entry.get("all_frames") is False, "Content script runs in the top frame only")
-        check(entry.get("run_at") == "document_start", "Content script starts before the page renders")
-        check(entry.get("css") == ["styles.css"], "Dedicated stylesheet is injected")
-        check(entry.get("js") == ["settings.js", "content.js"], "Settings helper loads before the content script")
+              "Each content script is restricted to the two supported SEEK origins")
+        check(entry.get("all_frames") is False, "Each content script runs in the top frame only")
+
+    main_script = next(
+        (entry for entry in scripts if entry.get("js") == ["settings.js", "content.js"]),
+        None
+    )
+    quiz_script = next(
+        (entry for entry in scripts if entry.get("js") == ["show-all-questions.js"]),
+        None
+    )
+
+    check(main_script is not None, "Settings helper loads before the content script")
+
+    if main_script:
+        check(main_script.get("run_at") == "document_start",
+              "Main content script starts before the page renders")
+        check(main_script.get("css") == ["styles.css"], "Dedicated stylesheet is injected")
+
+    check(quiz_script is not None, "Show-all-questions engine is declared")
+
+    if quiz_script:
+        check(quiz_script.get("run_at") == "document_idle",
+              "Show-all-questions engine starts after the quiz renders")
 
     check(manifest.get("action", {}).get("default_popup") == "popup.html", "Popup is declared")
     check(manifest.get("background", {}).get("service_worker") == "background.js",
@@ -62,7 +80,7 @@ def check_manifest():
     check(manifest.get("minimum_chrome_version") == "105", "Minimum Chrome version covers :has() support")
 
     required_files = [
-        "manifest.json", "settings.js", "content.js", "styles.css",
+        "manifest.json", "settings.js", "content.js", "show-all-questions.js", "styles.css",
         "popup.html", "popup.css", "popup.js", "background.js",
         "icons/icon16.png", "icons/icon32.png", "icons/icon48.png", "icons/icon128.png"
     ]
@@ -81,7 +99,7 @@ def check_syntax():
         print("  SKIP  node is not installed")
         return
 
-    for name in ["settings.js", "content.js", "popup.js", "background.js"]:
+    for name in ["settings.js", "content.js", "show-all-questions.js", "popup.js", "background.js"]:
         result = subprocess.run(
             [node, "--check", str(ROOT / name)],
             capture_output=True,
@@ -100,6 +118,10 @@ def check_popup():
         "unitNav", "overview", "divider",
         "header", "transcript", "answers", "objectives", "announcements", "forum", "calculator"
     ], "Ten independent settings are present in the expected order")
+
+    show_all = soup.select_one("#show-all-questions")
+    check(show_all is not None and "Show all questions" in show_all.get_text(" "),
+          "Show-all-questions action is present")
 
     default_keys = {"unitNav", "overview", "divider"}
     for element in inputs:
@@ -160,7 +182,7 @@ def check_settings_model():
 def check_no_remote_code():
     print("\nNo remote code or telemetry")
     scanned = [
-        "settings.js", "content.js", "styles.css", "popup.html",
+        "settings.js", "content.js", "show-all-questions.js", "styles.css", "popup.html",
         "popup.css", "popup.js", "background.js"
     ]
 

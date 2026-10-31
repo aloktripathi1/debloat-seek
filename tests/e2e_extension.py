@@ -25,6 +25,7 @@ FIXTURE = (ROOT / "tests" / "fixtures" / "seek-fixture.html").read_text(encoding
 OVERVIEW_FIXTURE = (ROOT / "tests" / "fixtures" / "course-overview-fixture.html").read_text(encoding="utf-8")
 ASSESSMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assessment-fixture.html").read_text(encoding="utf-8")
 ASSIGNMENT_FIXTURE = (ROOT / "tests" / "fixtures" / "assignment-fixture.html").read_text(encoding="utf-8")
+QUIZ_FIXTURE = (ROOT / "tests" / "fixtures" / "quiz-fixture.html").read_text(encoding="utf-8")
 MINIMAL = "<!doctype html><html lang='en'><body><h1>SEEK</h1></body></html>"
 SEEK_PATTERNS = [
     "https://seek.study.iitm.ac.in/**",
@@ -125,6 +126,8 @@ def route_handler(route):
         body = ASSESSMENT_FIXTURE
     elif url.endswith("/courses/assignment"):
         body = ASSIGNMENT_FIXTURE
+    elif url.endswith("/courses/quiz"):
+        body = QUIZ_FIXTURE
     else:
         body = FIXTURE
 
@@ -665,6 +668,49 @@ def check_assessment_redesign(page):
         check(actual == expected, f"{label} ({property_name}: {actual})")
 
 
+def check_show_all_questions(context, extension_id):
+    page = context.new_page()
+    page.on("pageerror", lambda error: page_errors.append(f"quiz: {error}"))
+    page.emulate_media(color_scheme="light")
+    page.goto("https://seek.study.iitm.ac.in/courses/quiz", wait_until="domcontentloaded")
+    wait_for_root(page, BOOLEAN_SETTINGS)
+    page.wait_for_selector("#saq-launcher.is-shown", timeout=5000)
+
+    check(page.locator("#saq-launcher").inner_text().strip() == "All Questions",
+          "quiz page shows the All Questions launcher")
+
+    popup = open_popup(context, extension_id)
+    page.bring_to_front()
+    popup.evaluate("() => document.getElementById('show-all-questions').click()")
+    page.wait_for_selector("#saq-sheet.is-open", timeout=10000)
+
+    check(page.locator(".saq-block").count() == 3,
+          "show all questions captures every question")
+    check(page.locator(".saq-title").inner_text() == "All Questions",
+          "show all questions opens the question sheet")
+    check(page.locator(".saq-clock-val").inner_text() == "12:34",
+          "question sheet mirrors the live timer")
+
+    block = page.locator('.saq-block[data-q="1"]')
+    block.locator('[role="radio"]').nth(1).click()
+    page.wait_for_function(
+        """() => !document.querySelector('.saq-block[data-q="1"]')?.classList.contains('is-syncing')""",
+        timeout=15000
+    )
+    check(block.locator('[role="radio"]').nth(1).get_attribute("aria-checked") == "true",
+          "answering in the sheet updates the live quiz question")
+
+    page.locator('.saq-btn[data-act="dismiss"]').click()
+    page.wait_for_function(
+        "() => !document.querySelector('#saq-sheet')?.classList.contains('is-open')",
+        timeout=5000
+    )
+    check(page.locator("#saq-launcher").evaluate("element => element.classList.contains('is-shown')"),
+          "closing the sheet restores the launcher")
+
+    page.close()
+
+
 def get_popup_states(popup):
     return popup.eval_on_selector_all(
         "input[data-setting]",
@@ -843,6 +889,9 @@ def main():
                 page.goto("https://seek.study.iitm.ac.in/courses/assessment", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)
                 check_assessment_redesign(page)
+
+                print("\nShow all questions")
+                check_show_all_questions(context, extension_id)
 
                 page.goto("https://seek.study.iitm.ac.in/courses/test", wait_until="domcontentloaded")
                 wait_for_root(page, BOOLEAN_SETTINGS)

@@ -28,6 +28,7 @@
   const statusElement = document.getElementById('status');
   const summaryElement = document.getElementById('summary');
   const restoreButton = document.getElementById('restore-defaults');
+  const showAllButton = document.getElementById('show-all-questions');
 
   let settings = { ...DEFAULT_SETTINGS };
   let saveChain = Promise.resolve();
@@ -149,6 +150,40 @@
     queueSave();
   }
 
+  async function showAllQuestions() {
+    if (!showAllButton || showAllButton.disabled) {
+      return;
+    }
+
+    showAllButton.disabled = true;
+    setStatus('Opening all questions…', 'pending');
+
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!tab?.id) {
+        throw new Error('No active tab');
+      }
+
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        type: 'debloat-seek:show-all-questions'
+      });
+
+      if (response?.ok) {
+        setStatus('All questions opened.', 'success');
+        window.close();
+        return;
+      }
+
+      setStatus(response?.reason || 'Open a quiz page with numbered questions first.', 'warning');
+    } catch (error) {
+      console.error('Debloat SEEK: could not open all questions.', error);
+      setStatus('Open a SEEK quiz tab first, then try again.', 'error');
+    } finally {
+      showAllButton.disabled = false;
+    }
+  }
+
   function bindThemeControls() {
     for (const button of document.querySelectorAll('[data-theme-option]')) {
       const theme = button.dataset.themeOption;
@@ -179,6 +214,10 @@
 
     if (restoreButton) {
       restoreButton.addEventListener('click', restoreDefaults);
+    }
+
+    if (showAllButton) {
+      showAllButton.addEventListener('click', showAllQuestions);
     }
 
     try {

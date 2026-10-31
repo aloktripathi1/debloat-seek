@@ -41,6 +41,17 @@
       ],
       "run_at": "document_start",
       "all_frames": false
+    },
+    {
+      "matches": [
+        "https://seek.study.iitm.ac.in/*",
+        "https://seek.onlinedegree.iitm.ac.in/*"
+      ],
+      "js": [
+        "show-all-questions.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ]
 }
