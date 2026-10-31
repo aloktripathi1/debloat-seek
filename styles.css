@@ -185,51 +185,91 @@ html[data-seek-cleaner="active"] {
   --seek-space-5: 2.4rem;
   --seek-space-6: 3.2rem;
 
+  /*
+   * A short, deliberate type scale. Everything in the workspace picks from
+   * these steps so headings, labels, and body copy stay related.
+   */
+  --seek-text-xs: 1.1rem;
+  --seek-text-sm: 1.2rem;
+  --seek-text-md: 1.3rem;
+  --seek-text-base: 1.5rem;
+  --seek-text-lg: 1.8rem;
+  --seek-text-xl: 2.2rem;
+  --seek-text-2xl: 2.8rem;
+
   --seek-radius-xs: 0.6rem;
   --seek-radius-sm: 0.8rem;
-  --seek-radius-md: 1rem;
-  --seek-radius-lg: 1.4rem;
-  --seek-radius-xl: 1.8rem;
+  --seek-radius-md: 1.2rem;
+  --seek-radius-lg: 1.6rem;
+  --seek-radius-xl: 2rem;
   --seek-radius-pill: 999px;
 
-  --seek-surface: var(--color-background-surface-base);
-  --seek-surface-subtle: var(--color-background-surface-subtle);
-  --seek-surface-raised: var(--color-background-surface-strong);
-  --seek-surface-strong: var(--color-background-surface-stronger);
-  --seek-border: var(--color-border-secondary);
-  --seek-border-strong: var(--color-border-default);
+  /*
+   * The canvas sits behind the content. Cards and panes use --seek-surface,
+   * so the page gains depth without heavy borders or shadows.
+   */
+  --seek-canvas: #f5f6f8;
+  --seek-surface: #ffffff;
+  --seek-surface-subtle: #f9f9fa;
+  --seek-surface-raised: #ffffff;
+  --seek-surface-strong: #eff0f2;
+  --seek-border-subtle: #eef0f4;
+  --seek-border: #e4e7ed;
+  --seek-border-strong: #d3d8e2;
   --seek-text: var(--color-text-default);
   --seek-text-muted: var(--color-text-secondary);
-  --seek-text-subtle: var(--color-text-disabled);
+  --seek-text-subtle: #7a8296;
   --seek-accent: var(--color-background-primary);
   --seek-accent-soft: var(--color-background-primary-light);
   --seek-on-accent: var(--color-text-on-primary);
+  --seek-success: var(--color-text-success-strong);
+  --seek-progress: var(--seek-accent);
   --seek-focus: var(--color-border-focus);
 
   --seek-duration-fast: 150ms;
   --seek-duration: 180ms;
+  --seek-duration-slow: 240ms;
   --seek-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  --seek-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --seek-shadow-md: 0 10px 30px -24px rgba(16, 24, 40, 0.4);
-  --seek-shadow-lg: 0 24px 60px -40px rgba(16, 24, 40, 0.55);
-
+  --seek-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 1px rgba(16, 24, 40, 0.04);
+  --seek-shadow-md: 0 16px 40px -32px rgba(16, 24, 40, 0.45);
+  --seek-shadow-lg: 0 28px 70px -44px rgba(16, 24, 40, 0.55);
 }
 
 html[data-seek-theme="dark"] {
+  --seek-canvas: #15171f;
+  --seek-surface: #1b1d29;
+  --seek-surface-subtle: #222736;
+  --seek-surface-raised: #222736;
+  --seek-surface-strong: #2d3243;
+  --seek-border-subtle: #242a39;
+  --seek-border: #2f3444;
+  --seek-border-strong: #454b60;
+  --seek-text-subtle: #8f97ad;
+
   --seek-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
   --seek-shadow-md: 0 16px 40px -30px rgba(0, 0, 0, 0.8);
   --seek-shadow-lg: 0 28px 64px -40px rgba(0, 0, 0, 0.9);
 }
 
 html[data-seek-theme="black"] {
+  --seek-canvas: #000000;
+  --seek-surface: #05070b;
+  --seek-surface-subtle: #0a0e14;
+  --seek-surface-raised: #0f1620;
+  --seek-surface-strong: #121a24;
+  --seek-border-subtle: #141b26;
+  --seek-border: #1e2735;
+  --seek-border-strong: #2a3446;
+  --seek-text-subtle: #8f97ad;
+
   --seek-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.55);
   --seek-shadow-md: 0 16px 40px -30px rgba(0, 0, 0, 0.95);
   --seek-shadow-lg: 0 28px 64px -40px rgba(0, 0, 0, 1);
 }
 
 html[data-seek-cleaner="active"] body {
-  background: var(--seek-surface);
+  background: var(--seek-canvas);
   color: var(--seek-text);
   font-family: var(--seek-font-sans);
   -webkit-font-smoothing: antialiased;
@@ -238,10 +278,15 @@ html[data-seek-cleaner="active"] body {
 
 html[data-seek-cleaner="active"] .course-shell,
 html[data-seek-cleaner="active"] .course-main,
-html[data-seek-cleaner="active"] .unit-view,
-html[data-seek-cleaner="active"] .unit-body,
 html[data-seek-cleaner="active"] app-course-overview,
 html[data-seek-cleaner="active"] app-assessments-view {
+  background: var(--seek-canvas);
+  color: var(--seek-text);
+  font-family: var(--seek-font-sans);
+}
+
+html[data-seek-cleaner="active"] .unit-view,
+html[data-seek-cleaner="active"] .unit-body {
   background: var(--seek-surface);
   color: var(--seek-text);
   font-family: var(--seek-font-sans);
@@ -501,7 +546,8 @@ html[data-seek-cleaner="active"] app-course-overview .widget {
 html[data-seek-cleaner="active"] app-course-overview .overview-card .course-header {
   gap: var(--seek-space-4) !important;
   padding: var(--seek-space-5) !important;
-  background: var(--seek-surface-subtle) !important;
+  border-bottom: 1px solid var(--seek-border) !important;
+  background: var(--seek-surface) !important;
 }
 
 html[data-seek-cleaner="active"] app-course-overview .overview-card .course-header::after {
@@ -571,14 +617,14 @@ html[data-seek-cleaner="active"] app-course-overview .overview-card .progress-ba
 
 html[data-seek-cleaner="active"] app-course-overview .overview-card .progress-bar::-webkit-progress-value {
   border-radius: var(--seek-radius-pill);
-  background: var(--color-text-success-strong);
+  background: var(--seek-progress);
 }
 
 html[data-seek-cleaner="active"] app-course-overview .description {
-  padding: var(--seek-space-5) !important;
+  padding: var(--seek-space-4) var(--seek-space-5) var(--seek-space-5) !important;
   color: var(--seek-text-muted);
   font-size: 1.3rem;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 html[data-seek-cleaner="active"] app-course-overview .modules {
@@ -588,7 +634,7 @@ html[data-seek-cleaner="active"] app-course-overview .modules {
 html[data-seek-cleaner="active"] app-course-overview .modules-title {
   color: var(--seek-text) !important;
   font-family: var(--seek-font-sans) !important;
-  font-size: 1.6rem !important;
+  font-size: 1.4rem !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em;
 }
@@ -664,25 +710,35 @@ html[data-seek-cleaner="active"] app-course-overview .module-meta .meta-label {
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   height: 2.6rem !important;
   padding: 0 1rem !important;
   border: 1px solid var(--seek-border) !important;
   border-radius: var(--seek-radius-pill) !important;
-  background: var(--seek-surface-raised) !important;
+  background: transparent !important;
   color: var(--seek-text-muted) !important;
   font-family: var(--seek-font-sans) !important;
   font-size: 1.1rem !important;
   font-weight: 600 !important;
 }
 
-html[data-seek-cleaner="active"] app-course-overview .module-status[data-status="complete"] {
-  border-color: color-mix(in srgb, var(--color-text-success-strong) 24%, transparent) !important;
-  background: color-mix(
-    in srgb,
-    var(--color-text-success-strong) 10%,
-    var(--seek-surface)
-  ) !important;
-  color: var(--color-text-success-strong) !important;
+html[data-seek-cleaner="active"] app-course-overview .module-status::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--seek-text-subtle);
+}
+
+html[data-seek-cleaner="active"] app-course-overview .module-status[data-status="complete"]::before {
+  background: var(--seek-success);
+}
+
+html[data-seek-cleaner="active"] app-course-overview .module-status[data-status="in-progress"]::before {
+  background: var(--seek-accent);
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-chevron {
@@ -712,12 +768,12 @@ html[data-seek-cleaner="active"] app-course-overview .module-progress::-webkit-p
 
 html[data-seek-cleaner="active"] app-course-overview .module-progress::-webkit-progress-value {
   border-radius: var(--seek-radius-pill) !important;
-  background: var(--color-text-success-strong) !important;
+  background: var(--seek-progress) !important;
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-progress::-moz-progress-bar {
   border-radius: var(--seek-radius-pill) !important;
-  background: var(--color-text-success-strong) !important;
+  background: var(--seek-progress) !important;
 }
 
 html[data-seek-cleaner="active"] app-course-overview .module-progress-caption {
@@ -806,7 +862,7 @@ html[data-seek-cleaner="active"] app-course-overview .banner {
 /* Assessments ------------------------------------------------------------ */
 html[data-seek-cleaner="active"] app-assessments-view .pa-start-page {
   padding: var(--seek-space-5) !important;
-  background: var(--seek-surface) !important;
+  background: transparent !important;
 }
 
 html[data-seek-cleaner="active"] app-assessments-view .assessment-instructions {
@@ -865,7 +921,7 @@ html[data-seek-cleaner="active"] app-assessments-view .submission-overview .stat
 }
 
 html[data-seek-cleaner="active"] app-assessments-view .programming-assignment-view {
-  background: var(--seek-surface) !important;
+  background: transparent !important;
 }
 
 html[data-seek-cleaner="active"] app-assessments-view .programming-assignment-view .question-layout {
@@ -975,12 +1031,11 @@ html[data-seek-cleaner="active"] app-assessments-view .test-case-pill:focus-visi
   }
 
   html[data-seek-cleaner="active"] app-course-overview .module-status {
-    width: 2.6rem;
-    padding: 0 !important;
-    justify-content: center;
+    min-width: 0;
+    padding: 0 var(--seek-space-2) !important;
+    font-size: var(--seek-text-xs) !important;
   }
 
-  html[data-seek-cleaner="active"] app-course-overview .module-status-label,
   html[data-seek-cleaner="active"] app-course-overview .module-status[data-status="lessons-only"],
   html[data-seek-cleaner="active"] app-course-overview .module-status[data-status="not-started"] {
     display: none;
@@ -1041,6 +1096,11 @@ html[data-seek-cleaner="active"] app-assessments-view .test-case-pill:focus-visi
  */
 
 /* Course bar ------------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-bar.course-bar {
+  border-bottom: 1px solid var(--seek-border);
+  background: var(--seek-surface);
+}
+
 html[data-seek-cleaner="active"] app-bar.course-bar .app-bar {
   gap: var(--seek-space-3);
   padding: 0 var(--seek-space-4);
@@ -1054,6 +1114,7 @@ html[data-seek-cleaner="active"] app-bar.course-bar .heading {
 html[data-seek-cleaner="active"] app-bar.course-bar .title {
   padding: 0 var(--seek-space-2);
   border-radius: var(--seek-radius-sm);
+  font-size: var(--seek-text-md);
   font-weight: 600;
   letter-spacing: -0.01em;
   transition: background-color var(--seek-duration-fast) var(--seek-ease);
@@ -1063,20 +1124,52 @@ html[data-seek-cleaner="active"] app-bar.course-bar .title:hover {
   background: var(--seek-surface-subtle);
 }
 
+html[data-seek-cleaner="active"] app-bar.course-bar .page-label {
+  color: var(--seek-text-subtle);
+  font-size: var(--seek-text-sm);
+  letter-spacing: 0.01em;
+}
+
 html[data-seek-cleaner="active"] app-bar.course-bar nav.actions {
   gap: 2px;
 }
 
+html[data-seek-cleaner="active"] app-bar.course-bar nav.actions .btn,
+html[data-seek-cleaner="active"] app-bar.course-bar .lead .btn {
+  min-height: 3.2rem;
+  padding: 0 var(--seek-space-2);
+  border-color: transparent;
+  border-radius: var(--seek-radius-sm);
+  background: transparent;
+  color: var(--seek-text-muted);
+  font-size: var(--seek-text-sm);
+  font-weight: 500;
+  transition:
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
+}
+
+html[data-seek-cleaner="active"] app-bar.course-bar nav.actions .btn:hover,
+html[data-seek-cleaner="active"] app-bar.course-bar .lead .btn:hover {
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text);
+}
+
 html[data-seek-cleaner="active"] app-bar.course-bar .profile {
   border-color: var(--seek-border);
+  background: var(--seek-surface-subtle);
+  color: var(--seek-text-muted);
+  font-size: var(--seek-text-xs);
   transition:
     border-color var(--seek-duration-fast) var(--seek-ease),
-    background-color var(--seek-duration-fast) var(--seek-ease);
+    background-color var(--seek-duration-fast) var(--seek-ease),
+    color var(--seek-duration-fast) var(--seek-ease);
 }
 
 html[data-seek-cleaner="active"] app-bar.course-bar .profile:hover {
   border-color: var(--seek-border-strong);
-  background: var(--seek-surface-subtle);
+  background: var(--seek-surface-strong);
+  color: var(--seek-text);
 }
 
 /* Contents sidebar ------------------------------------------------------- */
@@ -1097,9 +1190,9 @@ html[data-seek-cleaner="active"] app-course-outline .outline-header {
 html[data-seek-cleaner="active"] app-course-outline .outline-title {
   gap: 10px;
   color: var(--seek-text-muted);
-  font-size: 1.1rem;
+  font-size: var(--seek-text-xs);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .outline-title-icon {
@@ -1113,7 +1206,7 @@ html[data-seek-cleaner="active"] app-course-outline .outline-header .btn {
   border: 0;
   background: transparent;
   color: var(--seek-text-muted);
-  font-size: 1.15rem;
+  font-size: var(--seek-text-sm);
 }
 
 html[data-seek-cleaner="active"] app-course-outline .outline-header .btn:hover {
@@ -1166,7 +1259,7 @@ html[data-seek-cleaner="active"] app-course-outline .unit-header:hover {
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-container.is-open .unit-header {
-  background: var(--seek-surface-subtle);
+  background: transparent;
   color: var(--seek-text);
 }
 
@@ -1175,19 +1268,20 @@ html[data-seek-cleaner="active"] app-course-outline .unit-chevron {
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-title {
-  font-size: 1.3rem;
+  font-size: var(--seek-text-md);
   font-weight: 500;
   line-height: 1.4;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-container.is-open .unit-title {
-  font-size: 1.35rem;
+  font-size: var(--seek-text-md);
   font-weight: 600;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-count {
   color: var(--seek-text-subtle);
-  font-size: 1.05rem;
+  font-size: var(--seek-text-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .child-list {
@@ -1226,14 +1320,14 @@ html[data-seek-cleaner="active"] app-course-outline .child-row.selected .child-i
 }
 
 html[data-seek-cleaner="active"] app-course-outline .child-title {
-  font-size: 1.25rem;
+  font-size: var(--seek-text-md);
   line-height: 1.45;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .child-type {
   color: var(--seek-text-subtle);
-  font-size: 1.05rem;
-  letter-spacing: 0.01em;
+  font-size: var(--seek-text-xs);
+  letter-spacing: 0.02em;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .status-icon {
@@ -1300,8 +1394,8 @@ html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next:hov
 
 html[data-seek-cleaner="active"] app-course-outline .unit-nav-label {
   color: var(--seek-text-subtle);
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
+  font-size: var(--seek-text-xs);
+  letter-spacing: 0.08em;
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next .unit-nav-label {
@@ -1310,11 +1404,12 @@ html[data-seek-cleaner="active"] app-course-outline .unit-nav-button.is-next .un
 }
 
 html[data-seek-cleaner="active"] app-course-outline .unit-nav-title {
-  font-size: 1.3rem;
+  font-size: var(--seek-text-md);
 }
 
 /* Lesson header ---------------------------------------------------------- */
 html[data-seek-cleaner="active"] app-course-unit-view .title-bar {
+  min-height: 5.2rem;
   padding: var(--seek-space-3) var(--seek-space-5);
   border-bottom-color: var(--seek-border);
   background: var(--seek-surface);
@@ -1325,6 +1420,9 @@ html[data-seek-cleaner="active"] app-course-unit-view .title-bar .title-icon {
 }
 
 html[data-seek-cleaner="active"] app-course-unit-view .title-bar .title {
+  color: var(--seek-text);
+  font-size: 1.4rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
@@ -1359,7 +1457,7 @@ html[data-seek-cleaner="active"] app-course-unit-view .unit-body::-webkit-scroll
 }
 
 html[data-seek-cleaner="active"] app-lesson-view app-tab-bar.tab-bar {
-  margin: var(--seek-space-3) 0;
+  margin: var(--seek-space-3) 0 var(--seek-space-2);
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled {
@@ -1376,12 +1474,14 @@ html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled .tab-item {
+  position: relative;
+  z-index: 1;
   height: 3.2rem;
   padding: 0 var(--seek-space-3);
   border-radius: var(--seek-radius-sm);
   color: var(--seek-text-muted);
   font-family: var(--seek-font-sans);
-  font-size: 1.3rem;
+  font-size: var(--seek-text-md);
   font-weight: 500;
   transition:
     background-color var(--seek-duration-fast) var(--seek-ease),
@@ -1404,7 +1504,6 @@ html[data-seek-cleaner="active"] app-lesson-view .tab-bar-wrapper.reverse-filled
   border: 1px solid var(--seek-border);
   border-radius: var(--seek-radius-sm);
   background: var(--seek-surface);
-  box-shadow: var(--seek-shadow-sm);
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .tab-item:focus-visible {
@@ -1413,10 +1512,17 @@ html[data-seek-cleaner="active"] app-lesson-view .tab-item:focus-visible {
 }
 
 /* Objectives ------------------------------------------------------------- */
+html[data-seek-cleaner="active"] app-lesson-view .objectives,
+html[data-seek-cleaner="active"] app-lesson-view .objectives-full {
+  border: 0;
+  border-radius: var(--seek-radius-md);
+  background: var(--seek-surface-subtle);
+}
+
 html[data-seek-cleaner="active"] app-lesson-view .objectives .body {
-  padding: var(--seek-space-3) var(--seek-space-1) var(--seek-space-2);
+  padding: var(--seek-space-4) var(--seek-space-5) var(--seek-space-5);
   color: var(--seek-text);
-  font-size: 1.4rem;
+  font-size: var(--seek-text-base);
   line-height: 1.7;
 }
 
@@ -1436,9 +1542,13 @@ html[data-seek-cleaner="active"] app-lesson-view .objectives .body h3 {
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .objectives .empty-state {
-  padding: 56px var(--seek-space-4) 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 14rem;
+  padding: var(--seek-space-6) var(--seek-space-5);
   color: var(--seek-text-muted);
-  font-size: 1.3rem;
+  font-size: var(--seek-text-md);
 }
 
 /* Transcript ------------------------------------------------------------- */
@@ -1456,13 +1566,21 @@ html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .panel-header
 
 html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .language-label {
   color: var(--seek-text-muted);
-  font-size: 1.1rem;
+  font-size: var(--seek-text-xs);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .auto-scroll {
+  color: var(--seek-text-subtle);
+  font-size: var(--seek-text-xs);
+}
+
 html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   padding: 6px;
   scrollbar-width: thin;
   scrollbar-color: var(--seek-border-strong) transparent;
@@ -1480,8 +1598,12 @@ html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue-list::-w
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue {
+  display: grid;
+  grid-template-columns: 4.2rem minmax(0, 1fr);
+  gap: var(--seek-space-2);
+  align-items: start;
   width: 100%;
-  margin: 1px 0;
+  margin: 0;
   padding: var(--seek-space-2) 10px;
   border: 0;
   border-radius: var(--seek-radius-sm);
@@ -1506,13 +1628,20 @@ html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue.active {
   color: var(--seek-text);
 }
 
+html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue:focus-visible {
+  outline: 2px solid var(--seek-focus) !important;
+  outline-offset: -2px !important;
+}
+
 html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue .timestamp {
   color: var(--seek-text-subtle);
-  font-size: 1.1rem;
+  font-size: var(--seek-text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
 }
 
 html[data-seek-cleaner="active"] app-lesson-view .transcript-panel .cue .text {
-  font-size: 1.25rem;
+  font-size: var(--seek-text-md);
   line-height: 1.5;
 }
 

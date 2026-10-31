@@ -274,15 +274,25 @@ def check_workspace_redesign(page):
         ('.unit-header', 'border-top-left-radius', '8px', "unit headers use the shared radius"),
         ('.child-row', 'border-top-left-radius', '8px', "lesson rows use the shared radius"),
         ('.title-bar', 'padding', '12px 24px', "lesson header uses the workspace rhythm"),
-        ('.tab-bar-wrapper', 'border-top-left-radius', '10px', "lesson tabs use the shared radius"),
+        ('.title-bar .title-icon', 'color', 'rgb(122, 130, 150)',
+         "lesson header icon stays quiet"),
+        ('.tab-bar-wrapper', 'border-top-left-radius', '12px', "lesson tabs use the shared radius"),
         ('.tab-item', 'height', '32px', "lesson tabs use a compact height"),
-        ('.transcript-panel', 'border-top-left-radius', '10px',
-         "transcript panel uses the shared radius")
+        ('.tab-item', 'z-index', '1', "lesson tab labels stay above the slider"),
+        ('.objectives', 'border-top-left-radius', '12px',
+         "objectives panel uses the shared radius"),
+        ('.transcript-panel', 'border-top-left-radius', '12px',
+         "transcript panel uses the shared radius"),
+        ('.transcript-panel .cue', 'display', 'grid',
+         "transcript cues use a two-column rhythm")
     ]
 
     for selector, property_name, expected, label in checks:
         actual = computed_style(page, selector, property_name)
         check(actual == expected, f"{label} ({property_name}: {actual})")
+
+    check(computed_style(page, 'body', 'background-color') == 'rgb(245, 246, 248)',
+          "workspace sits on the quiet canvas")
 
 
 def check_sidebar_stability(page):
@@ -568,14 +578,15 @@ def check_overview_redesign(page):
     checks = [
         ('.overview-page', 'padding', '24px', 'course overview uses the page rhythm'),
         ('.overview-page', 'gap', '24px', 'course overview uses consistent spacing'),
-        ('.overview-card', 'border-radius', '14px', 'course overview card uses the shared radius'),
+        ('.overview-card', 'border-radius', '16px', 'course overview card uses the shared radius'),
         ('.course-header', 'padding', '24px', 'course header has generous padding'),
-        ('.course-header', 'background-color', 'rgb(249, 249, 250)', 'course header uses the subtle surface'),
+        ('.course-header', 'background-color', 'rgb(255, 255, 255)', 'course header sits on the card surface'),
+        ('.course-header', 'border-bottom-width', '1px', 'course header is divided by a hairline'),
         ('.course-title', 'font-size', '22px', 'course title has clear hierarchy'),
         ('.course-title', 'font-weight', '700', 'course title has strong emphasis'),
-        ('.module-card', 'border-radius', '14px', 'module cards use the shared radius'),
+        ('.module-card', 'border-radius', '16px', 'module cards use the shared radius'),
         ('.module-card', 'padding', '16px', 'module cards use consistent padding'),
-        ('.widget', 'border-radius', '14px', 'side widgets use the shared radius'),
+        ('.widget', 'border-radius', '16px', 'side widgets use the shared radius'),
         ('.due-item', 'padding', '12px 8px', 'upcoming items use compact spacing')
     ]
 
@@ -634,8 +645,8 @@ def check_overview_redesign(page):
 def check_assessment_redesign(page):
     checks = [
         ('.pa-start-page', 'padding', '24px', 'assessment start page uses the page rhythm'),
-        ('.assessment-instructions', 'border-radius', '14px', 'assessment instructions use the shared radius'),
-        ('.submission-overview', 'border-radius', '14px', 'submission overview uses the shared radius'),
+        ('.assessment-instructions', 'border-radius', '16px', 'assessment instructions use the shared radius'),
+        ('.submission-overview', 'border-radius', '16px', 'submission overview uses the shared radius'),
         ('.submission-overview', 'padding', '24px', 'submission overview has generous padding'),
         ('.submission-overview', 'background-color', 'rgb(249, 249, 250)',
          'submission overview uses the subtle surface'),
@@ -643,8 +654,8 @@ def check_assessment_redesign(page):
         ('.card-title', 'font-weight', '600', 'submission label has clear emphasis'),
         ('.earned', 'font-size', '32px', 'submission score has strong hierarchy'),
         ('.earned', 'font-weight', '700', 'submission score has strong emphasis'),
-        ('.submission-toolbar', 'border-radius', '10px', 'submission toolbar uses the compact radius'),
-        ('.test-case-card', 'border-radius', '10px', 'test cases use the compact radius'),
+        ('.submission-toolbar', 'border-radius', '12px', 'submission toolbar uses the compact radius'),
+        ('.test-case-card', 'border-radius', '12px', 'test cases use the compact radius'),
         ('.test-case-card', 'background-color', 'rgb(249, 249, 250)',
          'test cases use the subtle surface')
     ]

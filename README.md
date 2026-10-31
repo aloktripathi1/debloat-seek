@@ -40,6 +40,7 @@ The demo switches to the Black theme, then hides Previous/Next, Overview, the ta
 
 - **System**, **Light**, **Dark**, and **Black** themes
 - Cleaner course overview and assessment layouts
+- A calm canvas with white cards, a short type scale, and consistent radii
 - A calmer course shell with a clearer contents sidebar, course bar, lesson tabs, objectives, and transcript
 - The contents sidebar keeps your scroll position and expanded units when you switch course tabs
 - The lesson/video player and its playback behaviour stay untouched

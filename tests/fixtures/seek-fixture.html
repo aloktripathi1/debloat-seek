@@ -116,6 +116,51 @@
       gap: 2px;
     }
 
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--color-border-default);
+      border-radius: 6px;
+      background: var(--color-background-surface-base);
+      color: var(--color-text-default);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .page-label {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
+    .divider {
+      width: 1px;
+      height: 20px;
+      background: var(--color-border-default);
+    }
+
+    .auto-scroll {
+      color: var(--color-text-secondary);
+      font-size: 11px;
+    }
+
+    .cue {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      padding: 8px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
     .profile {
       width: 32px;
       height: 32px;
@@ -333,6 +378,12 @@
     .tab-scroller {
       display: flex;
       align-items: center;
+      position: relative;
+    }
+
+    .tab-slider {
+      position: absolute;
+      pointer-events: none;
     }
 
     .tab-item {

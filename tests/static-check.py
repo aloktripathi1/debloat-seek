@@ -239,8 +239,12 @@ def check_css():
           "Black mode keeps borders visible without glare")
     check(css.count('html[data-seek-cleaner="active"]') >= 100,
           "Premium interface rules are gated by the active content state")
-    check("--seek-radius-lg: 1.4rem;" in css,
+    check("--seek-radius-lg: 1.6rem;" in css,
           "Shared large radius token is declared")
+    check("--seek-canvas: #f5f6f8;" in css,
+          "Shared canvas token is declared")
+    check("--seek-text-base: 1.5rem;" in css,
+          "Shared body type token is declared")
     check("--seek-duration: 180ms;" in css,
           "Shared motion duration is declared")
     check(".lesson-view .video-container" not in css,
